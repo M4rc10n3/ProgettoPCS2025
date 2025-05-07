@@ -1,9 +1,10 @@
-list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/Polyhedra.hpp)
-list(APPEND polygonalMesh_headers ${CMAKE_CURRENT_SOURCE_DIR}/Utils.hpp)
-list(APPEND polygonalMesh_sources ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp)
+list(APPEND polygonal_headers ${CMAKE_CURRENT_SOURCE_DIR}/Utils.hpp)
+list(APPEND polygonal_sources ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp)
 
-list(APPEND src_includes ${CMAKE_CURRENT_SOURCE_DIR})
+list(APPEND polygonal_headers ${CMAKE_CURRENT_SOURCE_DIR}/Polyhedra.hpp)
 
-set(src_sources ${src_sources} PARENT_SCOPE)
-set(src_headers ${src_headers} PARENT_SCOPE)
-set(src_includes ${src_includes} PARENT_SCOPE)
+list(APPEND polygonal_includes ${CMAKE_CURRENT_SOURCE_DIR})
+
+set(polygonal_sources ${polygonal_sources} PARENT_SCOPE)
+set(polygonal_headers ${polygonal_headers} PARENT_SCOPE)
+set(polygonal_includes ${polygonal_includes} PARENT_SCOPE)
