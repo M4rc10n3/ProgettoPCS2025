@@ -1,5 +1,17 @@
+# folders
 Facsimile
-Debug
-Release
-PCS_Project.pdf
+*Debug
+*Release
+Libraries
+
+# Executables 
+*.exe 
+*.out
+*.app
+
+# Environments
+.vscode
 .DS_Store
+
+# files
+PCS_Project.pdf
