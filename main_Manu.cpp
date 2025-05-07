@@ -2,6 +2,7 @@
 #include "Polyhedra.hpp"
 
 using namespace PolyhedraLibrary;
+using namespace std;
 
 int main(){
     

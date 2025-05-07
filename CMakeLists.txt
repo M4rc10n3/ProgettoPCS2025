@@ -1,8 +1,38 @@
 # Minima versione di cmake richiesta per compilare il progetto
-cmake_minimum_required(VERSION 3.0.0) 
+cmake_minimum_required(VERSION 3.9) 
 
 # La scritta che riguarda il progetto con il suo nome, i linguaggi utilizzati e la evrsione del progetto
 project(Facsimile LANGUAGES C CXX VERSION 1.0.0)
+
+# Set C++ Standard
+################################################################################
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# IMPOSE WARNINGS ON DEBUG
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -pedantic-errors")
+
+# IMPOSE CXX FLAGS FOR WINDOWS
+if (WIN32)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
+endif (WIN32)
+
+# Librerie 
+## Eigen3
+find_package(Eigen3 CONFIG REQUIRED)
+list(APPEND ${PROJECT_NAME}_LINKED_LIBRARIES PUBLIC Eigen3::Eigen)
+
+## Threads
+find_package(Threads REQUIRED)
+list(APPEND ${PROJECT_NAME}_LINKED_LIBRARIES PRIVATE Threads::Threads)
+
+## GTest
+find_package(GTest REQUIRED)
+
+list(APPEND ${PROJECT_NAME}_LINKED_LIBRARIES PRIVATE GTest::gtest)
+list(APPEND ${PROJECT_NAME}_LIBRARIES PRIVATE GTest::gtest_main)
+list(APPEND ${PROJECT_NAME}_LIBRARIES PRIVATE GTest::gmock)
+list(APPEND ${PROJECT_NAME}_LIBRARIES PRIVATE GTest::gmock_main)
 
 # Creiamo un variabile di CMake Pippo con valore la lista [Bob, Ana] (CMake lavora principalmente con stringhe e liste di stringhe)
 set(Pippo Bob Ana)
@@ -51,10 +81,12 @@ add_executable(${CMAKE_PROJECT_NAME} main.cpp
                 ${${PROJECT_NAME}_headers})
 
 # Per fornire gli includes bisogna scrivere: (PUBLIC è una keyword per fare in modo che i file da includere siano pubblcii o privati, non ci serve sapere bene cosa fa per il corso)
-target_include_directories(${CMAKE_PROJECT_NAME} 
-                            PUBLIC 
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC 
                             ${${PROJECT_NAME}src_includes})
 
 # Per inserire le librerie Eigen e GoogleTest copiare da un file già fatto, cambiando il nome che può essere "Sorting2" o "PolygonalMesh" con ${PROJECT_NAME}
 
 # Per i GoogleTest va creato un nuovo eseguibile con delle nuove liste da riga 35 in poi con ${PROJECT_NAME}_TEST al posto di ${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}_TEST ${Facsimile_LINKED_LIBRARIES})
+target_include_directories(${PROJECT_NAME}_TEST PRIVATE ${Facsimile_INCLUDE} ${src_test_includes})
+target_compile_options(${PROJECT_NAME}_TEST PUBLIC -fPIC)

@@ -1,6 +1,7 @@
 /* File containing the name and a little description of the functions we'll use */
 
-#pragma once
+# pragma once
+# include "Polyhedra.hpp"
 
 using namespace PolyhedraLibrary;
 
