@@ -1,7 +1,5 @@
-# Minima versione di cmake richiesta per compilare il progetto
 cmake_minimum_required(VERSION 3.9) 
 
-# La scritta che riguarda il progetto con il suo nome, i linguaggi utilizzati e la evrsione del progetto
 project(Facsimile LANGUAGES C CXX VERSION 1.0.0)
 
 # Set C++ Standard
@@ -16,7 +14,7 @@ if (WIN32)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
 endif (WIN32)
 
-# Librerie 
+# Libraries 
 ## Eigen3
 find_package(Eigen3 CONFIG REQUIRED)
 list(APPEND ${PROJECT_NAME}_LINKED_LIBRARIES PUBLIC Eigen3::Eigen)
@@ -36,9 +34,9 @@ list(APPEND ${PROJECT_NAME}_LIBRARIES PRIVATE GTest::gmock_main)
 ## SUBDIRECTORIES
 add_subdirectory(src)
 
-list(APPEND ${PROJECT_NAME}_SOURCES ${polygonalMesh_sources})
-list(APPEND ${PROJECT_NAME}_HEADERS ${polygonalMesh_headers})
-list(APPEND ${PROJECT_NAME}_INCLUDE ${polygonalMesh_includes})
+list(APPEND ${PROJECT_NAME}_SOURCES ${src_sources})
+list(APPEND ${PROJECT_NAME}_HEADERS ${src_headers})
+list(APPEND ${PROJECT_NAME}_INCLUDE ${src_includes})
 
 add_subdirectory(ExportParaview)
 
@@ -59,7 +57,6 @@ list(APPEND ${PROJECT_NAME}_sources
         ${src_includes} 
         ${src_paraview_includes})
 
-        
 # Create executable
 add_executable(${CMAKE_PROJECT_NAME} main.cpp
                 ${${PROJECT_NAME}_sources}
