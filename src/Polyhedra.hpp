@@ -6,6 +6,6 @@ namespace PolyhedraLibrary{
 
     struct Polyhedron{
 
-    }
+    };
 
 }
