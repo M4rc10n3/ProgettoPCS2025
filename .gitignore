@@ -12,6 +12,7 @@ Libraries
 # Environments
 .vscode
 .DS_Store
+.devcontainer
 
 # files
 PCS_Project.pdf
