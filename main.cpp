@@ -8,18 +8,18 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    int p, q, b, c, id_vertex_1, id_vertex_2;
+    int p, q, b, c, id_vertex_1, id_vertex_2; // initialize all the varibales
     string executable;
     vector<string> parameters;
 
-    if (argc != 5 && argc != 7)
+    if (argc != 5 && argc != 7) // check if there is a compatible number of inputs 
     {
         cout << "Invalid tuple" << endl;
         return 1;        
     }
 
     executable = argv[0];
-    for (int i = 1; i < argc; i++)
+    for (int i = 1; i < argc; i++) // check that every input is a number 
     {
         string arg = argv[i];
         for (char ch : arg)
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     b = stoi(parameters[2]);
     c = stoi(parameters[3]);
 
-    if (argc == 7)
+    if (argc == 7) // prints the tuple 
     {
         id_vertex_1 = stoi(parameters[4]);
         id_vertex_2 = stoi(parameters[5]);
@@ -55,14 +55,14 @@ int main(int argc, char* argv[])
         c << ")" << endl; 
     }
 
-    switch (p)
+    switch (p) // finds the correct polyhedron requested
     {
     case 3:
         break;
     
     case 4:
     default:
-        cout << "Your tuple don't match any possyble polyhedra" << endl;
+        cout << "Your tuple doesn't match any possyble polyhedra" << endl;
         break;
     }
 
