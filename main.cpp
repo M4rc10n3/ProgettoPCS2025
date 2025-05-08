@@ -4,7 +4,10 @@
 using namespace PolyhedraLibrary;
 using namespace std;
 
-int main(){
-    cout << "Hello world" << endl;
+int main(int argc, char * argv[])
+{
+    cout << "argc" << argc << endl;
+    for (int i = 0; i < argc; i++)
+        cout << argv[i] << endl;
     return 0;
 }
