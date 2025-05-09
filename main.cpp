@@ -55,16 +55,7 @@ int main(int argc, char* argv[])
         c << ")" << endl; 
     }
 
-    switch (p) // finds the correct polyhedron requested
-    {
-    case 3:
-        break;
-    
-    case 4:
-    default:
-        cout << "Your tuple doesn't match any possyble polyhedra" << endl;
-        break;
-    }
+    BuildPolyhedra polyhedron(p, q);
 
     return 0;
 }
