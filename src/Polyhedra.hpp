@@ -32,77 +32,63 @@ namespace PolyhedraLibrary{
 
     class BuildPolyhedra
     {
-    private:
-        GEOPolyhedron polyhedron;
-        int NumFaces = polyhedron.NumFaces;
-        int NumEdges = polyhedron.NumEdges;
-        int NumVertices = polyhedron.NumVertices;
+    private: 
+
+    GEOPolyhedron polyhedron;
+    int NumFaces, NumEdges, NumVertices;
+    int p,q;
+
     public:
-        BuildPolyhedra(const int& p, const int& q)
+        BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q)
         {
-            polyhedron.NumFaces = 2*q / ((p*q) - (2*p) - (2*q));
-            polyhedron.NumEdges = 2*p / ((p*q) - (2*p) - (2*q));
-            polyhedron.NumVertices = NumEdges - NumFaces + 2;
-            switch (p) // finds the correct polyhedron requested
+            p = Schlafli_p;
+            q = Schlafli_q;
+
+            polyhedron.NumFaces = (4 * q) / ((2*p) - (p*q) + 2*q); // 4 * q / ((2*p) - (p*q) + 2*q)
+            polyhedron.NumEdges = (p * polyhedron.NumFaces) / 2;
+            polyhedron.NumVertices = (p * polyhedron.NumFaces) / q;
+
+            NumFaces = polyhedron.NumFaces;
+            NumEdges = polyhedron.NumEdges;
+            NumVertices = polyhedron.NumVertices;
+            
+        }
+        void DataPolyhedra()
+        {
+            if ((p - 2) * (q - 2) < 4)
             {
-            case 3:
-                switch (q)
+                switch (p) // finds the correct polyhedron requested
                 {
                 case 3:
-                    cout << "Your Polyhedron is a Tetrahedron with\n " <<
-                    NumVertices << " Vertices\n" <<
-                    NumEdges << " Edges\n" <<
-                    NumFaces << " Faces\n" << endl;
-                    break;
-
+                    switch (q)
+                    {
+                    case 3:
+                        cout << "Your Polyhedron is a Tetrahedron with\n";
+                        break;
+                    case 4:
+                        cout << "Your Polyhedron is a Octahedron with \n";
+                        break;
+                    case 5:
+                        cout << "Your Polyhedron is a Icosahedron with \n";
+                        break;
+                    }
                 case 4:
-                    cout << "Your Polyhedron is a Octahedron with \n " <<
-                    NumVertices << " Vertices\n" <<
-                    NumEdges << " Edges\n" <<
-                    NumFaces << " Faces\n" << endl;
-                    break;
-                
+                    if (q == 3)
+                    {
+                        cout << "Your Polyhedron is a Cube with \n";
+                        break;
+                    }
                 case 5:
-                    cout << "Your Polyhedron is a Icosahedron with \n " <<
-                    NumVertices << " Vertices\n" <<
-                    NumEdges << " Edges\n" <<
-                    NumFaces << " Faces\n" << endl;
-                    break;
+                    if (q == 3)
+                    {
+                        cout << "Your Polyhedron is a Icosahedron with \n";
+                        break;
+                    }
 
-                default:
-                    cout << "Your tuple doesn't match any possyble polyhedra" << endl;
-                    break;
                 }
-                break;
-            
-            case 4:
-                if (q == 3)
-                {
-                    cout << "Your Polyhedron is a Cube with \n " <<
-                    NumVertices << " Vertices\n" <<
-                    NumEdges << " Edges\n" <<
-                    NumFaces << " Faces\n" << endl;
-                } else {
-                    cout << "Your tuple doesn't match any possyble polyhedra" << endl;
-                }
-                break;
-        
-            case 5:
-                if (q == 3)
-                {
-                    cout << "Your Polyhedron is a Icosahedron with \n " <<
-                    NumVertices << " Vertices\n" <<
-                    NumEdges << " Edges\n" <<
-                    NumFaces << " Faces\n" << endl;
-                } else {
-                    cout << "Your tuple doesn't match any possyble polyhedra" << endl; 
-                }
-
-                break;
-                
-            default:
-                cout << "Your tuple doesn't match any possyble polyhedra" << endl;
-                break;
+                cout << NumVertices << " Vertices\n" <<
+                NumEdges << " Edges\n" <<
+                NumFaces << " Faces\n" << endl;
             }
         }
 
