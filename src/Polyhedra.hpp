@@ -14,7 +14,7 @@ namespace PolyhedraLibrary{
     {
         int NumVertices; // Number of vertices
         std::vector<string> IdVertices; // Id of all vertices
-        Eigen::Matrix3Xd CoordVertices; // Coordinates of the vertices, 3 x NumVertices matrix
+        Eigen::MatrixXd CoordVertices; // Coordinates of the vertices, 3 x NumVertices matrix
 
         int NumEdges; // Number of Edges
         std::vector<string> IdEdges; // Id of all vertices
@@ -95,9 +95,10 @@ namespace PolyhedraLibrary{
         }
         void Cell0DS()
         {   
-            // Eigen::Matrix3Xd CoordVertices = polyhedron.CoordVertices;
-            Eigen::Matrix3Xd CoordVertices = Eigen::Matrix3Xd::Zero(3, NumVertices);
-            fstream file("../PolygonalData/Cell0Ds.txt"); // the program should be launched inside Debug or Release folders
+            // Eigen::MatrixXd CoordVertices = polyhedron.CoordVertices;
+            Eigen::MatrixXd CoordVertices = Eigen::MatrixXd::Zero(3, NumVertices);
+            
+            ofstream file("../PolygonalData/Cell0Ds.txt"); // the program should be launched inside Debug or Release folders
             
             file << "Id,X,Y,Z\n";
             for (int i = 0; i < NumVertices; i++)
@@ -106,7 +107,7 @@ namespace PolyhedraLibrary{
                 CoordVertices(1,i) << "," << 
                 CoordVertices(2,i) << "\n";
                 
-                polyhedron.IdVertices[i] = "V" + to_string(i);
+                polyhedron.IdVertices.push_back("V" + to_string(i));
             }
 
             file.close();
@@ -114,9 +115,9 @@ namespace PolyhedraLibrary{
 
         void Cell1Ds()
         {   
-            // Eigen::Matrix3Xd ExtremesEdges = polyhedron.ExtremesEdges;
-            Eigen::Matrix3Xd ExtremesEdges = Eigen::Matrix3Xd::Zero(2, NumEdges);
-            fstream file("../PolygonalData/Cell1Ds.txt"); // the program should be launched inside Debug or Release folders
+            // Eigen::MatrixXd ExtremesEdges = polyhedron.ExtremesEdges;
+            Eigen::MatrixXd ExtremesEdges = Eigen::MatrixXd::Zero(2, NumEdges);
+            ofstream file("../PolygonalData/Cell1Ds.txt"); // the program should be launched inside Debug or Release folders
             
             file << "Id,Origin,End\n";
             for (int i = 0; i < NumEdges; i++)
@@ -124,7 +125,7 @@ namespace PolyhedraLibrary{
                 file << i << "," << ExtremesEdges(0,i) << "," << 
                 ExtremesEdges(1,i) << "\n";
                 
-                polyhedron.IdEdges[i] = "E" + to_string(i);
+                polyhedron.IdEdges.push_back("E" + to_string(i));
             }
 
             file.close();
@@ -134,9 +135,9 @@ namespace PolyhedraLibrary{
         {   
             // Eigen::Matrix3Xd ListVertFaces = polyhedron.ListVertFaces;
             // Eigen::Matrix3Xd ListEdgeFaces = polyhedron.ListEdgeFaces;
-            Eigen::Matrix3Xd ListVertFaces = Eigen::Matrix3Xd::Zero(NumVertices, NumFaces);
-            Eigen::Matrix3Xd ListEdgeFaces = Eigen::Matrix3Xd::Zero(NumEdges, NumFaces);
-            fstream file("../PolygonalData/Cell2Ds.txt"); // the program needs to be launched inside Debug or Release folders
+            Eigen::MatrixXd ListVertFaces = Eigen::MatrixXd::Zero(NumVertices, NumFaces);
+            Eigen::MatrixXd ListEdgeFaces = Eigen::MatrixXd::Zero(NumEdges, NumFaces);
+            ofstream file("../PolygonalData/Cell2Ds.txt"); // the program needs to be launched inside Debug or Release folders
             
             file << "Id,Vertices,Edges\n";
             for (int i = 0; i < NumFaces; i++)
@@ -153,7 +154,7 @@ namespace PolyhedraLibrary{
                 }
                 file << "\n";
 
-                polyhedron.IdFaces[i] = "F" + to_string(i);
+                polyhedron.IdFaces.push_back("F" + to_string(i));
             }
 
             file.close();
@@ -161,7 +162,7 @@ namespace PolyhedraLibrary{
 
         void Cell3DS()
         {   
-            fstream file("../PolygonalData/Cell3Ds.txt"); // the program should be launched inside Debug or Release folders
+            ofstream file("../PolygonalData/Cell3Ds.txt"); // the program should be launched inside Debug or Release folders
             
             file << "Id\n";
             for (int i = 0; i < NumVertices; i++)

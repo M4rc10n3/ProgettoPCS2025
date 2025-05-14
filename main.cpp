@@ -12,13 +12,23 @@ int main(int argc, char* argv[])
     string executable;
     vector<string> parameters;
 
+    if (strcmp(argv[0], "gdb") == 0)
+    {
+        argc--;
+        argv++;
+        executable = argv[0];
+    }
+    else {
+        executable = argv[0];
+    }
+    
+
     if (argc != 5 && argc != 7) // check if there is a compatible number of inputs 
     {
         cout << "Invalid tuple" << endl;
         return 1;        
     }
 
-    executable = argv[0];
     for (int i = 1; i < argc; i++) // check that every input is a number 
     {
         string arg = argv[i];
