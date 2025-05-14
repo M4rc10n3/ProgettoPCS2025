@@ -1,6 +1,5 @@
 /* File containing the body of the functions we'll use */
 
-# pragma once
 # include "Polyhedra.hpp"
 # include <vector>
 

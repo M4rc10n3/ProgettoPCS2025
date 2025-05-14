@@ -13,7 +13,7 @@ namespace PolyhedraLibrary{
     {
         int NumVertices; // Number of vertices
         std::vector<int> IdVertices; // Id of all vertices
-        Eigen::MatrixXd CoordVertices; // Coordinates of the vertices, 2 x NumVertices matrix
+        Eigen::Matrix3Xd CoordVertices; // Coordinates of the vertices, 3 x NumVertices matrix
 
         int NumEdges; // Number of Edges
         std::vector<int> IdEdges; // Id of all vertices
