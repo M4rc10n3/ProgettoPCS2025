@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
     }
 
     BuildPolyhedra polyhedron(p, q);
-    polyhedron.DataPolyhedra();
+    polyhedron.CreateCells();
 
     return 0;
 }
