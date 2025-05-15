@@ -83,7 +83,7 @@ namespace PolyhedraLibrary{
                 case 5:
                     if (q == 3)
                     {
-                        cout << "Your Polyhedron is a Icosahedron with \n";
+                        cout << "Your Polyhedron is a Dodecahedron with \n";
                 
                     }
                     break;
@@ -183,11 +183,14 @@ namespace PolyhedraLibrary{
             file.close();
         }
 
-        void CreateCells()
+        void CreateCells() // Function that calls all the other functions 
         {
             Cell0DS();
+
             Cell1Ds();
+
             Cell2Ds();
+
             Cell3DS();
         }
 
