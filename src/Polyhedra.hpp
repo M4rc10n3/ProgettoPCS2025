@@ -4,6 +4,7 @@
 # include <iostream>
 # include <fstream>
 # include <vector>
+# include <math.h>
 # include "Eigen/Eigen"
 
 using namespace std;
@@ -14,11 +15,11 @@ namespace PolyhedraLibrary{
     {
         int NumVertices; // Number of vertices
         std::vector<string> IdVertices; // Id of all vertices
-        Eigen::MatrixXd CoordVertices; // Coordinates of the vertices, 3 x NumVertices matrix
+        Eigen::MatrixXd CoordVertices; // Coordinates of the vertices, NumVertices x 3 matrix
 
         int NumEdges; // Number of Edges
         std::vector<string> IdEdges; // Id of all vertices
-        Eigen::Matrix2Xi ExtremesEdges; // Extremes of each edge, 2 x NumEdges matrix
+        Eigen::MatrixXi ExtremesEdges; // Extremes of each edge, NumEdges x 2 matrix
 
         int NumFaces; // Number of faces 
         int VertFaces; // Number of vertices per face
@@ -39,6 +40,7 @@ namespace PolyhedraLibrary{
     GEOPolyhedron polyhedron;
     int NumFaces, NumEdges, NumVertices;
     int p,q;
+    double Length_edge;
 
     public:
         BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q)
@@ -53,10 +55,16 @@ namespace PolyhedraLibrary{
             NumFaces = polyhedron.NumFaces; 
             NumEdges = polyhedron.NumEdges;
             NumVertices = polyhedron.NumVertices;
+
+            polyhedron.CoordVertices = Eigen::MatrixXd(NumVertices, 3);
+            polyhedron.ExtremesEdges = Eigen::MatrixXi(NumEdges, 2);
+            // polyhedron.ListEdgeFaces = Eigen::MatrixXi(NumEdges, NumFaces);
+            // polyhedron.ListVertFaces = Eigen::MatrixXi(NumVertices, NumFaces);
             
         }
         void DataPolyhedra()
         {
+            int edgeindex = 0;
             if ((p - 2) * (q - 2) < 4)
             {
                 switch (p) // finds the correct polyhedron requested
@@ -65,26 +73,46 @@ namespace PolyhedraLibrary{
                     switch (q)
                     {
                     case 3:
-                        cout << "Your Polyhedron is a Tetrahedron with\n";
+                        cout << "Your Polyhedron is a Tetrahedron with:\n";
+                        Length_edge = 2 * sqrt(6) / 3;
+                        polyhedron.CoordVertices << 0,0,1,
+                                                    2* sqrt(2)/3.0,0,-1.0/3,
+                                                    -7.0/(12*sqrt(2)),sqrt(23.0/32),-1.0/3,
+                                                    -7.0/(12*sqrt(2)),-sqrt(23.0/32),-1.0/3;
+                        
+                        for (int j = 0; j < NumVertices - 1; j++)
+                        {
+                            for (int k = j + 1; k < NumVertices; k++)
+                            {
+                                polyhedron.ExtremesEdges(edgeindex,0) = j;
+                                polyhedron.ExtremesEdges(edgeindex,1) = k;
+                                edgeindex ++;
+                            }
+                        }
+
                         break;
                     case 4:
-                        cout << "Your Polyhedron is a Octahedron with \n";
+                        cout << "Your Polyhedron is a Octahedron with: \n";
+                        Length_edge = sqrt(2);
                         break;
                     case 5:
-                        cout << "Your Polyhedron is a Icosahedron with \n";
+                        cout << "Your Polyhedron is a Icosahedron with: \n";
+                        Length_edge = 4 / sqrt(10 + 2*sqrt(5));
                         break;
                     }
+                    break;
                 case 4:
                     if (q == 3)
                     {
-                        cout << "Your Polyhedron is a Cube with \n";
+                        cout << "Your Polyhedron is a Cube with: \n";
+                        Length_edge = 2 / sqrt(3);
                     }
                     break;
                 case 5:
                     if (q == 3)
                     {
-                        cout << "Your Polyhedron is a Dodecahedron with \n";
-                
+                        cout << "Your Polyhedron is a Dodecahedron with: \n";
+                        Length_edge = 4 / (sqrt(3) * (1 + sqrt(5)));
                     }
                     break;
                 }
@@ -95,17 +123,17 @@ namespace PolyhedraLibrary{
         }
         void Cell0DS()
         {   
-            // Eigen::MatrixXd CoordVertices = polyhedron.CoordVertices;
-            Eigen::MatrixXd CoordVertices = Eigen::MatrixXd::Zero(3, NumVertices);
+            Eigen::MatrixXd CoordVertices = polyhedron.CoordVertices;
+            // Eigen::MatrixXd CoordVertices = Eigen::MatrixXd::Zero(NumVertices, 3);
             
             ofstream file("../PolygonalData/Cell0Ds.txt"); // the program should be launched inside Debug or Release folders
             
             file << "Id,X,Y,Z\n";
             for (int i = 0; i < NumVertices; i++)
             {
-                file << i << "," << CoordVertices(0,i) << "," << 
-                CoordVertices(1,i) << "," << 
-                CoordVertices(2,i) << "\n";
+                file << i << "," << CoordVertices(i, 0) << "," << 
+                CoordVertices(i, 1) << "," << 
+                CoordVertices(i, 2) << "\n";
                 
                 polyhedron.IdVertices.push_back("V" + to_string(i));
             }
@@ -115,15 +143,15 @@ namespace PolyhedraLibrary{
 
         void Cell1Ds()
         {   
-            // Eigen::MatrixXd ExtremesEdges = polyhedron.ExtremesEdges;
-            Eigen::MatrixXd ExtremesEdges = Eigen::MatrixXd::Zero(2, NumEdges);
+            Eigen::MatrixXi ExtremesEdges = polyhedron.ExtremesEdges;
+            // Eigen::MatrixXd ExtremesEdges = Eigen::MatrixXd::Zero(NumEdges, 2);
             ofstream file("../PolygonalData/Cell1Ds.txt"); // the program should be launched inside Debug or Release folders
             
             file << "Id,Origin,End\n";
             for (int i = 0; i < NumEdges; i++)
             {
-                file << i << "," << ExtremesEdges(0,i) << "," << 
-                ExtremesEdges(1,i) << "\n";
+                file << i << "," << ExtremesEdges(i,0) << "," << 
+                ExtremesEdges(i,1) << "\n";
                 
                 polyhedron.IdEdges.push_back("E" + to_string(i));
             }

@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     {
         id_vertex_1 = stoi(parameters[4]);
         id_vertex_2 = stoi(parameters[5]);
-        cout << "Your tuple is :(p,q,b,c,id_vertex_1,id_vertex_2) = (" <<
+        cout << "Your tuple is: (p,q,b,c,id_vertex_1,id_vertex_2) = (" <<
         p << "," << 
         q << "," << 
         b << "," << 
