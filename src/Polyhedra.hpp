@@ -79,7 +79,6 @@ namespace PolyhedraLibrary{
                                                     2* sqrt(2)/3.0,0,-1.0/3,
                                                     -7.0/(12*sqrt(2)),sqrt(23.0/32),-1.0/3,
                                                     -7.0/(12*sqrt(2)),-sqrt(23.0/32),-1.0/3;
-                        
                         for (int j = 0; j < NumVertices - 1; j++)
                         {
                             for (int k = j + 1; k < NumVertices; k++)
@@ -89,7 +88,6 @@ namespace PolyhedraLibrary{
                                 edgeindex ++;
                             }
                         }
-
                         break;
                     case 4:
                         cout << "Your Polyhedron is a Octahedron with: \n";
