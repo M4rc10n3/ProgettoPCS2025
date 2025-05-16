@@ -46,8 +46,6 @@ namespace PolyhedraLibrary{
                                                 2* sqrt(2)/3.0,0,-1.0/3,
                                                 -7.0/(12*sqrt(2)),sqrt(23.0/32),-1.0/3,
                                                 -7.0/(12*sqrt(2)),-sqrt(23.0/32),-1.0/3;
-                    FillStructPolyhedra();
-                    
                     break;
                 case 4:
                     cout << "Your Polyhedron is a Octahedron with: \n";
@@ -126,15 +124,16 @@ namespace PolyhedraLibrary{
         Eigen::MatrixXi ListEdgeFaces = Eigen::MatrixXi::Zero(NumEdges, NumFaces);
         ofstream file("../PolygonalData/Cell2Ds.txt"); // the program needs to be launched inside Debug or Release folders
         
-        file << "Id,Vertices,Edges\n";
+        file << "Id,NumVerices,Vertices,NumEdges,Edges\n";
         for (int i = 0; i < NumFaces; i++)
         {
-            file << i;
+            file << i << "," << NumVertices;
             for (int j = 0; j < NumVertices; j++)
             {
                 file << "," << ListVertFaces(j, i);
             }
-
+            
+            file << "," << NumEdges;
             for (int k = 0; k < NumEdges; k++)
             {
                 file << "," << ListEdgeFaces(k, i);
@@ -206,7 +205,7 @@ namespace PolyhedraLibrary{
             }
         }
       
-    /*  for(unsigned int i = 0; i < NumVertices; i++)
+    /*  for(unsigned int i = 0; i < NumVertices; i++) // prints the ListEdgeVertices
         {
             for(unsigned int j = 0; j < NumVertices; j++)
                 cout << ListEdgeVertices(i,j) << " ";
@@ -230,6 +229,7 @@ namespace PolyhedraLibrary{
                 if(ListEdgeVertices(i,j) >= 0 && adjVert.size() < q)
                 {
                     adjVert.push_back(j);
+                    // if (adjVert.size() == q)
                 }
             }
             for (int k = 1; k < adjVert.size(); k++)
@@ -258,8 +258,10 @@ namespace PolyhedraLibrary{
         }*/
     }
 
-    void BuildPolyhedra::CreateCells() // Function that calls all the other functions 
+    void BuildPolyhedra::CreateCells() 
     {
+        FillStructPolyhedra();
+
         Cell0Ds();
 
         Cell1Ds();
