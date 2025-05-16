@@ -176,9 +176,9 @@ namespace PolyhedraLibrary{
 
         unsigned int edgeIndex = 0;
 
-        for (unsigned int i = 0; i < NumVertices - 1; i++)
+        for (int i = 0; i < NumVertices - 1; i++)
         {
-            for (unsigned int j = i + 1; j < NumVertices; j++)
+            for (int j = i + 1; j < NumVertices; j++)
             {
                 polyhedron.ExtremesEdges(edgeIndex,0) = i;
                 polyhedron.ExtremesEdges(edgeIndex,1) = j;
@@ -188,9 +188,9 @@ namespace PolyhedraLibrary{
 
         edgeIndex = 0;
 
-        for(unsigned int i = 0; i < NumVertices; i++)
+        for(int i = 0; i < NumVertices; i++)
         {
-            for(unsigned int j = i; j < NumVertices; j++)
+            for(int j = i; j < NumVertices; j++)
             {
                 if(j == i || !(polyhedron.ExtremesEdges(edgeIndex,0) == i && polyhedron.ExtremesEdges(edgeIndex,1) == j))
                     ListEdgeVertices(i,j) = -1;
