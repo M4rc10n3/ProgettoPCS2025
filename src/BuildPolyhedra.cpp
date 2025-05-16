@@ -18,13 +18,15 @@ namespace PolyhedraLibrary{
         polyhedron.NumFaces = (4 * q) / ((2*p) - (p*q) + 2*q); // determines the number of Face with p,q 
         polyhedron.NumEdges = (p * polyhedron.NumFaces) / 2;
         polyhedron.NumVertices = (p * polyhedron.NumFaces) / q;
+        polyhedron.VertFaces = p;
 
         NumFaces = polyhedron.NumFaces; 
         NumEdges = polyhedron.NumEdges;
         NumVertices = polyhedron.NumVertices;
+        VertFaces = polyhedron.VertFaces;
 
         polyhedron.CoordVertices = Eigen::MatrixXd(NumVertices, 3);
-        polyhedron.ExtremesEdges = Eigen::MatrixXi(NumEdges, 2);
+        polyhedron.ExtremaEdges = Eigen::MatrixXi(NumEdges, 2);
         polyhedron.MatrEdgeVertices = Eigen::MatrixXi::Zero(NumEdges, NumVertices);
         polyhedron.ListEdgeFaces = Eigen::MatrixXi(NumEdges, NumFaces);
         polyhedron.ListVertFaces = Eigen::MatrixXi(NumVertices, NumFaces);
@@ -106,8 +108,8 @@ namespace PolyhedraLibrary{
         {
             for (int j = i + 1; j < NumVertices; j++)
             {
-                polyhedron.ExtremesEdges(edgeIndex,0) = i;
-                polyhedron.ExtremesEdges(edgeIndex,1) = j;
+                polyhedron.ExtremaEdges(edgeIndex,0) = i;
+                polyhedron.ExtremaEdges(edgeIndex,1) = j;
                 edgeIndex++;
             }
         }
@@ -118,7 +120,7 @@ namespace PolyhedraLibrary{
         {
             for(int j = i; j < NumVertices; j++)
             {
-                if(j == i || !(polyhedron.ExtremesEdges(edgeIndex,0) == i && polyhedron.ExtremesEdges(edgeIndex,1) == j))
+                if(j == i || !(polyhedron.ExtremaEdges(edgeIndex,0) == i && polyhedron.ExtremaEdges(edgeIndex,1) == j))
                     MatrEdgeVertices(i,j) = -1;
                 else
                 { 
@@ -239,15 +241,15 @@ namespace PolyhedraLibrary{
 
     void BuildPolyhedra::Cell1Ds()
     {   
-        Eigen::MatrixXi ExtremesEdges = polyhedron.ExtremesEdges;
-        // Eigen::MatrixXd ExtremesEdges = Eigen::MatrixXd::Zero(NumEdges, 2);
+        Eigen::MatrixXi ExtremaEdges = polyhedron.ExtremaEdges;
+        // Eigen::MatrixXd ExtremaEdges = Eigen::MatrixXd::Zero(NumEdges, 2);
         ofstream file("../PolygonalData/Cell1Ds.txt"); // the program should be launched inside Debug or Release folders
         
         file << "Id,Origin,End\n";
         for (int i = 0; i < NumEdges; i++)
         {
-            file << i << "," << ExtremesEdges(i,0) << "," << 
-            ExtremesEdges(i,1) << "\n";
+            file << i << "," << ExtremaEdges(i,0) << "," << 
+            ExtremaEdges(i,1) << "\n";
             
             polyhedron.IdEdges.push_back("E" + to_string(i));
         }
@@ -266,14 +268,14 @@ namespace PolyhedraLibrary{
         file << "Id,NumVerices,Vertices,NumEdges,Edges\n";
         for (int i = 0; i < NumFaces; i++)
         {
-            file << i << "," << p;
-            for (int j = 0; j < p; j++)
+            file << i << "," << VertFaces;
+            for (int j = 0; j < VertFaces; j++)
             {
                 file << "," << ListVertFaces(j, i);
             }
             
-            file << "," << p;
-            for (int k = 0; k < p; k++)
+            file << "," << VertFaces;
+            for (int k = 0; k < VertFaces; k++)
             {
                 file << "," << ListEdgeFaces(k, i);
             }

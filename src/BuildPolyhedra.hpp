@@ -7,7 +7,7 @@ namespace PolyhedraLibrary{
     {
     private: 
     GEOPolyhedron polyhedron;
-    int NumFaces, NumEdges, NumVertices, p, q;
+    int NumFaces, NumEdges, NumVertices, VertFaces, p, q;
     double Length_edge;
 
     void PointsPolyhedra();  // Provides all the point of the polyhedron
