@@ -27,6 +27,8 @@ namespace PolyhedraLibrary
         std::vector<string> IdFaces; // Id of all faces
         Eigen::MatrixXi ListVertFaces; // All the vertices of each face, NumVertices x NumFaces matrix
         Eigen::MatrixXi ListEdgeFaces; // All the edges of each face, NumEdges x NumFaces matrix
+
+        Eigen::MatrixXi ListEdgeVertices; //NumVertices x NumVertices matrix
     };
     /* TODO Path can be useful if we want a particular structure for the minimum path between
     two vertices */

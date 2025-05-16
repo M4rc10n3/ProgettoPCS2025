@@ -20,7 +20,9 @@ namespace PolyhedraLibrary{
     double Length_edge;
 
     public:
-        BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q); // initialyze the class
+        BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q); // Initialyze the class
+
+        void FillStructPolyhedra(); // 
 
         void DataPolyhedra(); // Gives all the important Data of the Polyhedron
 

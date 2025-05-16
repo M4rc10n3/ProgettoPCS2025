@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
     string executable;
     vector<string> parameters;
 
-    if (strcmp(argv[0], "gdb") == 0)
+    if (strcmp(argv[0], "gdb") == 0) 
     {
         argc--;
         argv++;
