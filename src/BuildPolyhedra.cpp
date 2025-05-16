@@ -18,12 +18,10 @@ namespace PolyhedraLibrary{
         polyhedron.NumFaces = (4 * q) / ((2*p) - (p*q) + 2*q); // determines the number of Face with p,q 
         polyhedron.NumEdges = (p * polyhedron.NumFaces) / 2;
         polyhedron.NumVertices = (p * polyhedron.NumFaces) / q;
-        polyhedron.VertFaces = p;
 
         NumFaces = polyhedron.NumFaces; 
         NumEdges = polyhedron.NumEdges;
         NumVertices = polyhedron.NumVertices;
-        VertFaces = polyhedron.VertFaces;
 
         polyhedron.CoordVertices = Eigen::MatrixXd(NumVertices, 3);
         polyhedron.ExtremaEdges = Eigen::MatrixXi(NumEdges, 2);
@@ -268,14 +266,14 @@ namespace PolyhedraLibrary{
         file << "Id,NumVerices,Vertices,NumEdges,Edges\n";
         for (int i = 0; i < NumFaces; i++)
         {
-            file << i << "," << VertFaces;
-            for (int j = 0; j < VertFaces; j++)
+            file << i << "," << p;
+            for (int j = 0; j < p; j++)
             {
                 file << "," << ListVertFaces(j, i);
             }
             
-            file << "," << VertFaces;
-            for (int k = 0; k < VertFaces; k++)
+            file << "," << p;
+            for (int k = 0; k < p; k++)
             {
                 file << "," << ListEdgeFaces(k, i);
             }
