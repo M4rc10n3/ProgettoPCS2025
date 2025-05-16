@@ -25,8 +25,8 @@ namespace PolyhedraLibrary{
 
         polyhedron.CoordVertices = Eigen::MatrixXd(NumVertices, 3);
         polyhedron.ExtremesEdges = Eigen::MatrixXi(NumEdges, 2);
-        polyhedron.ListEdgeVertices = Eigen::MatrixXi::Zero(NumEdges, NumVertices);
-        // polyhedron.ListEdgeFaces = Eigen::MatrixXi(NumEdges, NumFaces);
+        polyhedron.MatrEdgeVertices = Eigen::MatrixXi::Zero(NumEdges, NumVertices);
+        polyhedron.ListEdgeFaces = Eigen::MatrixXi(NumEdges, NumFaces);
         polyhedron.ListVertFaces = Eigen::MatrixXi(NumVertices, NumFaces);
         
     }
@@ -98,7 +98,7 @@ namespace PolyhedraLibrary{
     void BuildPolyhedra::FillStructPolyhedra()
     {   
         PointsPolyhedra();             
-        Eigen::MatrixXi& ListEdgeVertices = polyhedron.ListEdgeVertices;
+        Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
 
         unsigned int edgeIndex = 0;
 
@@ -119,25 +119,25 @@ namespace PolyhedraLibrary{
             for(int j = i; j < NumVertices; j++)
             {
                 if(j == i || !(polyhedron.ExtremesEdges(edgeIndex,0) == i && polyhedron.ExtremesEdges(edgeIndex,1) == j))
-                    ListEdgeVertices(i,j) = -1;
+                    MatrEdgeVertices(i,j) = -1;
                 else
                 { 
                     if(edgeIndex < NumEdges)
                     {
-                        ListEdgeVertices(i,j) = edgeIndex;
-                        ListEdgeVertices(j,i) = edgeIndex;
+                        MatrEdgeVertices(i,j) = edgeIndex;
+                        MatrEdgeVertices(j,i) = edgeIndex;
                         edgeIndex++;
                     }
                 }
             }
         }
       
-    /*  for(unsigned int i = 0; i < NumVertices; i++) // prints ListEdgeVertices
-        {
-            for(unsigned int j = 0; j < NumVertices; j++)
-                cout << ListEdgeVertices(i,j) << " ";
-            cout << endl;
-        }*/
+        // for(unsigned int i = 0; i < NumVertices; i++) // prints MatrEdgeVertices
+        // {
+        //     for(unsigned int j = 0; j < NumVertices; j++)
+        //         cout << MatrEdgeVertices(i,j) << " ";
+        //     cout << endl;
+        // }
 
         unsigned int faceIndex = 0;
 
@@ -146,25 +146,26 @@ namespace PolyhedraLibrary{
         set<int> vertFaces;
         vector<set<int>> vecVertFaces;
 
-        int v1, v2;
+        int v1, v2, v3, j;
 
         for (int i = 0; i < NumVertices; i++)
         {
             adjVert.clear();
-            for (int j = 0; j < NumVertices; j++)
+            j = 0;
+            while (j < NumVertices && adjVert.size() <= q)
             {
-                if(ListEdgeVertices(i,j) >= 0 && adjVert.size() < q)
+                if(MatrEdgeVertices(i,j) >= 0 && adjVert.size() < q)
                 {
                     adjVert.push_back(j);
-                    // if (adjVert.size() == q)
                 }
+                j++;
             }
-            for (int k = 1; k < adjVert.size(); k++)
+            for (unsigned int k = 1; k < adjVert.size(); k++)
             {
                 v1 = adjVert[k-1];
                 v2 = adjVert[k];
 
-                if(ListEdgeVertices(v1, v2) >= 0)
+                if(MatrEdgeVertices(v1, v2) >= 0)
                 {
                     vertFaces = {i, v1, v2};
                     
@@ -179,10 +180,21 @@ namespace PolyhedraLibrary{
                 }
             }
         }
-    /*    for(unsigned int i = 0; i < ; i++)
-        {
 
-        }*/
+        faceIndex = 0;
+
+        for (set<int> vertFaces : vecVertFaces)
+        {
+            auto it = vertFaces.begin();
+            int v1 = *it++;
+            int v2 = *it++;
+            int v3 = *it;
+
+            polyhedron.ListEdgeFaces(0, faceIndex) = MatrEdgeVertices(v1,v2);
+            polyhedron.ListEdgeFaces(1, faceIndex) = MatrEdgeVertices(v2,v3);
+            polyhedron.ListEdgeFaces(2, faceIndex) = MatrEdgeVertices(v1,v3);
+            faceIndex++;
+        }
     }
 
     void BuildPolyhedra::Cell0Ds()
@@ -226,22 +238,22 @@ namespace PolyhedraLibrary{
     void BuildPolyhedra::Cell2Ds()
     {   
         Eigen::MatrixXi ListVertFaces = polyhedron.ListVertFaces;
-        // Eigen::MatrixXi ListEdgeFaces = polyhedron.ListEdgeFaces;
+        Eigen::MatrixXi ListEdgeFaces = polyhedron.ListEdgeFaces;
         // Eigen::MatrixXi ListVertFaces = Eigen::MatrixXi::Zero(NumVertices, NumFaces);
-        Eigen::MatrixXi ListEdgeFaces = Eigen::MatrixXi::Zero(NumEdges, NumFaces);
+        // Eigen::MatrixXi ListEdgeFaces = Eigen::MatrixXi::Zero(NumEdges, NumFaces);
         ofstream file("../PolygonalData/Cell2Ds.txt"); // the program needs to be launched inside Debug or Release folders
         
         file << "Id,NumVerices,Vertices,NumEdges,Edges\n";
         for (int i = 0; i < NumFaces; i++)
         {
-            file << i << "," << NumVertices;
-            for (int j = 0; j < NumVertices; j++)
+            file << i << "," << p;
+            for (int j = 0; j < p; j++)
             {
                 file << "," << ListVertFaces(j, i);
             }
             
-            file << "," << NumEdges;
-            for (int k = 0; k < NumEdges; k++)
+            file << "," << p;
+            for (int k = 0; k < p; k++)
             {
                 file << "," << ListEdgeFaces(k, i);
             }

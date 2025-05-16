@@ -12,7 +12,7 @@ namespace PolyhedraLibrary{
 
     void PointsPolyhedra();  // Provides all the point of the polyhedron
 
-    void FillStructPolyhedra(); // Fill all the structures of GEOPolyhedron
+    void FillStructPolyhedra(); // Fills all the structures of GEOPolyhedron
     
     void Cell0Ds(); // Create Cell0Ds 
 
