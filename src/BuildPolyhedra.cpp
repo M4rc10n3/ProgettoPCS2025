@@ -183,18 +183,38 @@ namespace PolyhedraLibrary{
 
         faceIndex = 0;
 
+        int vert[3];
+
         for (set<int> vertFaces : vecVertFaces)
         {
-            auto it = vertFaces.begin();
-            int v1 = *it++;
-            int v2 = *it++;
-            int v3 = *it;
+            // alternativa 1
+            // auto it = vertFaces.begin();
+            // v1 = *it++;
+            // v2 = *it++;
+            // v3 = *it;
+
+            // alternativa 2
+            // copy(vertFaces.begin(), vertFaces.end(), vert);
+            
+            // alternativa 3
+            // unsigned int index = 0;
+
+            // for (int val : vertFaces)
+            // {
+            //     vert[index] = val;
+            //     index++;
+            // }
+
+            v1 = vert[0];
+            v2 = vert[1];
+            v3 = vert[2];
 
             polyhedron.ListEdgeFaces(0, faceIndex) = MatrEdgeVertices(v1,v2);
             polyhedron.ListEdgeFaces(1, faceIndex) = MatrEdgeVertices(v2,v3);
             polyhedron.ListEdgeFaces(2, faceIndex) = MatrEdgeVertices(v1,v3);
             faceIndex++;
         }
+
     }
 
     void BuildPolyhedra::Cell0Ds()
