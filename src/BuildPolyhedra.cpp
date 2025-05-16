@@ -25,6 +25,7 @@ namespace PolyhedraLibrary{
 
         polyhedron.CoordVertices = Eigen::MatrixXd(NumVertices, 3);
         polyhedron.ExtremesEdges = Eigen::MatrixXi(NumEdges, 2);
+        polyhedron.ListEdgeVertices = Eigen::MatrixXi::Zero(NumEdges, NumVertices);
         // polyhedron.ListEdgeFaces = Eigen::MatrixXi(NumEdges, NumFaces);
         polyhedron.ListVertFaces = Eigen::MatrixXi(NumVertices, NumFaces);
         
@@ -76,6 +77,112 @@ namespace PolyhedraLibrary{
             NumEdges << " Edges\n" <<
             NumFaces << " Faces\n" << endl;
         }
+    }
+
+    void BuildPolyhedra::PointsPolyhedra()
+    {   
+        DataPolyhedra();
+        Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
+        vector<double> x(NumVertices), y(NumVertices), z(NumVertices);
+
+        x[0] = 0;
+        y[0] = 0;
+        z[0] = 1;
+
+        x[1] = 0;
+        y[1] = 0;
+        z[1] = 1;
+        
+    }
+
+    void BuildPolyhedra::FillStructPolyhedra()
+    {   
+        PointsPolyhedra();             
+        Eigen::MatrixXi& ListEdgeVertices = polyhedron.ListEdgeVertices;
+
+        unsigned int edgeIndex = 0;
+
+        for (int i = 0; i < NumVertices - 1; i++)
+        {
+            for (int j = i + 1; j < NumVertices; j++)
+            {
+                polyhedron.ExtremesEdges(edgeIndex,0) = i;
+                polyhedron.ExtremesEdges(edgeIndex,1) = j;
+                edgeIndex++;
+            }
+        }
+
+        edgeIndex = 0;
+
+        for(int i = 0; i < NumVertices; i++)
+        {
+            for(int j = i; j < NumVertices; j++)
+            {
+                if(j == i || !(polyhedron.ExtremesEdges(edgeIndex,0) == i && polyhedron.ExtremesEdges(edgeIndex,1) == j))
+                    ListEdgeVertices(i,j) = -1;
+                else
+                { 
+                    if(edgeIndex < NumEdges)
+                    {
+                        ListEdgeVertices(i,j) = edgeIndex;
+                        ListEdgeVertices(j,i) = edgeIndex;
+                        edgeIndex++;
+                    }
+                }
+            }
+        }
+      
+    /*  for(unsigned int i = 0; i < NumVertices; i++) // prints ListEdgeVertices
+        {
+            for(unsigned int j = 0; j < NumVertices; j++)
+                cout << ListEdgeVertices(i,j) << " ";
+            cout << endl;
+        }*/
+
+        unsigned int faceIndex = 0;
+
+        vector<int> adjVert;
+
+        set<int> vertFaces;
+        vector<set<int>> vecVertFaces;
+
+        int v1, v2;
+
+        for (int i = 0; i < NumVertices; i++)
+        {
+            adjVert.clear();
+            for (int j = 0; j < NumVertices; j++)
+            {
+                if(ListEdgeVertices(i,j) >= 0 && adjVert.size() < q)
+                {
+                    adjVert.push_back(j);
+                    // if (adjVert.size() == q)
+                }
+            }
+            for (int k = 1; k < adjVert.size(); k++)
+            {
+                v1 = adjVert[k-1];
+                v2 = adjVert[k];
+
+                if(ListEdgeVertices(v1, v2) >= 0)
+                {
+                    vertFaces = {i, v1, v2};
+                    
+                    if(find(vecVertFaces.begin(), vecVertFaces.end(), vertFaces) == vecVertFaces.end())
+                    {
+                        polyhedron.ListVertFaces(0, faceIndex) = i;
+                        polyhedron.ListVertFaces(1, faceIndex) = v1;
+                        polyhedron.ListVertFaces(2, faceIndex) = v2;
+                        faceIndex++;
+                        vecVertFaces.push_back(vertFaces);
+                    }
+                }
+            }
+        }
+    /*    for(unsigned int i = 0; i < ; i++)
+        {
+
+        }*/
     }
 
     void BuildPolyhedra::Cell0Ds()
@@ -167,95 +274,6 @@ namespace PolyhedraLibrary{
         }
 
         file.close();
-    }
-
-    void BuildPolyhedra::FillStructPolyhedra()
-    {                
-        Eigen::MatrixXi ListEdgeVertices = Eigen::MatrixXi::Zero(NumVertices, NumVertices);
-
-        unsigned int edgeIndex = 0;
-
-        for (int i = 0; i < NumVertices - 1; i++)
-        {
-            for (int j = i + 1; j < NumVertices; j++)
-            {
-                polyhedron.ExtremesEdges(edgeIndex,0) = i;
-                polyhedron.ExtremesEdges(edgeIndex,1) = j;
-                edgeIndex++;
-            }
-        }
-
-        edgeIndex = 0;
-
-        for(int i = 0; i < NumVertices; i++)
-        {
-            for(int j = i; j < NumVertices; j++)
-            {
-                if(j == i || !(polyhedron.ExtremesEdges(edgeIndex,0) == i && polyhedron.ExtremesEdges(edgeIndex,1) == j))
-                    ListEdgeVertices(i,j) = -1;
-                else
-                { 
-                    if(edgeIndex < NumEdges)
-                    {
-                        ListEdgeVertices(i,j) = edgeIndex;
-                        ListEdgeVertices(j,i) = edgeIndex;
-                        edgeIndex++;
-                    }
-                }
-            }
-        }
-      
-    /*  for(unsigned int i = 0; i < NumVertices; i++) // prints the ListEdgeVertices
-        {
-            for(unsigned int j = 0; j < NumVertices; j++)
-                cout << ListEdgeVertices(i,j) << " ";
-            cout << endl;
-        }*/
-
-        unsigned int faceIndex = 0;
-
-        vector<int> adjVert;
-
-        set<int> vertFaces;
-        vector<set<int>> vecVertFaces;
-
-        int v1, v2;
-
-        for (int i = 0; i < NumVertices; i++)
-        {
-            adjVert.clear();
-            for (int j = 0; j < NumVertices; j++)
-            {
-                if(ListEdgeVertices(i,j) >= 0 && adjVert.size() < q)
-                {
-                    adjVert.push_back(j);
-                    // if (adjVert.size() == q)
-                }
-            }
-            for (int k = 1; k < adjVert.size(); k++)
-            {
-                v1 = adjVert[k-1];
-                v2 = adjVert[k];
-
-                if(ListEdgeVertices(v1, v2) >= 0)
-                {
-                    vertFaces = {i, v1, v2};
-                    
-                    if(find(vecVertFaces.begin(), vecVertFaces.end(), vertFaces) == vecVertFaces.end())
-                    {
-                        polyhedron.ListVertFaces(0, faceIndex) = i;
-                        polyhedron.ListVertFaces(1, faceIndex) = v1;
-                        polyhedron.ListVertFaces(2, faceIndex) = v2;
-                        faceIndex++;
-                        vecVertFaces.push_back(vertFaces);
-                    }
-                }
-            }
-        }
-    /*    for(unsigned int i = 0; i < ; i++)
-        {
-
-        }*/
     }
 
     void BuildPolyhedra::CreateCells() 

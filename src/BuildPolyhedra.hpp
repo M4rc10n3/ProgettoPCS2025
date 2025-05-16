@@ -6,8 +6,13 @@ namespace PolyhedraLibrary{
     class BuildPolyhedra
     {
     private: 
+    GEOPolyhedron polyhedron;
+    int NumFaces, NumEdges, NumVertices, p, q;
+    double Length_edge;
 
-    void FillStructPolyhedra(); // Fill all the Structures of GEOPolyhedron
+    void PointsPolyhedra();  // Provides all the point of the polyhedron
+
+    void FillStructPolyhedra(); // Fill all the structures of GEOPolyhedron
     
     void Cell0Ds(); // Create Cell0Ds 
 
@@ -17,9 +22,6 @@ namespace PolyhedraLibrary{
 
     void Cell3Ds(); // Create Cell3Ds
 
-    GEOPolyhedron polyhedron;
-    int NumFaces, NumEdges, NumVertices, p, q;
-    double Length_edge;
 
     public:
         BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q); // Initialyze the class
