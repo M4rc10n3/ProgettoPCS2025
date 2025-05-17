@@ -32,10 +32,10 @@ GEOPolyhedron Dualise(GEOPolyhedron& polyhedron);
 // Che sia meglio dare come output il tipo void? Se facciamo return Polyhedron sarà una grossa e lenta operazione, vero? 
 // Forse è meglio definire un nuovo poliedro prima di chiamare questa funzione e mettiamo come altro input della funzione il poliedro stesso in cui dobbiamo fare output?
 
-/* OntoTheSphere is a function that takes a point as input and projects it onto the unitary sphere 
+/* OntoTheSphere is a function that takes a point as input and projects it onto the unit sphere 
 Inputs list:
 vertex: the point that the function will projects onto the sphere normalising its vector*/
-void OntoTheSphere(vector<double>& vertex);
+void OntoTheUnitSphere(vector<double>& vertex);
 // Pensavo di usare la normalizzazione per proiettare sulla sfera unitaria, a voi viene in mente un modo migliore? Pensate che il mio funzioni?
 // La variabile vertex ha come tipo vertex, ma in realtà non so ancora cosa sarà, probabilmente un vettore.
 

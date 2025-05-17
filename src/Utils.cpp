@@ -27,7 +27,7 @@ GEOPolyhedron Dualise(GEOPolyhedron& polyhedron)
     return polyhedron;
 }
 
-void OntoTheSphere(vector<double>& vertex)
+void OntoTheUnitSphere(vector<double>& vertex)
 {
 
 }
