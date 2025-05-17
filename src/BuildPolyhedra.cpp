@@ -3,8 +3,8 @@
 # include <vector>
 # include <set>
 # include <math.h>
-# include "Polyhedra.hpp"
 # include "Eigen/Eigen"
+# include "Polyhedra.hpp"
 # include "BuildPolyhedra.hpp"
 
 using namespace std;
@@ -84,14 +84,25 @@ namespace PolyhedraLibrary{
         DataPolyhedra();
         Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
         vector<double> x(NumVertices), y(NumVertices), z(NumVertices);
+        vector<int> vert_valence(NumVertices);
+        
+        double angle_vectors;
 
         x[0] = 0;
         y[0] = 0;
         z[0] = 1;
 
-        x[1] = 0;
+        x[1] = sqrt(1 - pow(0.5*(2.0 - Length_edge * Length_edge), 2));
         y[1] = 0;
-        z[1] = 1;
+        z[1] = 0.5*(2.0 - Length_edge * Length_edge);
+
+        angle_vectors = x[0] * x[1] + y[0] * y[1] + z[0] * z[1];
+        // cout << angle_vectors << endl;
+        // cout << x[1] * x[1] + y[1] * y [1] + z[1] * z[1];
+        for (int i = 2; i < NumVertices; i++)
+        {
+
+        }
         
     }
 
@@ -99,8 +110,8 @@ namespace PolyhedraLibrary{
     {   
         PointsPolyhedra();             
         Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
-
         unsigned int edgeIndex = 0;
+        double length_edge;
 
         for (int i = 0; i < NumVertices - 1; i++)
         {
