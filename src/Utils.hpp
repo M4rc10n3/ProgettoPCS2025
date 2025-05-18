@@ -32,6 +32,12 @@ GEOPolyhedron Dualise(GEOPolyhedron& polyhedron);
 // Che sia meglio dare come output il tipo void? Se facciamo return Polyhedron sarà una grossa e lenta operazione, vero? 
 // Forse è meglio definire un nuovo poliedro prima di chiamare questa funzione e mettiamo come altro input della funzione il poliedro stesso in cui dobbiamo fare output?
 
+/* FindBarycenter is a function that outputs a vector containing the coordinates of the barycenter 
+of each triangular face
+Inputs list:
+ListVertFace: object of type "MatrixXi" containing the ids of each vertex of the face */
+Eigen::Vector3d FindBarycenter(Eigen::Vector3i& ColumnOfListVertFaces);
+
 /* OntoTheSphere is a function that takes a point as input and projects it onto the unit sphere 
 Inputs list:
 vertex: the point that the function will projects onto the sphere normalising its vector*/

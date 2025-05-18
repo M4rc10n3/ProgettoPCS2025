@@ -24,11 +24,11 @@ namespace PolyhedraLibrary{
 
 
     public:
-        BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q); // Initialyze the class
+        BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q); // Initialize the class
 
-        void DataPolyhedra(); // Gives all the important Data of the Polyhedron
+        void DataPolyhedra(); // Gives all the important Data of the polyhedron
 
-        void CreateCells(); // First fill the structure than calls all the CellXDs functions  
+        void CreateCells(); // First fill the structure then calls all the CellXDs functions  
 
     };
 

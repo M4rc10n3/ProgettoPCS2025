@@ -15,10 +15,13 @@ namespace PolyhedraLibrary{
         p = Schlafli_p;
         q = Schlafli_q;
 
-        polyhedron.NumFaces = (4 * q) / ((2*p) - (p*q) + 2*q); // determines the number of Face with p,q 
+        polyhedron.NumFaces = (4 * q) / ((2*p) - (p*q) + 2*q); // determines the number of faces using p and q 
         polyhedron.NumEdges = (p * polyhedron.NumFaces) / 2;
         polyhedron.NumVertices = (p * polyhedron.NumFaces) / q;
 
+        // Così stiamo creando delle copie, non sarebbe meglio creare dei semplici alias? 
+        // Per farlo si usa la sintassi:
+        // int &NumFaces = polyhedron.NumFaces;
         NumFaces = polyhedron.NumFaces; 
         NumEdges = polyhedron.NumEdges;
         NumVertices = polyhedron.NumVertices;
@@ -33,6 +36,7 @@ namespace PolyhedraLibrary{
 
     void BuildPolyhedra::DataPolyhedra()
     {
+        cout << "Entering DataPolyhedra" << endl;
         if ((p - 2) * (q - 2) < 4)
         {
             switch (p) // finds the correct polyhedron requested
@@ -44,17 +48,34 @@ namespace PolyhedraLibrary{
                     cout << "Your Polyhedron is a Tetrahedron with:\n";
                     Length_edge = 2 * sqrt(6) / 3;
                     polyhedron.CoordVertices << 0,0,1,
-                                                2* sqrt(2)/3.0,0,-1.0/3,
-                                                -7.0/(12*sqrt(2)),sqrt(23.0/32),-1.0/3,
-                                                -7.0/(12*sqrt(2)),-sqrt(23.0/32),-1.0/3;
+                                                -0.94,0,-0.33,
+                                                0.47,-0.82,-0.33,
+                                                0.47,0.82,-0.33;
                     break;
                 case 4:
-                    cout << "Your Polyhedron is a Octahedron with: \n";
                     Length_edge = sqrt(2);
+                    polyhedron.CoordVertices << 0,0,1,
+                                                0,0,-1,
+                                                0,1,0,
+                                                0,-1,0,
+                                                1,0,0,
+                                                -1,0,0;
                     break;
                 case 5:
                     cout << "Your Polyhedron is a Icosahedron with: \n";
                     Length_edge = 4 / sqrt(10 + 2*sqrt(5));
+                    polyhedron.CoordVertices << 0,0,1,
+                                                0.89,0,0.45,
+                                                0.28,0.85,0.45,
+                                                0.72,0.53,-0.45,
+                                                -0.28,0.85,-0.45,
+                                                0,0,-1,
+                                                -0.89,0,-0.45,
+                                                -0.28,-0.85,-0.45,
+                                                -0.72,-0.53,0.45,
+                                                0.28,-0.85,0.45,
+                                                0.72,-0.53,-0.45,
+                                                -0.72,0.53,0.45;
                     break;
                 }
                 break;
@@ -74,8 +95,14 @@ namespace PolyhedraLibrary{
                 break;
             }
             cout << NumVertices << " Vertices\n" <<
-            NumEdges << " Edges\n" <<
-            NumFaces << " Faces\n" << endl;
+                    NumEdges << " Edges\n" <<
+                    NumFaces << " Faces\n" << endl;
+        }
+        // Questo else da me aggiunto serve?
+        else
+        {
+            cout << "This program cannot handle your polyhedron."  << endl;
+            cout << "This program only works with platonic polyhedra."  << endl;
         }
     }
 
@@ -91,7 +118,9 @@ namespace PolyhedraLibrary{
         x[0] = 0;
         y[0] = 0;
         z[0] = 1;
-
+        
+        // Piuttosto di "pow" la prof. aveva detto che per potenze piccole è meglio 
+        // moltiplicare l'elemento per se stesso
         x[1] = sqrt(1 - pow(0.5*(2.0 - Length_edge * Length_edge), 2));
         y[1] = 0;
         z[1] = 0.5*(2.0 - Length_edge * Length_edge);
@@ -103,25 +132,51 @@ namespace PolyhedraLibrary{
         {
 
         }
-        
     }
 
     void BuildPolyhedra::FillStructPolyhedra()
     {   
-        PointsPolyhedra();             
+        PointsPolyhedra();            
         Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
         unsigned int edgeIndex = 0;
-        double length_edge;
+        // A cosa serviva questa variabile?
+        // double& length_edge = Length_edge;
+        double length_edge_squared = Length_edge * Length_edge;
 
         for (int i = 0; i < NumVertices - 1; i++)
         {
+            /* Non c'è sequenzialità nel dare gli estremi dei vertici, perchè, per esempio nell'ottaedro lo 0 va conesso ai suoi 3 prossimi, 
+                ma il vertice con id 1  va connesso ai vertici con id 2, 4 e 5, non connessi da alcuna logica. Quindi tocca unire i vertici che hanno la giusta distanza, 
+                ovvero la lunghezza del lato */
+            
+            // Saving in some variables the coordinates of the first vertex
+            double x_point_1 = polyhedron.CoordVertices(i, 0);
+            double y_point_1 = polyhedron.CoordVertices(i, 1);
+            double z_point_1 = polyhedron.CoordVertices(i, 2);
+
             for (int j = i + 1; j < NumVertices; j++)
             {
-                polyhedron.ExtremaEdges(edgeIndex,0) = i;
-                polyhedron.ExtremaEdges(edgeIndex,1) = j;
-                edgeIndex++;
+                // Saving in some variables the coordinates of the second vertex
+                double x_point_2 = polyhedron.CoordVertices(j, 0);
+                double y_point_2 = polyhedron.CoordVertices(j, 1);
+                double z_point_2 = polyhedron.CoordVertices(j, 2);
+
+                // Calculating the distance between the two vertices, but squared
+                double distance_squared = (x_point_1 - x_point_2) * (x_point_1 - x_point_2) + 
+                                          (y_point_1 - y_point_2) * (y_point_1 - y_point_2) +
+                                          (z_point_1 - z_point_2) * (z_point_1 - z_point_2);
+
+                // When the two vertices have the correct distance between them we save them as an 
+                // edge of the polyhedron
+                if(distance_squared - length_edge_squared < 5e-2){
+                    polyhedron.ExtremaEdges(edgeIndex,0) = i;
+                    polyhedron.ExtremaEdges(edgeIndex,1) = j;
+                    // Passing to the next edge only if we saved an edge during this iteration
+                    edgeIndex++;
+                }
             }
         }
+        cout << "polyhedron.ExtremaEdges: " << polyhedron.ExtremaEdges << endl;
 
         edgeIndex = 0;
 
@@ -230,7 +285,7 @@ namespace PolyhedraLibrary{
 
     void BuildPolyhedra::Cell0Ds()
     {   
-        Eigen::MatrixXd CoordVertices = polyhedron.CoordVertices;
+        Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
         // Eigen::MatrixXd CoordVertices = Eigen::MatrixXd::Zero(NumVertices, 3);
         
         ofstream file("../PolygonalData/Cell0Ds.txt"); // the program should be launched inside Debug or Release folders

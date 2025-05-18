@@ -11,6 +11,15 @@ int main(){
     int n = 10;
     Matrix3Xd m = MatrixXd::Zero(3, n);
     cout << "m: " << m << endl;
+    Eigen::RowVector3d barycenter_coordinates = Eigen::RowVector3d::Zero(3);
+    cout << "barycenter_coordinates: " << barycenter_coordinates << endl;
     cout << "Hello world" << endl;
+
+    int p = 3;
+    int q = 5;
+    cout << "p = " << p << endl;
+    cout << "q = " << q << endl;
+    BuildPolyhedra polyhedron(p, q);
+    polyhedron.CreateCells();
     return 0;
 }

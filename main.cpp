@@ -8,7 +8,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    int p, q, b, c, id_vertex_1, id_vertex_2; // initialize all the varibales
+    int p, q, b, c, id_vertex_1, id_vertex_2; // initialize all the variables
     string executable;
     vector<string> parameters;
 
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
         id_vertex_1 << "," <<
         id_vertex_2 << ")" << endl;
     } else {
-        cout << " Your tuple is :(p,q,b,c) = (" <<
+        cout << "Your tuple is: (p,q,b,c) = (" <<
         p << "," << 
         q << "," << 
         b << "," << 
