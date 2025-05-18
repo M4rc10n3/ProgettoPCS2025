@@ -25,8 +25,8 @@ namespace PolyhedraLibrary
         
         int NumFaces; // Number of faces 
         std::vector<string> IdFaces; // Id of all faces
-        Eigen::MatrixXi ListVertFaces; // All the vertices of each face, NumVertices x NumFaces matrix
-        Eigen::MatrixXi ListEdgeFaces; // All the edges of each face, NumEdges x NumFaces matrix
+        Eigen::MatrixXi ListVertFaces; // All the vertices of each face, p x NumFaces matrix
+        Eigen::MatrixXi ListEdgeFaces; // All the edges of each face, p x NumFaces matrix
 
     };
     /* TODO Path can be useful if we want a particular structure for the minimum path between

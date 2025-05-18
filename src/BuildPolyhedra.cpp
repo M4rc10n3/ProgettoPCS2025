@@ -28,9 +28,9 @@ namespace PolyhedraLibrary{
 
         polyhedron.CoordVertices = Eigen::MatrixXd(NumVertices, 3);
         polyhedron.ExtremaEdges = Eigen::MatrixXi(NumEdges, 2);
-        polyhedron.MatrEdgeVertices = Eigen::MatrixXi::Zero(NumEdges, NumVertices);
-        polyhedron.ListEdgeFaces = Eigen::MatrixXi(NumEdges, NumFaces);
-        polyhedron.ListVertFaces = Eigen::MatrixXi(NumVertices, NumFaces);
+        polyhedron.MatrEdgeVertices = Eigen::MatrixXi::Zero(NumVertices, NumVertices);
+        polyhedron.ListEdgeFaces = Eigen::MatrixXi(p, NumFaces);
+        polyhedron.ListVertFaces = Eigen::MatrixXi(p, NumFaces);
         
     }
 
@@ -143,7 +143,7 @@ namespace PolyhedraLibrary{
         // double& length_edge = Length_edge;
         double length_edge_squared = Length_edge * Length_edge;
 
-        for (int i = 0; i < NumVertices - 1; i++)
+        for(int i = 0; i < NumVertices - 1; i++)
         {
             /* Non c'è sequenzialità nel dare gli estremi dei vertici, perchè, per esempio nell'ottaedro lo 0 va conesso ai suoi 3 prossimi, 
                 ma il vertice con id 1  va connesso ai vertici con id 2, 4 e 5, non connessi da alcuna logica. Quindi tocca unire i vertici che hanno la giusta distanza, 
@@ -171,32 +171,49 @@ namespace PolyhedraLibrary{
                 if(distance_squared - length_edge_squared < 5e-2){
                     polyhedron.ExtremaEdges(edgeIndex,0) = i;
                     polyhedron.ExtremaEdges(edgeIndex,1) = j;
+
+                    // Se un lato ha id 0 allora non potremo mai vederlo in una matrice sparsa, 
+                    // quindi qui gli id dei lati sono spostati tutti di uno.
+                    // A cosa serve questa matrice esattamente?
+                    // In questo momento al posto (i,j) sta l'id del lato che connette i vertici con id i e id j
+                    polyhedron.MatrEdgeVertices(i,j) = edgeIndex + 1;
+                    polyhedron.MatrEdgeVertices(j,i) = edgeIndex + 1;
+
                     // Passing to the next edge only if we saved an edge during this iteration
                     edgeIndex++;
                 }
             }
         }
-        cout << "polyhedron.ExtremaEdges: " << polyhedron.ExtremaEdges << endl;
+        cout << "polyhedron.ExtremaEdges: " << endl << polyhedron.ExtremaEdges << endl;
+        cout << "polyhedron.MatrEdgeVertices: " << endl << polyhedron.MatrEdgeVertices << endl;
 
-        edgeIndex = 0;
+        // edgeIndex = 0;
+        
+        // for(int i = 0; i < NumEdges; i++){
+        //     int a = polyhedron.ExtremaEdges[i, 0];
+        //     int b = polyhedron.ExtremaEdges[i, 1];
+        //     MatrEdgeVertices(a,b) = edgeIndex;
+        //     MatrEdgeVertices(b,a) = edgeIndex;
+        //     edgeIndex++;
+        // }
 
-        for(int i = 0; i < NumVertices; i++)
-        {
-            for(int j = i; j < NumVertices; j++)
-            {
-                if(j == i || !(polyhedron.ExtremaEdges(edgeIndex,0) == i && polyhedron.ExtremaEdges(edgeIndex,1) == j))
-                    MatrEdgeVertices(i,j) = -1;
-                else
-                { 
-                    if(edgeIndex < NumEdges)
-                    {
-                        MatrEdgeVertices(i,j) = edgeIndex;
-                        MatrEdgeVertices(j,i) = edgeIndex;
-                        edgeIndex++;
-                    }
-                }
-            }
-        }
+        // for(int i = 0; i < NumVertices; i++)
+        // {
+        //     for(int j = i; j < NumVertices; j++)
+        //     {
+        //         if(j == i || !(polyhedron.ExtremaEdges(edgeIndex,0) == i && polyhedron.ExtremaEdges(edgeIndex,1) == j))
+        //             MatrEdgeVertices(i,j) = -1;
+        //         else
+        //         { 
+        //             if(edgeIndex < NumEdges)
+        //             {
+        //                 MatrEdgeVertices(i,j) = edgeIndex;
+        //                 MatrEdgeVertices(j,i) = edgeIndex;
+        //                 edgeIndex++;
+        //             }
+        //         }
+        //     }
+        // }
       
         // for(unsigned int i = 0; i < NumVertices; i++) // prints MatrEdgeVertices
         // {
@@ -207,14 +224,78 @@ namespace PolyhedraLibrary{
 
         unsigned int faceIndex = 0;
 
+        // Modo di Marco per salvare le facce perché purtroppo non ho capito il codice che è stato scritto
+
+        for(int vertex = 0; vertex < NumVertices; vertex++){
+            // Saving the vertices that create an edge together with "vertex"
+            vector<int> verticesConnectedToVertex;
+
+            for(int element = 0; element < NumVertices; element++){
+                int& edgeIdToCheck = polyhedron.MatrEdgeVertices(vertex, element);
+                if(edgeIdToCheck != 0){
+                    verticesConnectedToVertex.push_back(element);
+                }
+            }
+            // Stampa per controllare che abbia salvato i vertici corretti
+            cout << "verticesConnectedToVertex: { ";
+            for(auto elem : verticesConnectedToVertex){
+                cout << elem << " ";
+            }
+            cout << "}" << endl;
+            // Salva i vertici corretti
+
+            // Ora dobbiamo salvare il secondo e terzo vertice della faccia e vedere se essi formano un lato o meno;
+            // se così è, allora abbiamo trovato una faccia.
+
+            for(int i = 0; i <= verticesConnectedToVertex.size(); i++){
+                int vertexToCheck1 = verticesConnectedToVertex[i];
+                cout << "i: " << i << endl;
+                for(int j = i + 1; j <= verticesConnectedToVertex.size(); j++ ){
+                    int vertexToCheck2 = verticesConnectedToVertex[j];
+                    cout << "j: " << j << endl;
+                    // TODO: Ci va un controllo sul fatto che la faccia non sia già stata salvata e sul fatto che 
+                    // il programma salvi anche le facce che hanno 2 vertici in comune
+                    
+                    // Al momento questo if presenta un bug che salva le facce con i vertici 0, 2, 0, 
+                    // oppure 0, 4, 0 che ovviamente non formano una faccia
+                    if(polyhedron.MatrEdgeVertices(vertexToCheck1,vertexToCheck2) != 0){
+                        // Abbiamo trovato i tre vertici che formano una faccia
+                        cout << "There is an edge with vertices: ( " << i << ", " << j << " )" << endl;
+                        polyhedron.ListVertFaces(0, faceIndex) = vertex;
+                        polyhedron.ListVertFaces(1, faceIndex) = vertexToCheck1;
+                        polyhedron.ListVertFaces(2, faceIndex) = vertexToCheck2;
+                        
+                        // Stampa per controllo
+                        cout << "polyhedron.ListVertFaces: " << endl << polyhedron.ListVertFaces << endl;
+
+                        // Bisogna salvare i lati della faccia nella matrice polyhedron.ListEdgeFaces
+                        
+                        
+                        // Passing to the next face only if we saved a face during this iteration
+                        faceIndex++;
+                    }
+                    else{
+                        cout << "There isn't an edge with vertices: ( " << i << ", " << j << " )" << endl;
+                    }
+                }
+            }
+            
+                
+        }
+         
+
+
+        faceIndex = 0;
+        // Questo è il vettore dei vettori di una faccia?
         vector<int> adjVert;
 
+        //O è questo quello dei vertici di una faccia?
         set<int> vertFaces;
         vector<set<int>> vecVertFaces;
 
         int v1, v2, v3, j;
 
-        for (int i = 0; i < NumVertices; i++)
+        for(int i = 0; i < NumVertices; i++)
         {
             adjVert.clear();
             j = 0;
@@ -248,7 +329,7 @@ namespace PolyhedraLibrary{
         }
 
         faceIndex = 0;
-
+        
         int vert[3];
 
         for (set<int> vertFaces : vecVertFaces)
@@ -293,7 +374,8 @@ namespace PolyhedraLibrary{
         file << "Id,X,Y,Z\n";
         for (int i = 0; i < NumVertices; i++)
         {
-            file << i << "," << CoordVertices(i, 0) << "," << 
+            file << i << "," << 
+            CoordVertices(i, 0) << "," << 
             CoordVertices(i, 1) << "," << 
             CoordVertices(i, 2) << "\n";
             
