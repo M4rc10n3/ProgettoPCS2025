@@ -228,7 +228,7 @@ namespace PolyhedraLibrary{
 
             //Modo di Anna
             int element = 0;
-            while(element < NumVertices && verticesConnectedToVertex.size() < = q)
+            while(element < NumVertices && verticesConnectedToVertex.size() <= q)
             {
                 int& edgeIdToCheck = MatrEdgeVertices(vertex, element);
                 if(edgeIdToCheck >= 0){
@@ -275,7 +275,7 @@ namespace PolyhedraLibrary{
                         // Passing to the next face only if we saved a face during this iteration
                         faceIndex++;
 
-                        vecVertFaces.push_back(vertFaces);
+                        
                     }
                     else{
                         cout << "There isn't an edge with vertices: ( " << i << ", " << j << " )" << endl;
