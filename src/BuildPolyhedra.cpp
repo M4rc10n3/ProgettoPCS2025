@@ -26,9 +26,13 @@ namespace PolyhedraLibrary{
         NumEdges = polyhedron.NumEdges;
         NumVertices = polyhedron.NumVertices;
 
+        polyhedron.IdVertices.reserve(NumVertices);
+        polyhedron.IdEdges.reserve(NumEdges);
+        polyhedron.IdFaces.reserve(NumFaces);
+
         polyhedron.CoordVertices = Eigen::MatrixXd(NumVertices, 3);
         polyhedron.ExtremaEdges = Eigen::MatrixXi(NumEdges, 2);
-        polyhedron.MatrEdgeVertices = Eigen::MatrixXi::Zero(NumVertices, NumVertices);
+        polyhedron.MatrEdgeVertices = Eigen::MatrixXi::Constant(NumVertices, NumVertices, -1);
         polyhedron.ListEdgeFaces = Eigen::MatrixXi(p, NumFaces);
         polyhedron.ListVertFaces = Eigen::MatrixXi(p, NumFaces);
         
@@ -53,6 +57,7 @@ namespace PolyhedraLibrary{
                                                 0.47,0.82,-0.33;
                     break;
                 case 4:
+                    cout << "Your Polyhedron is a Octahedron with:\n";
                     Length_edge = sqrt(2);
                     polyhedron.CoordVertices << 0,0,1,
                                                 0,0,-1,
@@ -137,7 +142,11 @@ namespace PolyhedraLibrary{
     void BuildPolyhedra::FillStructPolyhedra()
     {   
         PointsPolyhedra();            
+        Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
         Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
+        Eigen::MatrixXi& ListVertFaces = polyhedron.ListVertFaces;
+        Eigen::MatrixXi& ListEdgeFaces = polyhedron.ListEdgeFaces;
+
         unsigned int edgeIndex = 0;
         // A cosa serviva questa variabile?
         // double& length_edge = Length_edge;
@@ -168,77 +177,115 @@ namespace PolyhedraLibrary{
 
                 // When the two vertices have the correct distance between them we save them as an 
                 // edge of the polyhedron
-                if(distance_squared - length_edge_squared < 5e-2){
-                    polyhedron.ExtremaEdges(edgeIndex,0) = i;
-                    polyhedron.ExtremaEdges(edgeIndex,1) = j;
+                if(distance_squared - length_edge_squared < 5e-2)
+                {
+                    ExtremaEdges(edgeIndex,0) = i;
+                    ExtremaEdges(edgeIndex,1) = j;
 
                     // Se un lato ha id 0 allora non potremo mai vederlo in una matrice sparsa, 
-                    // quindi qui gli id dei lati sono spostati tutti di uno.
+                    // quindi la matrice è inizializzata con tutti valori pari a -1
                     // A cosa serve questa matrice esattamente?
                     // In questo momento al posto (i,j) sta l'id del lato che connette i vertici con id i e id j
-                    polyhedron.MatrEdgeVertices(i,j) = edgeIndex + 1;
-                    polyhedron.MatrEdgeVertices(j,i) = edgeIndex + 1;
+                    MatrEdgeVertices(i,j) = edgeIndex;
+                    MatrEdgeVertices(j,i) = edgeIndex;
 
                     // Passing to the next edge only if we saved an edge during this iteration
                     edgeIndex++;
                 }
             }
         }
-        cout << "polyhedron.ExtremaEdges: " << endl << polyhedron.ExtremaEdges << endl;
-        cout << "polyhedron.MatrEdgeVertices: " << endl << polyhedron.MatrEdgeVertices << endl;
-
-        // edgeIndex = 0;
+        
+        cout << "ExtremaEdges: " << endl << ExtremaEdges << endl;
+        cout << "MatrEdgeVertices: " << endl << MatrEdgeVertices << endl;
         
         // for(int i = 0; i < NumEdges; i++){
-        //     int a = polyhedron.ExtremaEdges[i, 0];
-        //     int b = polyhedron.ExtremaEdges[i, 1];
+        //     int a = ExtremaEdges[i, 0];
+        //     int b = ExtremaEdges[i, 1];
         //     MatrEdgeVertices(a,b) = edgeIndex;
         //     MatrEdgeVertices(b,a) = edgeIndex;
         //     edgeIndex++;
         // }
 
-        // for(int i = 0; i < NumVertices; i++)
-        // {
-        //     for(int j = i; j < NumVertices; j++)
-        //     {
-        //         if(j == i || !(polyhedron.ExtremaEdges(edgeIndex,0) == i && polyhedron.ExtremaEdges(edgeIndex,1) == j))
-        //             MatrEdgeVertices(i,j) = -1;
-        //         else
-        //         { 
-        //             if(edgeIndex < NumEdges)
-        //             {
-        //                 MatrEdgeVertices(i,j) = edgeIndex;
-        //                 MatrEdgeVertices(j,i) = edgeIndex;
-        //                 edgeIndex++;
-        //             }
-        //         }
-        //     }
-        // }
-      
-        // for(unsigned int i = 0; i < NumVertices; i++) // prints MatrEdgeVertices
-        // {
-        //     for(unsigned int j = 0; j < NumVertices; j++)
-        //         cout << MatrEdgeVertices(i,j) << " ";
-        //     cout << endl;
-        // }
 
         unsigned int faceIndex = 0;
 
         // Modo di Marco per salvare le facce perché purtroppo non ho capito il codice che è stato scritto
 
-        for(int vertex = 0; vertex < NumVertices; vertex++){
+        // for(int vertex = 0; vertex < NumVertices; vertex++)
+        // {
+        //     // Saving the vertices that create an edge together with "vertex"
+        //     vector<int> verticesConnectedToVertex;
+
+        //     for(int element = 0; element < NumVertices; element++)
+        //     {
+        //         int& edgeIdToCheck = MatrEdgeVertices(vertex, element);
+        //         if(edgeIdToCheck >= 0){
+        //             verticesConnectedToVertex.push_back(element);
+        //         }
+        //     }
+        //     // Stampa per controllare che abbia salvato i vertici corretti
+        //     cout << "verticesConnectedToVertex: { ";
+        //     for(auto elem : verticesConnectedToVertex)
+        //     {
+        //         cout << elem << " ";
+        //     }
+        //     cout << "}" << endl;
+        //     // Salva i vertici corretti
+
+        //     // Ora dobbiamo salvare il secondo e terzo vertice della faccia e vedere se essi formano un lato o meno;
+        //     // se così è, allora abbiamo trovato una faccia.
+
+        //     for(int i = 0; i <= verticesConnectedToVertex.size(); i++){
+        //         int vertexToCheck1 = verticesConnectedToVertex[i];
+        //         cout << "i: " << i << endl;
+        //         for(int j = i + 1; j <= verticesConnectedToVertex.size(); j++ ){
+        //             int vertexToCheck2 = verticesConnectedToVertex[j];
+        //             cout << "j: " << j << endl;
+        //             // TODO: Ci va un controllo sul fatto che la faccia non sia già stata salvata e sul fatto che 
+        //             // il programma salvi anche le facce che hanno 2 vertici in comune
+                    
+        //             // Al momento questo if presenta un bug che salva le facce con i vertici 0, 2, 0, 
+        //             // oppure 0, 4, 0 che ovviamente non formano una faccia
+        //             if(MatrEdgeVertices(vertexToCheck1,vertexToCheck2) >= 0){
+        //                 // Abbiamo trovato i tre vertici che formano una faccia
+        //                 cout << "There is an edge with vertices: ( " << i << ", " << j << " )" << endl;
+        //                 ListVertFaces(0, faceIndex) = vertex;
+        //                 ListVertFaces(1, faceIndex) = vertexToCheck1;
+        //                 ListVertFaces(2, faceIndex) = vertexToCheck2;
+                        
+        //                 // Stampa per controllo
+        //                 cout << "ListVertFaces: " << endl << ListVertFaces << endl;
+
+        //                 // Bisogna salvare i lati della faccia nella matrice polyhedron.ListEdgeFaces
+                        
+                        
+        //                 // Passing to the next face only if we saved a face during this iteration
+        //                 faceIndex++;
+        //             }
+        //             else{
+        //                 cout << "There isn't an edge with vertices: ( " << i << ", " << j << " )" << endl;
+        //             }
+        //         }
+        //     }                      
+        // }
+         
+        for(int vertex = 0; vertex < NumVertices; vertex++)
+        {
             // Saving the vertices that create an edge together with "vertex"
             vector<int> verticesConnectedToVertex;
-
-            for(int element = 0; element < NumVertices; element++){
-                int& edgeIdToCheck = polyhedron.MatrEdgeVertices(vertex, element);
-                if(edgeIdToCheck != 0){
+            int element = 0;
+            while(element < NumVertices && verticesConnectedToVertex.size() < = q)
+            {
+                int& edgeIdToCheck = MatrEdgeVertices(vertex, element);
+                if(edgeIdToCheck >= 0){
                     verticesConnectedToVertex.push_back(element);
+                    element++;
                 }
             }
             // Stampa per controllare che abbia salvato i vertici corretti
             cout << "verticesConnectedToVertex: { ";
-            for(auto elem : verticesConnectedToVertex){
+            for(auto elem : verticesConnectedToVertex)
+            {
                 cout << elem << " ";
             }
             cout << "}" << endl;
@@ -258,34 +305,31 @@ namespace PolyhedraLibrary{
                     
                     // Al momento questo if presenta un bug che salva le facce con i vertici 0, 2, 0, 
                     // oppure 0, 4, 0 che ovviamente non formano una faccia
-                    if(polyhedron.MatrEdgeVertices(vertexToCheck1,vertexToCheck2) != 0){
+                    if(MatrEdgeVertices(vertexToCheck1,vertexToCheck2) >= 0){
                         // Abbiamo trovato i tre vertici che formano una faccia
                         cout << "There is an edge with vertices: ( " << i << ", " << j << " )" << endl;
-                        polyhedron.ListVertFaces(0, faceIndex) = vertex;
-                        polyhedron.ListVertFaces(1, faceIndex) = vertexToCheck1;
-                        polyhedron.ListVertFaces(2, faceIndex) = vertexToCheck2;
+                        ListVertFaces(0, faceIndex) = vertex;
+                        ListVertFaces(1, faceIndex) = vertexToCheck1;
+                        ListVertFaces(2, faceIndex) = vertexToCheck2;
                         
                         // Stampa per controllo
-                        cout << "polyhedron.ListVertFaces: " << endl << polyhedron.ListVertFaces << endl;
+                        cout << "ListVertFaces: " << endl << ListVertFaces << endl;
 
                         // Bisogna salvare i lati della faccia nella matrice polyhedron.ListEdgeFaces
                         
                         
                         // Passing to the next face only if we saved a face during this iteration
                         faceIndex++;
+
+                        vecVertFaces.push_back(vertFaces);
                     }
                     else{
                         cout << "There isn't an edge with vertices: ( " << i << ", " << j << " )" << endl;
                     }
                 }
-            }
-            
-                
+            }                      
         }
-         
 
-
-        faceIndex = 0;
         // Questo è il vettore dei vettori di una faccia?
         vector<int> adjVert;
 
@@ -322,7 +366,7 @@ namespace PolyhedraLibrary{
                         polyhedron.ListVertFaces(1, faceIndex) = v1;
                         polyhedron.ListVertFaces(2, faceIndex) = v2;
                         faceIndex++;
-                        vecVertFaces.push_back(vertFaces);
+                        
                     }
                 }
             }
@@ -356,9 +400,9 @@ namespace PolyhedraLibrary{
             v2 = vert[1];
             v3 = vert[2];
 
-            polyhedron.ListEdgeFaces(0, faceIndex) = MatrEdgeVertices(v1,v2);
-            polyhedron.ListEdgeFaces(1, faceIndex) = MatrEdgeVertices(v2,v3);
-            polyhedron.ListEdgeFaces(2, faceIndex) = MatrEdgeVertices(v1,v3);
+            ListEdgeFaces(0, faceIndex) = MatrEdgeVertices(v1,v2);
+            ListEdgeFaces(1, faceIndex) = MatrEdgeVertices(v2,v3);
+            ListEdgeFaces(2, faceIndex) = MatrEdgeVertices(v1,v3);
             faceIndex++;
         }
 
