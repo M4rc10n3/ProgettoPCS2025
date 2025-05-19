@@ -216,6 +216,7 @@ namespace PolyhedraLibrary{
         {
             // Saving the vertices that create an edge together with "vertex"
             vector<int> verticesConnectedToVertex;
+            verticesConnectedToVertex.reserve(q);
 
             // Modo di Marco
             // for(int element = 0; element < NumVertices; element++)
@@ -228,13 +229,13 @@ namespace PolyhedraLibrary{
 
             //Modo di Anna
             int element = 0;
-            while(element < NumVertices && verticesConnectedToVertex.size() <= q)
+            while(element < NumVertices && verticesConnectedToVertex.size() < q)
             {
                 int& edgeIdToCheck = MatrEdgeVertices(vertex, element);
                 if(edgeIdToCheck >= 0){
                     verticesConnectedToVertex.push_back(element);
-                    element++;
                 }
+                element++;
             }
             // Stampa per controllare che abbia salvato i vertici corretti
             cout << "verticesConnectedToVertex: { ";
