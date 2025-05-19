@@ -26,9 +26,10 @@ namespace PolyhedraLibrary{
         NumEdges = polyhedron.NumEdges;
         NumVertices = polyhedron.NumVertices;
 
-        polyhedron.IdVertices.reserve(NumVertices);
-        polyhedron.IdEdges.reserve(NumEdges);
-        polyhedron.IdFaces.reserve(NumFaces);
+        // Credo sia utile se rendiamo gli id come int o unsigned int piuttosto che string
+        // polyhedron.IdVertices.reserve(NumVertices);
+        // polyhedron.IdEdges.reserve(NumEdges);
+        // polyhedron.IdFaces.reserve(NumFaces);
 
         polyhedron.CoordVertices = Eigen::MatrixXd(NumVertices, 3);
         polyhedron.ExtremaEdges = Eigen::MatrixXi(NumEdges, 2);
@@ -209,70 +210,23 @@ namespace PolyhedraLibrary{
 
         unsigned int faceIndex = 0;
 
-        // Modo di Marco per salvare le facce perché purtroppo non ho capito il codice che è stato scritto
-
-        // for(int vertex = 0; vertex < NumVertices; vertex++)
-        // {
-        //     // Saving the vertices that create an edge together with "vertex"
-        //     vector<int> verticesConnectedToVertex;
-
-        //     for(int element = 0; element < NumVertices; element++)
-        //     {
-        //         int& edgeIdToCheck = MatrEdgeVertices(vertex, element);
-        //         if(edgeIdToCheck >= 0){
-        //             verticesConnectedToVertex.push_back(element);
-        //         }
-        //     }
-        //     // Stampa per controllare che abbia salvato i vertici corretti
-        //     cout << "verticesConnectedToVertex: { ";
-        //     for(auto elem : verticesConnectedToVertex)
-        //     {
-        //         cout << elem << " ";
-        //     }
-        //     cout << "}" << endl;
-        //     // Salva i vertici corretti
-
-        //     // Ora dobbiamo salvare il secondo e terzo vertice della faccia e vedere se essi formano un lato o meno;
-        //     // se così è, allora abbiamo trovato una faccia.
-
-        //     for(int i = 0; i <= verticesConnectedToVertex.size(); i++){
-        //         int vertexToCheck1 = verticesConnectedToVertex[i];
-        //         cout << "i: " << i << endl;
-        //         for(int j = i + 1; j <= verticesConnectedToVertex.size(); j++ ){
-        //             int vertexToCheck2 = verticesConnectedToVertex[j];
-        //             cout << "j: " << j << endl;
-        //             // TODO: Ci va un controllo sul fatto che la faccia non sia già stata salvata e sul fatto che 
-        //             // il programma salvi anche le facce che hanno 2 vertici in comune
-                    
-        //             // Al momento questo if presenta un bug che salva le facce con i vertici 0, 2, 0, 
-        //             // oppure 0, 4, 0 che ovviamente non formano una faccia
-        //             if(MatrEdgeVertices(vertexToCheck1,vertexToCheck2) >= 0){
-        //                 // Abbiamo trovato i tre vertici che formano una faccia
-        //                 cout << "There is an edge with vertices: ( " << i << ", " << j << " )" << endl;
-        //                 ListVertFaces(0, faceIndex) = vertex;
-        //                 ListVertFaces(1, faceIndex) = vertexToCheck1;
-        //                 ListVertFaces(2, faceIndex) = vertexToCheck2;
-                        
-        //                 // Stampa per controllo
-        //                 cout << "ListVertFaces: " << endl << ListVertFaces << endl;
-
-        //                 // Bisogna salvare i lati della faccia nella matrice polyhedron.ListEdgeFaces
-                        
-                        
-        //                 // Passing to the next face only if we saved a face during this iteration
-        //                 faceIndex++;
-        //             }
-        //             else{
-        //                 cout << "There isn't an edge with vertices: ( " << i << ", " << j << " )" << endl;
-        //             }
-        //         }
-        //     }                      
-        // }
+        // Modo di Marco per salvare le facce perché purtroppo non ho capito il codice che è stato scritto    
          
         for(int vertex = 0; vertex < NumVertices; vertex++)
         {
             // Saving the vertices that create an edge together with "vertex"
             vector<int> verticesConnectedToVertex;
+
+            // Modo di Marco
+            // for(int element = 0; element < NumVertices; element++)
+            // {
+            //     int& edgeIdToCheck = MatrEdgeVertices(vertex, element);
+            //     if(edgeIdToCheck >= 0){
+            //         verticesConnectedToVertex.push_back(element);
+            //     }
+            // }
+
+            //Modo di Anna
             int element = 0;
             while(element < NumVertices && verticesConnectedToVertex.size() < = q)
             {
