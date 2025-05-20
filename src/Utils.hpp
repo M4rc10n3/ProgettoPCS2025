@@ -11,7 +11,7 @@ using namespace std;
 Inputs list:
 p: number of vertices of each face of the polyhedron; therefore, each face is a p-sided polygon
 q: number of regular p-sided polygon faces around each vertex of the polyhedra*/
-GEOPolyhedron CreatePolyhedron(const int& p, const int& q);
+// GEOPolyhedron CreatePolyhedron(const int& p, const int& q);
 
 /* TypeITassellation is a function that modifies the attributes of the object <polyhedron> in order to 
 output its tassellations of type I regarding geodetic polyhedra 
@@ -36,12 +36,12 @@ GEOPolyhedron Dualise(GEOPolyhedron& polyhedron);
 of each triangular face
 Inputs list:
 ListVertFace: object of type "MatrixXi" containing the ids of each vertex of the face */
-Eigen::Vector3d FindBarycenter(Eigen::Vector3i& ColumnOfListVertFaces);
+Eigen::Vector3d FindBarycenter(Eigen::Vector3i& VertFace);
 
 /* OntoTheSphere is a function that takes a point as input and projects it onto the unit sphere 
 Inputs list:
 vertex: the point that the function will projects onto the sphere normalising its vector*/
-void OntoTheUnitSphere(vector<double>& vertex);
+void OntoTheUnitSphere(Eigen::Vector3d vertex);
 // Pensavo di usare la normalizzazione per proiettare sulla sfera unitaria, a voi viene in mente un modo migliore? Pensate che il mio funzioni?
 // La variabile vertex ha come tipo vertex, ma in realtà non so ancora cosa sarà, probabilmente un vettore.
 
@@ -50,4 +50,4 @@ by the ids given as inputs
 Inputs list:
 id_vertex_1: the id associated to the first vertex of the minimum path we're looking for 
 id_vertex_2: the id associated to the second/last vertex of the minimum path we're looking for*/
-vector<double> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2);
+vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2);
