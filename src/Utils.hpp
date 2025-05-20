@@ -41,7 +41,7 @@ Eigen::Vector3d FindBarycenter(Eigen::Vector3i& VertFace);
 /* OntoTheSphere is a function that takes a point as input and projects it onto the unit sphere 
 Inputs list:
 vertex: the point that the function will projects onto the sphere normalising its vector*/
-void OntoTheUnitSphere(Eigen::Vector3d vertex);
+Eigen::Vector3d OntoTheUnitSphere(Eigen::Vector3d vertex);
 // Pensavo di usare la normalizzazione per proiettare sulla sfera unitaria, a voi viene in mente un modo migliore? Pensate che il mio funzioni?
 // La variabile vertex ha come tipo vertex, ma in realtà non so ancora cosa sarà, probabilmente un vettore.
 

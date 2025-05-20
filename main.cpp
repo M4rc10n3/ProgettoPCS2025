@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
     string executable;
     vector<string> parameters;
 
-    if (strcmp(argv[0], "gdb") == 0) 
+    if (strcmp(argv[0], "gdb") == 0) // check if you're using gdb for Debug and avoids unnecessary input errors
     {
         argc--;
         argv++;
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
         c << ")" << endl; 
     }
 
-    BuildPolyhedra polyhedron(p, q);
+    BuildPolyhedra polyhedron(p, q); // create the structure of the Polyedron
     polyhedron.CreateCells();
 
     return 0;

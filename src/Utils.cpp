@@ -25,7 +25,7 @@ GEOPolyhedron Dualise(GEOPolyhedron& polyhedron)
 Eigen::Vector3d FindBarycenter(Eigen::Vector3i& VertFace)
 {
     GEOPolyhedron polyhedron;
-    Eigen::Vector3d barycenter_coordinates = Eigen::Vector3d::Zero(3);
+    Eigen::Vector3d barycenter_coordinates = Eigen::Vector3d::Zero(3); // initialyze a vector for the final coordinates
     double Coord_x = 0;
     double Coord_y = 0;
     double Coord_z = 0;
@@ -43,15 +43,16 @@ Eigen::Vector3d FindBarycenter(Eigen::Vector3i& VertFace)
     return barycenter_coordinates;
 }
 
-void OntoTheUnitSphere(Eigen::Vector3d vertex)
+Eigen::Vector3d OntoTheUnitSphere(Eigen::Vector3d vertex)
 {
     double norm = vertex.norm();
-    if (norm > 1e-8) 
+    if (norm > 1e-16) // Avoids ZeroDivision errors
     {
         vertex /= norm;
     } else {
         vertex.setZero();
     }
+    return vertex;
 }
 
 
