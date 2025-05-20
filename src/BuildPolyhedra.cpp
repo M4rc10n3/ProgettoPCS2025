@@ -208,154 +208,240 @@ namespace PolyhedraLibrary{
         //     edgeIndex++;
         // }
 
-
         unsigned int faceIndex = 0;
 
-        vector<array<int, 3>> vecVertFaces;
+        vector<array<int, 3>> vecVertFaces; // This vector stores unique triangles (faces) as sorted arrays of 3 vertices
         vecVertFaces.reserve(NumFaces);
-
-        // Modo di Marco per salvare le facce perché purtroppo non ho capito il codice che è stato scritto    
-         
+        
         for(int vertex = 0; vertex < NumVertices; vertex++)
-        {
-            // Saving the vertices that create an edge together with "vertex"
-            vector<int> connectedVertices;
-            connectedVertices.reserve(q);
-
-            // Modo di Marco
-            // for(int element = 0; element < NumVertices; element++)
-            // {
-            //     int& edgeIdToCheck = MatrEdgeVertices(vertex, element);
-            //     if(edgeIdToCheck >= 0){
-            //         verticesConnectedToVertex.push_back(element);
-            //     }
-            // }
-
-            //Modo di Anna
-            int element = 0;
-            while(element < NumVertices && connectedVertices.size() < q)
+        { 
+            if (faceIndex < NumFaces) // Proceed only if all the faces have not been numbered yet
             {
-                int& edgeIdToCheck = MatrEdgeVertices(vertex, element);
-                if(edgeIdToCheck >= 0){
-                    connectedVertices.push_back(element);
-                }
-                element++;
-            }
-            // Stampa per controllare che abbia salvato i vertici corretti
-            // cout << "connectedVertices: { ";
-            // for(auto elem : connectedVertices)
-            // {
-            //     cout << elem << " ";
-            // }
-            // cout << "}" << endl;
+                // Saving the vertices that are adjacent to "vertex"
+                vector<int> connectedVertices;
+                connectedVertices.reserve(q);
 
-            // Modo di Marco
-
-            // Ora dobbiamo salvare il secondo e terzo vertice della faccia e vedere se essi formano un lato o meno;
-            // se così è, allora abbiamo trovato una faccia.
-
-            // for(int i = 0; i <= verticesConnectedToVertex.size(); i++)
-            // {
-            //     int& vertexToCheck1 = verticesConnectedToVertex[i];
-            //     cout << "i: " << i << endl;
-            //     for(int j = i + 1; j <= verticesConnectedToVertex.size(); j++)
-            //     {
-            //         int& vertexToCheck2 = verticesConnectedToVertex[j];
-            //         cout << "j: " << j << endl;
-            //         // TODO: Ci va un controllo sul fatto che la faccia non sia già stata salvata e sul fatto che 
-            //         // il programma salvi anche le facce che hanno 2 vertici in comune
-                    
-            //         // Al momento questo if presenta un bug che salva le facce con i vertici 0, 2, 0, 
-            //         // oppure 0, 4, 0 che ovviamente non formano una faccia
-            //         if(MatrEdgeVertices(vertexToCheck1,vertexToCheck2) >= 0){
-            //             // Abbiamo trovato i tre vertici che formano una faccia
-            //             cout << "There is an edge with vertices: ( " << i << ", " << j << " )" << endl;
-            //             ListVertFaces(0, faceIndex) = vertex;
-            //             ListVertFaces(1, faceIndex) = vertexToCheck1;
-            //             ListVertFaces(2, faceIndex) = vertexToCheck2;
-                        
-                //         // Stampa per controllo
-                //         cout << "ListVertFaces: " << endl << ListVertFaces << endl;
-
-                //         // Bisogna salvare i lati della faccia nella matrice polyhedron.ListEdgeFaces
-                        
-                        
-                //         // Passing to the next face only if we saved a face during this iteration
-                //         faceIndex++;
-
-                        
-                //     }
-                //     else{
-                //         cout << "There isn't an edge with vertices: ( " << i << ", " << j << " )" << endl;
-                //     }
-                // }
-
-            for(int i = 0; i < connectedVertices.size(); i++)
-            {
-                int& vertexToCheck1 = connectedVertices[i];
-                // cout << "i: " << i << endl;
-                for(int j = i + 1; j < connectedVertices.size(); j++)
+                int element = 0;
+                while(element < NumVertices && connectedVertices.size() < q)
                 {
-                    int& vertexToCheck2 = connectedVertices[j];
-                    // cout << "j: " << j << endl;
-                    
-                    // Verifica che tutti e tre i vertici siano distinti
-                    if(vertex != vertexToCheck1 && vertex != vertexToCheck2 && vertexToCheck1 != vertexToCheck2)
-                    {                    
-                        int& edgeIdToAdd = MatrEdgeVertices(vertexToCheck1,vertexToCheck2);     
-                        if (edgeIdToAdd >= 0) 
-                        {
-                            array<int, 3> vertFace = {vertex, vertexToCheck1, vertexToCheck2};
-                            array<int, 3> sortedVertFace = vertFace;
-                            sort(sortedVertFace.begin(), sortedVertFace.end());
-
-                            if(find(vecVertFaces.begin(), vecVertFaces.end(), sortedVertFace) == vecVertFaces.end())
-                            {
-                                vecVertFaces.push_back(sortedVertFace);
-
-                                // Trova ID degli spigoli tra i vertici
-                                int e1 = MatrEdgeVertices(vertex, vertexToCheck1);
-                                int e2 = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);
-                                int e3 = MatrEdgeVertices(vertexToCheck2, vertex);
-
-                                vector<int> edgesInFace = {e1, e2, e3};
-                                vector<int> verticesInFace = {vertexToCheck1, vertexToCheck2};
-
-                                // Debug
-                                cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
-
-                                // Condizione per determinare orientamento corretto
-                                // (può essere raffinata a seconda della struttura ExtremaEdges)
-                                if (ExtremaEdges(e1, 1) == ExtremaEdges(e2, 0)) 
-                                {
-                                    verticesInFace.push_back(vertex); // completamento ordine coerente
-                                        
-                                    ListVertFaces(0, faceIndex) = verticesInFace[0];
-                                    ListVertFaces(1, faceIndex) = verticesInFace[1];
-                                    ListVertFaces(2, faceIndex) = verticesInFace[2];
-
-                                    ListEdgeFaces(0, faceIndex) = edgesInFace[0];
-                                    ListEdgeFaces(1, faceIndex) = edgesInFace[1];
-                                    ListEdgeFaces(2, faceIndex) = edgesInFace[2];
-                                    
-                                    // Passing to the next face only if we saved a face during this iteration
-                                    faceIndex++;
-                                }
-                            }  
-                        } 
-                    }  
-                    else
-                    {
-                        // cout << "There isn't an edge with vertices: ( " << i << ", " << j << " )" << endl;
-                        continue;
+                    int& edgeIdToCheck = MatrEdgeVertices(vertex, element);
+                    if(edgeIdToCheck >= 0){
+                        connectedVertices.push_back(element);
                     }
+                    element++;
                 }
-            }   
-        }    
+
+                // Try forming triangles from combinations of connected vertices
+                for(int i = 0; i < connectedVertices.size(); i++)
+                {
+                    int& vertexToCheck1 = connectedVertices[i];
+                    // cout << "i: " << i << endl;
+                    for(int j = i + 1; j < connectedVertices.size(); j++)
+                    {
+                        int& vertexToCheck2 = connectedVertices[j];
+                        // cout << "j: " << j << endl;
+                        
+                        // Check all three vertices are distinct
+                        if(vertex != vertexToCheck1 && vertex != vertexToCheck2 && vertexToCheck1 != vertexToCheck2)
+                        {                    
+                            int& edgeIdToAdd = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);     
+                            if (edgeIdToAdd >= 0) // Proceed only if there is an edge that connects the two vertices
+                            {
+                                array<int, 3> sortedVertFace = {vertex, vertexToCheck1, vertexToCheck2};
+                                sort(sortedVertFace.begin(), sortedVertFace.end()); // Sorting avoids counting multiple times same triangles with different vertex ordering
+
+                                // Check if the sorted triangle is already in the vector
+                                if(find(vecVertFaces.begin(), vecVertFaces.end(), sortedVertFace) == vecVertFaces.end())
+                                {
+                                    vecVertFaces.push_back(sortedVertFace);
+
+                                    // Find the edge IDs between the three vertices
+                                    int e1 = MatrEdgeVertices(vertex, vertexToCheck1);
+                                    int e2 = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);
+                                    int e3 = MatrEdgeVertices(vertexToCheck2, vertex);
+
+                                    array<int, 3> edgesInFace = {e1, e2, e3}; 
+                                    array<int, 3> verticesInFace = {vertexToCheck1, vertexToCheck2, vertex};
+
+                                    cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
+
+                                    // Check face orientation consistency
+                                    if (ExtremaEdges(e1, 1) == ExtremaEdges(e2, 0)) // e1.end == e2.origin
+                                    {                                            
+                                        ListVertFaces(0, faceIndex) = verticesInFace[0];
+                                        ListVertFaces(1, faceIndex) = verticesInFace[1];
+                                        ListVertFaces(2, faceIndex) = verticesInFace[2];
+
+                                        ListEdgeFaces(0, faceIndex) = edgesInFace[0];
+                                        ListEdgeFaces(1, faceIndex) = edgesInFace[1];
+                                        ListEdgeFaces(2, faceIndex) = edgesInFace[2];
+                                        
+                                        faceIndex++; // Passing to the next face only if we saved a face during this iteration
+                                    }
+                                }  
+                            } 
+                        }  
+                        else
+                            continue; 
+                    }
+                }   
+            }
+            else
+                break; 
+        } 
         // Stampa finale per controllo
         cout << "ListVertFaces: " << endl << ListVertFaces << endl;
         cout << "ListEdgeFaces: " << endl << ListEdgeFaces << endl;
+
+
+    //     unsigned int faceIndex = 0;
+
+    //     vector<array<int, 3>> vecVertFaces;
+    //     vecVertFaces.reserve(NumFaces);
+
+    //     // Modo di Marco per salvare le facce perché purtroppo non ho capito il codice che è stato scritto    
+         
+    //     for(int vertex = 0; vertex < NumVertices; vertex++)
+    //     {
+    //         // Saving the vertices that create an edge together with "vertex"
+    //         vector<int> connectedVertices;
+    //         connectedVertices.reserve(q);
+
+    //         // Modo di Marco
+    //         // for(int element = 0; element < NumVertices; element++)
+    //         // {
+    //         //     int& edgeIdToCheck = MatrEdgeVertices(vertex, element);
+    //         //     if(edgeIdToCheck >= 0){
+    //         //         verticesConnectedToVertex.push_back(element);
+    //         //     }
+    //         // }
+
+    //         //Modo di Anna
+    //         int element = 0;
+    //         while(element < NumVertices && connectedVertices.size() < q)
+    //         {
+    //             int& edgeIdToCheck = MatrEdgeVertices(vertex, element);
+    //             if(edgeIdToCheck >= 0){
+    //                 connectedVertices.push_back(element);
+    //             }
+    //             element++;
+    //         }
+    //         // Stampa per controllare che abbia salvato i vertici corretti
+    //         // cout << "connectedVertices: { ";
+    //         // for(auto elem : connectedVertices)
+    //         // {
+    //         //     cout << elem << " ";
+    //         // }
+    //         // cout << "}" << endl;
+
+    //         // Modo di Marco
+
+    //         // Ora dobbiamo salvare il secondo e terzo vertice della faccia e vedere se essi formano un lato o meno;
+    //         // se così è, allora abbiamo trovato una faccia.
+
+    //         // for(int i = 0; i <= verticesConnectedToVertex.size(); i++)
+    //         // {
+    //         //     int& vertexToCheck1 = verticesConnectedToVertex[i];
+    //         //     cout << "i: " << i << endl;
+    //         //     for(int j = i + 1; j <= verticesConnectedToVertex.size(); j++)
+    //         //     {
+    //         //         int& vertexToCheck2 = verticesConnectedToVertex[j];
+    //         //         cout << "j: " << j << endl;
+    //         //         // TODO: Ci va un controllo sul fatto che la faccia non sia già stata salvata e sul fatto che 
+    //         //         // il programma salvi anche le facce che hanno 2 vertici in comune
+                    
+    //         //         // Al momento questo if presenta un bug che salva le facce con i vertici 0, 2, 0, 
+    //         //         // oppure 0, 4, 0 che ovviamente non formano una faccia
+    //         //         if(MatrEdgeVertices(vertexToCheck1,vertexToCheck2) >= 0){
+    //         //             // Abbiamo trovato i tre vertici che formano una faccia
+    //         //             cout << "There is an edge with vertices: ( " << i << ", " << j << " )" << endl;
+    //         //             ListVertFaces(0, faceIndex) = vertex;
+    //         //             ListVertFaces(1, faceIndex) = vertexToCheck1;
+    //         //             ListVertFaces(2, faceIndex) = vertexToCheck2;
+                        
+    //         //             // Stampa per controllo
+    //         //             cout << "ListVertFaces: " << endl << ListVertFaces << endl;
+
+    //         //             // Bisogna salvare i lati della faccia nella matrice polyhedron.ListEdgeFaces
+                        
+                        
+    //         //             // Passing to the next face only if we saved a face during this iteration
+    //         //             faceIndex++;
+
+                        
+    //         //         }
+    //         //         else{
+    //         //             cout << "There isn't an edge with vertices: ( " << i << ", " << j << " )" << endl;
+    //         //         }
+    //         //     }
+
+    //         for(int i = 0; i < connectedVertices.size(); i++)
+    //         {
+    //             int& vertexToCheck1 = connectedVertices[i];
+    //             // cout << "i: " << i << endl;
+    //             for(int j = i + 1; j < connectedVertices.size(); j++)
+    //             {
+    //                 int& vertexToCheck2 = connectedVertices[j];
+    //                 // cout << "j: " << j << endl;
+                    
+    //                 // Verifica che tutti e tre i vertici siano distinti
+    //                 if(vertex != vertexToCheck1 && vertex != vertexToCheck2 && vertexToCheck1 != vertexToCheck2)
+    //                 {                    
+    //                     int& edgeIdToAdd = MatrEdgeVertices(vertexToCheck1,vertexToCheck2);     
+    //                     if (edgeIdToAdd >= 0) 
+    //                     {
+    //                         array<int, 3> sortedVertFace = {vertex, vertexToCheck1, vertexToCheck2};
+    //                         sort(sortedVertFace.begin(), sortedVertFace.end());
+
+    //                         if(find(vecVertFaces.begin(), vecVertFaces.end(), sortedVertFace) == vecVertFaces.end())
+    //                         {
+    //                             vecVertFaces.push_back(sortedVertFace);
+
+    //                             // Trova ID degli spigoli tra i vertici
+    //                             int e1 = MatrEdgeVertices(vertex, vertexToCheck1);
+    //                             int e2 = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);
+    //                             int e3 = MatrEdgeVertices(vertexToCheck2, vertex);
+
+    //                             vector<int> edgesInFace = {e1, e2, e3};
+    //                             vector<int> verticesInFace = {vertexToCheck1, vertexToCheck2};
+
+    //                             // Debug
+    //                             cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
+
+    //                             // Condizione per determinare orientamento corretto
+    //                             // (può essere raffinata a seconda della struttura ExtremaEdges)
+    //                             if (ExtremaEdges(e1, 1) == ExtremaEdges(e2, 0)) 
+    //                             {
+    //                                 verticesInFace.push_back(vertex); // completamento ordine coerente
+                                        
+    //                                 ListVertFaces(0, faceIndex) = verticesInFace[0];
+    //                                 ListVertFaces(1, faceIndex) = verticesInFace[1];
+    //                                 ListVertFaces(2, faceIndex) = verticesInFace[2];
+
+    //                                 ListEdgeFaces(0, faceIndex) = edgesInFace[0];
+    //                                 ListEdgeFaces(1, faceIndex) = edgesInFace[1];
+    //                                 ListEdgeFaces(2, faceIndex) = edgesInFace[2];
+                                    
+    //                                 // Passing to the next face only if we saved a face during this iteration
+    //                                 faceIndex++;
+    //                             }
+    //                         }  
+    //                     } 
+    //                 }  
+    //                 else
+    //                 {
+    //                     // cout << "There isn't an edge with vertices: ( " << i << ", " << j << " )" << endl;
+    //                     continue;
+    //                 }
+    //             }
+    //         }   
+    //     }    
+    //     // Stampa finale per controllo
+    //     cout << "ListVertFaces: " << endl << ListVertFaces << endl;
+    //     cout << "ListEdgeFaces: " << endl << ListEdgeFaces << endl;
     }
+
+
 
     void BuildPolyhedra::Cell0Ds()
     {   
