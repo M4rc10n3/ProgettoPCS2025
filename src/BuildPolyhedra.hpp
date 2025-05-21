@@ -28,13 +28,11 @@ namespace PolyhedraLibrary{
     public:
         BuildPolyhedra(const unsigned int& Schlafli_p, const unsigned int& Schlafli_q); // Initialize the class
 
-        BuildPolyhedra(GEOPolyhedron& polyhedron); // Initialize the class 
-
         void DataPolyhedra(); // Gives all the important Data of the polyhedron
 
         void CreateCells(); // First fill the structure then calls all the CellXDs functions  
 
-        void GetStructure(); // Export the strctures using the code of Mr. Vicini in order 
+        void GetStructure(); // Export the structures using the code of Mr. Vicini in order 
                              // to create a file readable by ParaView
 
     };

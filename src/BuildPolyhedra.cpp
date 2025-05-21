@@ -32,12 +32,6 @@ namespace PolyhedraLibrary{
         polyhedron.MatrEdgeVertices = Eigen::MatrixXi::Constant(NumVertices, NumVertices, -1);
         polyhedron.ListEdgeFaces = Eigen::MatrixXi(p, NumFaces);
         polyhedron.ListVertFaces = Eigen::MatrixXi(p, NumFaces);
-        
-    }
-
-    BuildPolyhedra::BuildPolyhedra(GEOPolyhedron& DualPolyhedron)
-    {
-
     }
 
     void BuildPolyhedra::DataPolyhedra()
@@ -92,7 +86,6 @@ namespace PolyhedraLibrary{
                     NumEdges << " Edges\n" <<
                     NumFaces << " Faces\n" << endl;
         }
-        // Questo else da me aggiunto serve?
         else
         {
             cout << "This program cannot handle your polyhedron."  << endl;
@@ -130,7 +123,7 @@ namespace PolyhedraLibrary{
 
     void BuildPolyhedra::FillStructPolyhedra()
     {   
-        PointsPolyhedra();            
+        DataPolyhedra();            
         Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
         Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
         Eigen::MatrixXi& ListVertFaces = polyhedron.ListVertFaces;
@@ -392,7 +385,6 @@ namespace PolyhedraLibrary{
 
         Cell3Ds();
     }
-
 
     void BuildPolyhedra::GetStructure()
     {

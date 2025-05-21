@@ -67,6 +67,7 @@ int main(int argc, char* argv[])
 
     BuildPolyhedra polyhedron(p, q); // create the structure of the Polyedron
     polyhedron.CreateCells();
+    polyhedron.GetStructure();
 
     return 0;
 }
