@@ -28,5 +28,16 @@ int main(){
     cout << "q = " << q << endl;
     BuildPolyhedra polyhedron(p, q);
     polyhedron.CreateCells();
+
+    // Gedim::UCDUtilities utilities;
+    // utilities.ExportPoints("./Cell0Ds.inp",
+    //                        polyhedron.CoordVertices);
+
+    // utilities.ExportSegments("./Cell1Ds.inp",
+    //                          polyhedron.CoordVertices,
+    //                          polyhedron.ExtremaEdges);
+
+    
+
     return 0;
 }
