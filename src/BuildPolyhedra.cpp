@@ -28,9 +28,9 @@ namespace PolyhedraLibrary{
         NumVertices = polyhedron.NumVertices;
 
         // Credo sia utile se rendiamo gli id come int o unsigned int piuttosto che string
-        // polyhedron.IdVertices.reserve(NumVertices);
-        // polyhedron.IdEdges.reserve(NumEdges);
-        // polyhedron.IdFaces.reserve(NumFaces);
+        polyhedron.IdVertices.reserve(NumVertices);
+        polyhedron.IdEdges.reserve(NumEdges);
+        polyhedron.IdFaces.reserve(NumFaces);
 
         polyhedron.CoordVertices = Eigen::MatrixXd(3, NumVertices);
         polyhedron.ExtremaEdges = Eigen::MatrixXi(2, NumEdges);
