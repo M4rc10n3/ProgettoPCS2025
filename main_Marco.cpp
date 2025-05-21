@@ -23,21 +23,11 @@ int main(){
     cout << "Hello world" << endl;
 
     int p = 3;
-    int q = 4;
+    int q = 5;
     cout << "p = " << p << endl;
     cout << "q = " << q << endl;
     BuildPolyhedra polyhedron(p, q);
     polyhedron.CreateCells();
-
-    // Gedim::UCDUtilities utilities;
-    // utilities.ExportPoints("./Cell0Ds.inp",
-    //                        polyhedron.CoordVertices);
-
-    // utilities.ExportSegments("./Cell1Ds.inp",
-    //                          polyhedron.CoordVertices,
-    //                          polyhedron.ExtremaEdges);
-
-    
-
+    polyhedron.GetStructure();
     return 0;
 }

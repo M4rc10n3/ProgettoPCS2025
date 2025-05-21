@@ -7,6 +7,7 @@
 # include "Eigen/Eigen"
 # include "Polyhedra.hpp"
 # include "BuildPolyhedra.hpp"
+# include "UCDUtilities.hpp"
 
 using namespace std;
 
@@ -312,7 +313,8 @@ namespace PolyhedraLibrary{
 
     void BuildPolyhedra::Cell1Ds()
     {   
-        Eigen::MatrixXi ExtremaEdges = polyhedron.ExtremaEdges;
+        Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
+
         ofstream file("../PolygonalData/Cell1Ds.txt"); // the program should be launched inside Debug or Release folders
         
         file << "Id,Origin,End\n";
@@ -391,5 +393,47 @@ namespace PolyhedraLibrary{
         Cell3Ds();
     }
 
+
+    void BuildPolyhedra::GetStructure()
+    {
+        Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
+        Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
+        Eigen::MatrixXi& ListVertFaces = polyhedron.ListVertFaces;
+
+        Gedim::UCDUtilities utilities;
+        utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
+                               CoordVertices);
+
+        utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
+                                 CoordVertices,
+                                 ExtremaEdges);
+        
+        /* Creating a vector of vectors starting from ListVertFaces in order 
+        to use Mr. Vicini's code (UCDUtilities.hpp) */
+        
+        vector<vector<unsigned int>> FacesVertices;
+        FacesVertices.resize(NumFaces);
+        for(int i; i < NumFaces; i++)
+        {
+            FacesVertices[i].resize(3);
+            
+            // Salvo i vertici di ciascuna faccia con indice "i" all'interno del vettore con indice "i"
+            FacesVertices[i][0] = ListVertFaces(0, i);
+            FacesVertices[i][1] = ListVertFaces(1, i);
+            FacesVertices[i][2] = ListVertFaces(2, i);
+            
+            // Printing in order to check
+            cout << "FacesVertices[" << i << "]: { ";
+            for(auto elem : FacesVertices[i])
+            {
+                cout << elem << " ";
+            }
+            cout << "}" << endl;
+        }
+
+        utilities.ExportPolygons("../PolygonalData/Cell2Ds.inp",
+                                  CoordVertices,
+                                  FacesVertices);
+    }
 
 };

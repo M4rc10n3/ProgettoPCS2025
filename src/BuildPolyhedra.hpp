@@ -34,6 +34,9 @@ namespace PolyhedraLibrary{
 
         void CreateCells(); // First fill the structure then calls all the CellXDs functions  
 
+        void GetStructure(); // Export the strctures using the code of Mr. Vicini in order 
+                             // to create a file readable by ParaView
+
     };
 
 }
