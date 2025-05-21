@@ -7,7 +7,10 @@ namespace PolyhedraLibrary{
     {
     private: 
     GEOPolyhedron polyhedron;
-    int NumFaces, NumEdges, NumVertices, p, q;
+    unsigned int p, q;
+    int& NumFaces = polyhedron.NumFaces; 
+    int& NumEdges = polyhedron.NumEdges;
+    int& NumVertices = polyhedron.NumVertices;
     double Length_edge;
 
     void PointsPolyhedra();  // Provides all the point of the polyhedron
@@ -22,13 +25,17 @@ namespace PolyhedraLibrary{
 
     void Cell3Ds(); // Create Cell3Ds
 
-
     public:
         BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q); // Initialize the class
+
+        BuildPolyhedra(GEOPolyhedron& polyhedron); // Initialize the class 
 
         void DataPolyhedra(); // Gives all the important Data of the polyhedron
 
         void CreateCells(); // First fill the structure then calls all the CellXDs functions  
+
+        void GetStructure(); // Export the strctures using the code of Mr. Vicini in order 
+                             // to create a file readable by ParaView
 
     };
 

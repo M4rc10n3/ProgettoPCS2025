@@ -1,26 +1,12 @@
 /* File containing the body of the functions we'll use */
 
-# include "Polyhedra.hpp"
 # include "Utils.hpp"
+# include "Polyhedra.hpp"
+# include "BuildPolyhedra.hpp"
 # include <vector>
 
 using namespace PolyhedraLibrary;
 using namespace std;
-
-void TypeITassellation(GEOPolyhedron& polyhedron)
-{
-
-}
-
-void TypeIITassellation(GEOPolyhedron& polyhedron)
-{
-
-}
-
-GEOPolyhedron Dualise(GEOPolyhedron& polyhedron)
-{
-    return polyhedron;
-}
 
 Eigen::Vector3d FindBarycenter(Eigen::Vector3i& VertFace)
 {
@@ -60,4 +46,19 @@ vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2)
 {
     vector<int> Path;
     return Path;
+}
+
+GEOPolyhedron Dualise(GEOPolyhedron& polyhedron)
+{
+    return polyhedron;
+}
+
+void TypeITassellation(GEOPolyhedron& polyhedron)
+{
+
+}
+
+void TypeIITassellation(GEOPolyhedron& polyhedron)
+{
+
 }
