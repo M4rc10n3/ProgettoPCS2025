@@ -26,7 +26,7 @@ namespace PolyhedraLibrary{
     void Cell3Ds(); // Create Cell3Ds
 
     public:
-        BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q); // Initialize the class
+        BuildPolyhedra(const unsigned int& Schlafli_p, const unsigned int& Schlafli_q); // Initialize the class
 
         BuildPolyhedra(GEOPolyhedron& polyhedron); // Initialize the class 
 
