@@ -16,28 +16,27 @@ namespace PolyhedraLibrary{
         p = Schlafli_p;
         q = Schlafli_q;
 
-        polyhedron.NumFaces = (4 * q) / ((2*p) - (p*q) + 2*q); // determines the number of faces using p and q 
-        polyhedron.NumEdges = (p * polyhedron.NumFaces) / 2;
-        polyhedron.NumVertices = (p * polyhedron.NumFaces) / q;
+        NumFaces = (4 * q) / ((2*p) - (p*q) + 2*q); // determines the number of faces using p and q 
+        NumEdges = (p * NumFaces) / 2;
+        NumVertices = (p * NumFaces) / q;
 
-        // Così stiamo creando delle copie, non sarebbe meglio creare dei semplici alias? 
-        // Per farlo si usa la sintassi:
-        // int &NumFaces = polyhedron.NumFaces;
-        NumFaces = polyhedron.NumFaces; 
-        NumEdges = polyhedron.NumEdges;
-        NumVertices = polyhedron.NumVertices;
+        // Reserves the exact amount of memory for the differents IDs
+        polyhedron.IdVertices.reserve(NumVertices);
+        polyhedron.IdEdges.reserve(NumEdges);
+        polyhedron.IdFaces.reserve(NumFaces);
 
-        // Credo sia utile se rendiamo gli id come int o unsigned int piuttosto che string
-        // polyhedron.IdVertices.reserve(NumVertices);
-        // polyhedron.IdEdges.reserve(NumEdges);
-        // polyhedron.IdFaces.reserve(NumFaces);
-
+        // Initialize all the Matrices 
         polyhedron.CoordVertices = Eigen::MatrixXd(NumVertices, 3);
         polyhedron.ExtremaEdges = Eigen::MatrixXi(NumEdges, 2);
         polyhedron.MatrEdgeVertices = Eigen::MatrixXi::Constant(NumVertices, NumVertices, -1);
         polyhedron.ListEdgeFaces = Eigen::MatrixXi(p, NumFaces);
         polyhedron.ListVertFaces = Eigen::MatrixXi(p, NumFaces);
         
+    }
+
+    BuildPolyhedra::BuildPolyhedra(GEOPolyhedron& DualPolyhedron)
+    {
+
     }
 
     void BuildPolyhedra::DataPolyhedra()
@@ -441,13 +440,9 @@ namespace PolyhedraLibrary{
     //     cout << "ListEdgeFaces: " << endl << ListEdgeFaces << endl;
     }
 
-
-
     void BuildPolyhedra::Cell0Ds()
     {   
         Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
-        // Eigen::MatrixXd CoordVertices = Eigen::MatrixXd::Zero(NumVertices, 3);
-        
         ofstream file("../PolygonalData/Cell0Ds.txt"); // the program should be launched inside Debug or Release folders
         
         file << "Id,X,Y,Z\n";
@@ -458,7 +453,7 @@ namespace PolyhedraLibrary{
             CoordVertices(i, 1) << "," << 
             CoordVertices(i, 2) << "\n";
             
-            polyhedron.IdVertices.push_back("V" + to_string(i));
+            polyhedron.IdVertices.push_back(i);
         }
 
         file.close();
@@ -467,7 +462,6 @@ namespace PolyhedraLibrary{
     void BuildPolyhedra::Cell1Ds()
     {   
         Eigen::MatrixXi ExtremaEdges = polyhedron.ExtremaEdges;
-        // Eigen::MatrixXd ExtremaEdges = Eigen::MatrixXd::Zero(NumEdges, 2);
         ofstream file("../PolygonalData/Cell1Ds.txt"); // the program should be launched inside Debug or Release folders
         
         file << "Id,Origin,End\n";
@@ -476,7 +470,7 @@ namespace PolyhedraLibrary{
             file << i << "," << ExtremaEdges(i,0) << "," << 
             ExtremaEdges(i,1) << "\n";
             
-            polyhedron.IdEdges.push_back("E" + to_string(i));
+            polyhedron.IdEdges.push_back(i);
         }
 
         file.close();
@@ -486,8 +480,6 @@ namespace PolyhedraLibrary{
     {   
         Eigen::MatrixXi ListVertFaces = polyhedron.ListVertFaces;
         Eigen::MatrixXi ListEdgeFaces = polyhedron.ListEdgeFaces;
-        // Eigen::MatrixXi ListVertFaces = Eigen::MatrixXi::Zero(NumVertices, NumFaces);
-        // Eigen::MatrixXi ListEdgeFaces = Eigen::MatrixXi::Zero(NumEdges, NumFaces);
         ofstream file("../PolygonalData/Cell2Ds.txt"); // the program needs to be launched inside Debug or Release folders
         
         file << "Id,NumVerices,Vertices,NumEdges,Edges\n";
@@ -506,7 +498,7 @@ namespace PolyhedraLibrary{
             }
             file << "\n";
 
-            polyhedron.IdFaces.push_back("F" + to_string(i));
+            polyhedron.IdFaces.push_back(i);
         }
 
         file.close();
@@ -519,17 +511,17 @@ namespace PolyhedraLibrary{
         file << "Id\n";
         for (int i = 0; i < NumVertices; i++)
         {
-            file << polyhedron.IdVertices[i] << "\n";
+            file << "V" << polyhedron.IdVertices[i] << "\n";
         }
 
         for (int j = 0; j < NumEdges; j++)
         {
-            file << polyhedron.IdEdges[j] << "\n";
+            file << "E" << polyhedron.IdEdges[j] << "\n";
         }
 
         for (int k = 0; k < NumFaces; k++)
         {
-            file << polyhedron.IdFaces[k] << "\n";
+            file << "F" << polyhedron.IdFaces[k] << "\n";
         }
 
         file.close();

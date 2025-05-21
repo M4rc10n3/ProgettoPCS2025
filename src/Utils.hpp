@@ -7,31 +7,6 @@
 using namespace PolyhedraLibrary;
 using namespace std;
 
-/* CreatePolyhedron is a function that creates the Polyhedron starting from the input data p and q
-Inputs list:
-p: number of vertices of each face of the polyhedron; therefore, each face is a p-sided polygon
-q: number of regular p-sided polygon faces around each vertex of the polyhedra*/
-// GEOPolyhedron CreatePolyhedron(const int& p, const int& q);
-
-/* TypeITassellation is a function that modifies the attributes of the object <polyhedron> in order to 
-output its tassellations of type I regarding geodetic polyhedra 
-Inputs list:
-polyhedron: object of type "Polyhedron" that the function modifies. */
-void TypeITassellation(GEOPolyhedron& polyhedron);
-
-/* TypeIITassellation is a function that modifies the attributes of the object <polyhedron> in order to 
-output its tassellations of type II regarding geodetic polyhedra 
-Inputs list:
-polyhedron: object of type "Polyhedron" that the function modifies. */
-void TypeIITassellation(GEOPolyhedron& polyhedron);
-
-/* Dualise is a function that outputs the dual, expressed as the type "Polyhedron", of a <polyhedron> given as input 
-Inputs list:
-polyhedron: object of type "Polyhedron" that the function uses to create its dual */
-GEOPolyhedron Dualise(GEOPolyhedron& polyhedron);
-// Che sia meglio dare come output il tipo void? Se facciamo return Polyhedron sarà una grossa e lenta operazione, vero? 
-// Forse è meglio definire un nuovo poliedro prima di chiamare questa funzione e mettiamo come altro input della funzione il poliedro stesso in cui dobbiamo fare output?
-
 /* FindBarycenter is a function that outputs a vector containing the coordinates of the barycenter 
 of each triangular face
 Inputs list:
@@ -51,3 +26,22 @@ Inputs list:
 id_vertex_1: the id associated to the first vertex of the minimum path we're looking for 
 id_vertex_2: the id associated to the second/last vertex of the minimum path we're looking for*/
 vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2);
+
+/* Dualise is a function that outputs the dual, expressed as the type "Polyhedron", of a <polyhedron> given as input 
+Inputs list:
+polyhedron: object of type "Polyhedron" that the function uses to create its dual */
+GEOPolyhedron Dualise(GEOPolyhedron& polyhedron);
+// Che sia meglio dare come output il tipo void? Se facciamo return Polyhedron sarà una grossa e lenta operazione, vero? 
+// Forse è meglio definire un nuovo poliedro prima di chiamare questa funzione e mettiamo come altro input della funzione il poliedro stesso in cui dobbiamo fare output?
+
+/* TypeITassellation is a function that modifies the attributes of the object <polyhedron> in order to 
+output its tassellations of type I regarding geodetic polyhedra 
+Inputs list:
+polyhedron: object of type "Polyhedron" that the function modifies. */
+void TypeITassellation(GEOPolyhedron& polyhedron);
+
+/* TypeIITassellation is a function that modifies the attributes of the object <polyhedron> in order to 
+output its tassellations of type II regarding geodetic polyhedra 
+Inputs list:
+polyhedron: object of type "Polyhedron" that the function modifies. */
+void TypeIITassellation(GEOPolyhedron& polyhedron);

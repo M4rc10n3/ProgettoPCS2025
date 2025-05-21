@@ -15,16 +15,16 @@ namespace PolyhedraLibrary
     struct GEOPolyhedron
     {
         int NumVertices; // Number of vertices
-        std::vector<string> IdVertices; // Id of all vertices
+        std::vector<int> IdVertices; // Id of all vertices
         Eigen::MatrixXd CoordVertices; // Coordinates of the vertices, NumVertices x 3 matrix
 
         int NumEdges; // Number of Edges
-        std::vector<string> IdEdges; // Id of all vertices
+        std::vector<int> IdEdges; // Id of all vertices
         Eigen::MatrixXi ExtremaEdges; // Extrema of each edge, NumEdges x 2 matrix
         Eigen::MatrixXi MatrEdgeVertices; // Edge connecting each pair of extrema, NumVertices x NumVertices matrix
         
         int NumFaces; // Number of faces 
-        std::vector<string> IdFaces; // Id of all faces
+        std::vector<int> IdFaces; // Id of all faces
         Eigen::MatrixXi ListVertFaces; // All the vertices of each face, p x NumFaces matrix
         Eigen::MatrixXi ListEdgeFaces; // All the edges of each face, p x NumFaces matrix
 
