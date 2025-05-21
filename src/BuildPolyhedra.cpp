@@ -53,36 +53,23 @@ namespace PolyhedraLibrary{
                 case 3:
                     cout << "Your Polyhedron is a Tetrahedron with:\n";
                     Length_edge = 2 * sqrt(6) / 3;
-                    polyhedron.CoordVertices << 0,0,1,
-                                                -0.94,0,-0.33,
-                                                0.47,-0.82,-0.33,
-                                                0.47,0.82,-0.33;
+                    polyhedron.CoordVertices << 0, -0.94, 0.47, 0.47,
+                                                0, 0, -0.82, 0.82,
+                                                1, -0.33, -0.33, -0.33;
                     break;
                 case 4:
                     cout << "Your Polyhedron is a Octahedron with:\n";
                     Length_edge = sqrt(2);
-                    polyhedron.CoordVertices << 0,0,1,
-                                                0,0,-1,
-                                                0,1,0,
-                                                0,-1,0,
-                                                1,0,0,
-                                                -1,0,0;
+                    polyhedron.CoordVertices << 0, 0, 0, 0, 1, -1,
+                                                0, 0, 1, -1, 0, 0,
+                                                1, -1, 0, 0, 0, 0;
                     break;
                 case 5:
                     cout << "Your Polyhedron is a Icosahedron with: \n";
                     Length_edge = 4 / sqrt(10 + 2*sqrt(5));
-                    polyhedron.CoordVertices << 0,0,1,
-                                                0.89,0,0.45,
-                                                0.28,0.85,0.45,
-                                                0.72,0.53,-0.45,
-                                                -0.28,0.85,-0.45,
-                                                0,0,-1,
-                                                -0.89,0,-0.45,
-                                                -0.28,-0.85,-0.45,
-                                                -0.72,-0.53,0.45,
-                                                0.28,-0.85,0.45,
-                                                0.72,-0.53,-0.45,
-                                                -0.72,0.53,0.45;
+                    polyhedron.CoordVertices << 0, 0.89, 0.28, 0.72, -0.28, 0, -0.89, -0.28, -0.72, 0.28, 0.72, -0.72,
+                                                0, 0, 0.85, 0.53, 0.85, 0, 0, -0.85, -0.53, -0.85, -0.53, 0.53,
+                                                1, 0.45, 0.45, -0.45, -0.45, -1, -0.45, -0.45, 0.45, 0.45, -0.45, 0.45;   
                     break;
                 }
                 break;
@@ -222,7 +209,7 @@ namespace PolyhedraLibrary{
         
         for(int vertex = 0; vertex < NumVertices; vertex++)
         { 
-            if (faceIndex < NumFaces) // Proceed only if all the faces have not been numbered yet
+            if (faceIndex <= NumFaces) // Proceed only if all the faces have not been numbered yet
             {
                 // Saving the vertices that are adjacent to "vertex"
                 vector<int> connectedVertices;
@@ -273,7 +260,7 @@ namespace PolyhedraLibrary{
                                     array<int, 3> edgesInFace = {e1, e2, e3}; 
                                     array<int, 3> verticesInFace = {vertex, vertexToCheck1, vertexToCheck2};
 
-                                    cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
+                                    // cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
 
                                     // Check face orientation consistency
                                     if (ExtremaEdges(1, e1) == ExtremaEdges(0, e2)) // e1.end == e2.origin
@@ -383,13 +370,11 @@ namespace PolyhedraLibrary{
             file << polyhedron.IdVertices[i] << "\n";
         }
 
-        file << "IdEdges:\n";
         for (int j = 0; j < NumEdges; j++)
         {
             file << polyhedron.IdEdges[j] << "\n";
         }
 
-        file << "IdFaces\n";
         for (int k = 0; k < NumFaces; k++)
         {
             file << polyhedron.IdFaces[k] << "\n";

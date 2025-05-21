@@ -31,9 +31,13 @@ int main(){
 
     // Gedim::UCDUtilities utilities;
     // utilities.ExportPoints("./Cell0Ds.inp",
-    //                        polyhedron.CoordVertices,
-    //                        {},
-    //                        mesh.Cell0DsMarkers);
+    //                        polyhedron.CoordVertices);
+
+    // utilities.ExportSegments("./Cell1Ds.inp",
+    //                          polyhedron.CoordVertices,
+    //                          polyhedron.ExtremaEdges);
+
+    
 
     return 0;
 }
