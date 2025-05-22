@@ -36,7 +36,7 @@ namespace PolyhedraLibrary{
 
     void BuildPolyhedra::DataPolyhedra()
     {
-        cout << "Entering DataPolyhedra" << endl;
+        // Entering DataPolyhedra
         if ((p - 2) * (q - 2) < 4)
         {
             switch (p) // finds the correct polyhedron requested
@@ -85,6 +85,7 @@ namespace PolyhedraLibrary{
             cout << NumVertices << " Vertices\n" <<
                     NumEdges << " Edges\n" <<
                     NumFaces << " Faces\n" << endl;
+            FillStructPolyhedra();
         }
         else
         {
@@ -93,37 +94,14 @@ namespace PolyhedraLibrary{
         }
     }
 
-    void BuildPolyhedra::PointsPolyhedra()
+    void BuildPolyhedra::PointsPolyhedra(Eigen::MatrixXd& CoordVertices)
     {   
-        DataPolyhedra();
-        // Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
-        // vector<double> x(NumVertices), y(NumVertices), z(NumVertices);
-        // vector<int> vert_valence(NumVertices);
-        
-        // double angle_vectors;
-
-        // x[0] = 0;
-        // y[0] = 0;
-        // z[0] = 1;
-        
-        // // Piuttosto di "pow" la prof. aveva detto che per potenze piccole è meglio 
-        // // moltiplicare l'elemento per se stesso
-        // x[1] = sqrt(1 - pow(0.5*(2.0 - Length_edge * Length_edge), 2));
-        // y[1] = 0;
-        // z[1] = 0.5*(2.0 - Length_edge * Length_edge);
-
-        // angle_vectors = x[0] * x[1] + y[0] * y[1] + z[0] * z[1];
-        // // cout << angle_vectors << endl;
-        // // cout << x[1] * x[1] + y[1] * y [1] + z[1] * z[1];
-        // for (int i = 2; i < NumVertices; i++)
-        // {
-
-        // }
+        polyhedron.CoordVertices = CoordVertices;
+        FillStructPolyhedra();
     }
 
     void BuildPolyhedra::FillStructPolyhedra()
-    {   
-        DataPolyhedra();            
+    {             
         Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
         Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
         Eigen::MatrixXi& ListVertFaces = polyhedron.ListVertFaces;
@@ -386,7 +364,7 @@ namespace PolyhedraLibrary{
         Cell3Ds();
     }
 
-    void BuildPolyhedra::GetStructure()
+    void BuildPolyhedra::ExportPolyhedra()
     {
         Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
         Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
@@ -426,6 +404,12 @@ namespace PolyhedraLibrary{
         utilities.ExportPolygons("../PolygonalData/Cell2Ds.inp",
                                   CoordVertices,
                                   FacesVertices);
+    
     }
 
+    GEOPolyhedron BuildPolyhedra::GetPolyhedron()
+    {
+        return polyhedron;
+    }
+    
 };

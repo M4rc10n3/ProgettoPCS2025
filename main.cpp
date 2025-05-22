@@ -8,7 +8,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    int p, q, b, c, id_vertex_1, id_vertex_2; // initialize all the variables
+    unsigned int p, q, b, c, id_vertex_1, id_vertex_2; // initialize all the variables
     string executable;
     vector<string> parameters;
 
@@ -65,9 +65,10 @@ int main(int argc, char* argv[])
         c << ")" << endl; 
     }
 
-    BuildPolyhedra polyhedron(p, q); // create the structure of the Polyedron
-    polyhedron.CreateCells();
-    polyhedron.GetStructure();
+    BuildPolyhedra Constructor(p, q); // create the structure of the Polyedron
+    Constructor.DataPolyhedra();
+    GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
+    Dualise(polyhedron, p, q);
 
     return 0;
 }

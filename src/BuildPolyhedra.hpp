@@ -13,8 +13,6 @@ namespace PolyhedraLibrary{
     int& NumVertices = polyhedron.NumVertices;
     double Length_edge;
 
-    void PointsPolyhedra();  // Provides all the point of the polyhedron
-
     void FillStructPolyhedra(); // Fills all the structures of GEOPolyhedron
     
     void Cell0Ds(); // Create Cell0Ds 
@@ -30,10 +28,14 @@ namespace PolyhedraLibrary{
 
         void DataPolyhedra(); // Gives all the important Data of the polyhedron
 
+        void PointsPolyhedra(Eigen::MatrixXd& CoordVertices);  // Fills all the point of the polyhedron
+
         void CreateCells(); // First fill the structure then calls all the CellXDs functions  
 
-        void GetStructure(); // Export the structures using the code of Mr. Vicini in order 
-                             // to create a file readable by ParaView
+        GEOPolyhedron GetPolyhedron(); // Retturns the final polyhedron requested 
+
+        void ExportPolyhedra(); // Export the structures using the code of Mr. Vicini in order 
+                                // to create a file readable by ParaView
 
     };
 

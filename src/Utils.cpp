@@ -47,38 +47,21 @@ vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2)
     return Path;
 }
 
-GEOPolyhedron Dualise(GEOPolyhedron& polyhedron, const unsigned int& Schlafli_p, const unsigned int& Schlafli_q)
+void Dualise(GEOPolyhedron& polyhedron, const unsigned int& Schlafli_p, const unsigned int& Schlafli_q)
 {
-    GEOPolyhedron DualPolyhedron;
-
-    const unsigned int& q = Schlafli_p;
-    const unsigned int& p = Schlafli_q;
-
-    DualPolyhedron.NumFaces = (4 * q) / ((2*p) - (p*q) + 2*q); // determines the number of faces using p and q 
-    DualPolyhedron.NumEdges = (p * DualPolyhedron.NumFaces) / 2;
-    DualPolyhedron.NumVertices = (p * DualPolyhedron.NumFaces) / q;
-
-    // Reserves the exact amount of memory for the differents IDs
-    polyhedron.IdVertices.reserve(DualPolyhedron.NumVertices);
-    polyhedron.IdEdges.reserve(DualPolyhedron.NumEdges);
-    polyhedron.IdFaces.reserve(DualPolyhedron.NumFaces);
-
-    // Initialize all the Matrices 
-    polyhedron.CoordVertices = Eigen::MatrixXd(3, DualPolyhedron.NumVertices);
-    polyhedron.ExtremaEdges = Eigen::MatrixXi(2, DualPolyhedron.NumEdges);
-    polyhedron.MatrEdgeVertices = Eigen::MatrixXi::Constant(DualPolyhedron.NumVertices, DualPolyhedron.NumVertices, -1);
-    polyhedron.ListEdgeFaces = Eigen::MatrixXi(p, DualPolyhedron.NumFaces);
-    polyhedron.ListVertFaces = Eigen::MatrixXi(p, DualPolyhedron.NumFaces);
+    Eigen::MatrixXd CoordVertices;
+    BuildPolyhedra constructor(Schlafli_q, Schlafli_p); // p, q are switched becasue it's the dual polyhedron
 
     for (int i : polyhedron.IdFaces)
     {
         Eigen::Vector3i dual_vertex  = polyhedron.ListVertFaces.col(i);
         Eigen::Vector3d barycenter_coordinates = OntoTheUnitSphere(FindBarycenter(dual_vertex));
-        DualPolyhedron.CoordVertices.row(i) = barycenter_coordinates;
-
+        cout << barycenter_coordinates(0) << "," << barycenter_coordinates(1) << "," << barycenter_coordinates(2) << endl;
+        CoordVertices.row(i) = barycenter_coordinates.transpose(); 
     }
 
-    return DualPolyhedron;
+    constructor.PointsPolyhedra(CoordVertices);
+    constructor.CreateCells();
 }
 
 void TypeITassellation(GEOPolyhedron& polyhedron)

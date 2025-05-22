@@ -14,7 +14,7 @@ int main(int argc, char * argv[])
     cout << "q = " << q << endl;
     BuildPolyhedra polyhedron(p, q);
     polyhedron.CreateCells();
-    polyhedron.GetStructure();
+    polyhedron.ExportPolyhedra();
     
     return 0;
 }

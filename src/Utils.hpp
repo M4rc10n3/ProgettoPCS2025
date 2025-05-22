@@ -30,7 +30,7 @@ vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2);
 /* Dualise is a function that outputs the dual, expressed as the type "Polyhedron", of a <polyhedron> given as input 
 Inputs list:
 polyhedron: object of type "Polyhedron" that the function uses to create its dual */
-GEOPolyhedron Dualise(GEOPolyhedron& polyhedron);
+void Dualise(GEOPolyhedron& polyhedron, const unsigned int& Schlafli_p, const unsigned int& Schlafli_q);
 // Che sia meglio dare come output il tipo void? Se facciamo return Polyhedron sarà una grossa e lenta operazione, vero? 
 // Forse è meglio definire un nuovo poliedro prima di chiamare questa funzione e mettiamo come altro input della funzione il poliedro stesso in cui dobbiamo fare output?
 
