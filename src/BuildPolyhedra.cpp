@@ -97,6 +97,7 @@ namespace PolyhedraLibrary{
     void BuildPolyhedra::PointsPolyhedra(Eigen::MatrixXd& CoordVertices)
     {   
         polyhedron.CoordVertices = CoordVertices;
+        Length_edge = 2 * sqrt(6) / 3; // TODO we need to call the Length Edge inside PointPolyhedra
         FillStructPolyhedra();
     }
 
@@ -142,7 +143,7 @@ namespace PolyhedraLibrary{
                     // When the two vertices have the correct distance between them we save them as an 
                     // edge of the polyhedron (we decided to set this small tolerance because the data 
                     // we used to create the polygons has two decimal digits)
-                    if(distance_squared - length_edge_squared < 5e-2)
+                    if(abs(distance_squared - length_edge_squared) < 5e-2)
                     {
                         ExtremaEdges(0, edgeIndex) = i;
                         ExtremaEdges(1, edgeIndex) = j;

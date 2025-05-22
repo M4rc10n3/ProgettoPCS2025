@@ -60,9 +60,7 @@ void Dualise(GEOPolyhedron& polyhedron, const unsigned int& Schlafli_p, const un
     for (int i = 0; i < polyhedron.NumFaces; i++)
     {
         Eigen::Vector3i dual_vertex  = polyhedron.ListVertFaces.col(i);
-        cout << dual_vertex(0) << "," << dual_vertex(1) << "," << dual_vertex(2);
         Eigen::Vector3d barycenter_coordinates = OntoTheUnitSphere(FindBarycenter(polyhedron, dual_vertex));
-        cout << barycenter_coordinates(0) << "," << barycenter_coordinates(1) << "," << barycenter_coordinates(2) << endl;
         CoordVertices.col(i) = barycenter_coordinates; 
     }
 
