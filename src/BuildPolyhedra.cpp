@@ -353,8 +353,6 @@ namespace PolyhedraLibrary{
 
     void BuildPolyhedra::CreateCells() 
     {
-        FillStructPolyhedra();
-
         Cell0Ds();
 
         Cell1Ds();

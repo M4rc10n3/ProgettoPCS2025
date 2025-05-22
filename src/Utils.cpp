@@ -8,9 +8,8 @@
 using namespace PolyhedraLibrary;
 using namespace std;
 
-Eigen::Vector3d FindBarycenter(Eigen::Vector3i& VertFace)
+Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertFace)
 {
-    GEOPolyhedron polyhedron;
     Eigen::Vector3d barycenter_coordinates = Eigen::Vector3d::Zero(3); // initialyze a vector for the final coordinates
     double Coord_x = 0;
     double Coord_y = 0;
@@ -19,9 +18,9 @@ Eigen::Vector3d FindBarycenter(Eigen::Vector3i& VertFace)
     // Finding the coordinates of each vertex 
     for (int i = 0; i < VertFace.size(); i++)
     {
-        Coord_x += polyhedron.CoordVertices(VertFace(i), 0);
-        Coord_y += polyhedron.CoordVertices(VertFace(i), 1);
-        Coord_z += polyhedron.CoordVertices(VertFace(i), 2);
+        Coord_x += polyhedron.CoordVertices(0, VertFace(i));
+        Coord_y += polyhedron.CoordVertices(1, VertFace(i));
+        Coord_z += polyhedron.CoordVertices(2, VertFace(i));
     }
 
     barycenter_coordinates = {Coord_x/3.0, Coord_y/3.0, Coord_z/3.0};
@@ -53,15 +52,18 @@ vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2)
 
 void Dualise(GEOPolyhedron& polyhedron, const unsigned int& Schlafli_p, const unsigned int& Schlafli_q)
 {
-    Eigen::MatrixXd CoordVertices;
+    Eigen::MatrixXd CoordVertices(3, polyhedron.NumFaces);
     BuildPolyhedra constructor(Schlafli_q, Schlafli_p); // p, q are switched becasue it's the dual polyhedron
 
-    for (int i : polyhedron.IdFaces)
+    cout << "\n DualPolyhedron \n" << endl;
+
+    for (int i = 0; i < polyhedron.NumFaces; i++)
     {
         Eigen::Vector3i dual_vertex  = polyhedron.ListVertFaces.col(i);
-        Eigen::Vector3d barycenter_coordinates = OntoTheUnitSphere(FindBarycenter(dual_vertex));
+        cout << dual_vertex(0) << "," << dual_vertex(1) << "," << dual_vertex(2);
+        Eigen::Vector3d barycenter_coordinates = OntoTheUnitSphere(FindBarycenter(polyhedron, dual_vertex));
         cout << barycenter_coordinates(0) << "," << barycenter_coordinates(1) << "," << barycenter_coordinates(2) << endl;
-        CoordVertices.row(i) = barycenter_coordinates.transpose(); 
+        CoordVertices.col(i) = barycenter_coordinates; 
     }
 
     constructor.PointsPolyhedra(CoordVertices);
