@@ -26,8 +26,13 @@ int main(){
     int q = 5;
     cout << "p = " << p << endl;
     cout << "q = " << q << endl;
-    BuildPolyhedra polyhedron(p, q);
-    polyhedron.CreateCells();
-    polyhedron.ExportPolyhedra();
+    // BuildPolyhedra polyhedron(p, q);
+    // polyhedron.CreateCells();
+    // polyhedron.ExportPolyhedra();
+
+    BuildPolyhedra Constructor(p, q); // create the structure of the Polyedron
+    Constructor.DataPolyhedra();
+    GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
+    Constructor.ExportPolyhedra();
     return 0;
 }

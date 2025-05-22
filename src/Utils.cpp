@@ -43,6 +43,10 @@ Eigen::Vector3d OntoTheUnitSphere(Eigen::Vector3d vertex)
 
 vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2)
 {
+    // Le due prossime righe servono a rimuovere solo i warning dalla compilazione
+    id_vertex_1 = 0;
+    id_vertex_2 = 0;
+
     vector<int> Path;
     return Path;
 }
@@ -64,12 +68,12 @@ void Dualise(GEOPolyhedron& polyhedron, const unsigned int& Schlafli_p, const un
     constructor.CreateCells();
 }
 
-void TypeITassellation(GEOPolyhedron& polyhedron)
-{
+// void TypeITassellation(GEOPolyhedron& polyhedron)
+// {
+    
+// }
 
-}
-
-void TypeIITassellation(GEOPolyhedron& polyhedron)
-{
-
-}
+// void TypeIITassellation(GEOPolyhedron& polyhedron)
+// {
+    
+// }

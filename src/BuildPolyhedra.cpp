@@ -12,7 +12,7 @@
 using namespace std;
 
 namespace PolyhedraLibrary{
-    BuildPolyhedra::BuildPolyhedra(const unsigned int& Schlafli_p, const unsigned int& Schlafli_q)
+    BuildPolyhedra::BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q)
     {
         p = Schlafli_p;
         q = Schlafli_q;
@@ -370,20 +370,38 @@ namespace PolyhedraLibrary{
         Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
         Eigen::MatrixXi& ListVertFaces = polyhedron.ListVertFaces;
 
+        Eigen::VectorXi VerticesMarkers(NumVertices);
+        for(int i = 0; i < NumVertices; i++)
+        {
+            VerticesMarkers[i] = 1;
+        }
+        
+        Eigen::VectorXi EdgesMarkers(NumEdges);
+        for(int i = 0; i < NumEdges; i++)
+        {
+            EdgesMarkers[i] = 2;
+        }
+
         Gedim::UCDUtilities utilities;
         utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
-                               CoordVertices);
+                               CoordVertices,
+                               {},
+                               VerticesMarkers);
 
         utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
                                  CoordVertices,
-                                 ExtremaEdges);
+                                 ExtremaEdges,
+                                 {},
+                                 {},
+                                 EdgesMarkers);
         
         /* Creating a vector of vectors starting from ListVertFaces in order 
         to use Mr. Vicini's code (UCDUtilities.hpp) */
         
         vector<vector<unsigned int>> FacesVertices;
         FacesVertices.resize(NumFaces);
-        for(int i; i < NumFaces; i++)
+
+        for(int i = 0; i < NumFaces; i++)
         {
             FacesVertices[i].resize(3);
             
@@ -391,14 +409,6 @@ namespace PolyhedraLibrary{
             FacesVertices[i][0] = ListVertFaces(0, i);
             FacesVertices[i][1] = ListVertFaces(1, i);
             FacesVertices[i][2] = ListVertFaces(2, i);
-            
-            // Printing in order to check
-            cout << "FacesVertices[" << i << "]: { ";
-            for(auto elem : FacesVertices[i])
-            {
-                cout << elem << " ";
-            }
-            cout << "}" << endl;
         }
 
         utilities.ExportPolygons("../PolygonalData/Cell2Ds.inp",

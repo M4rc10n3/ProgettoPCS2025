@@ -7,7 +7,7 @@ namespace PolyhedraLibrary{
     {
     private: 
     GEOPolyhedron polyhedron;
-    unsigned int p, q;
+    int p, q;
     int& NumFaces = polyhedron.NumFaces; 
     int& NumEdges = polyhedron.NumEdges;
     int& NumVertices = polyhedron.NumVertices;
@@ -24,7 +24,7 @@ namespace PolyhedraLibrary{
     void Cell3Ds(); // Create Cell3Ds
 
     public:
-        BuildPolyhedra(const unsigned int& Schlafli_p, const unsigned int& Schlafli_q); // Initialize the class
+        BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q); // Initialize the class
 
         void DataPolyhedra(); // Gives all the important Data of the polyhedron
 
@@ -32,7 +32,7 @@ namespace PolyhedraLibrary{
 
         void CreateCells(); // First fill the structure then calls all the CellXDs functions  
 
-        GEOPolyhedron GetPolyhedron(); // Retturns the final polyhedron requested 
+        GEOPolyhedron GetPolyhedron(); // Returns the final polyhedron requested 
 
         void ExportPolyhedra(); // Export the structures using the code of Mr. Vicini in order 
                                 // to create a file readable by ParaView
