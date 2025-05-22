@@ -66,6 +66,7 @@ void Dualise(GEOPolyhedron& polyhedron, const unsigned int& Schlafli_p, const un
 
     constructor.PointsPolyhedra(CoordVertices);
     constructor.CreateCells();
+    constructor.ExportPolyhedra();
 }
 
 // void TypeITassellation(GEOPolyhedron& polyhedron)

@@ -68,8 +68,8 @@ int main(int argc, char* argv[])
     BuildPolyhedra Constructor(p, q); // create the structure of the Polyedron
     Constructor.DataPolyhedra();
     GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
-    Constructor.CreateCells();
-    // Dualise(polyhedron, p, q);
-
+    // Constructor.CreateCells();
+    // Constructor.ExportPolyhedra();
+    Dualise(polyhedron, p, q);
     return 0;
 }
