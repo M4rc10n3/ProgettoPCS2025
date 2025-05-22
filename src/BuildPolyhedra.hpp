@@ -11,9 +11,28 @@ namespace PolyhedraLibrary{
     int& NumFaces = polyhedron.NumFaces; 
     int& NumEdges = polyhedron.NumEdges;
     int& NumVertices = polyhedron.NumVertices;
-    double Length_edge;
 
-    void FillStructPolyhedra(); // Fills all the structures of GEOPolyhedron
+    double Length_edge;
+    
+    Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
+    Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
+    Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
+    Eigen::MatrixXi& ListVertFaces = polyhedron.ListVertFaces;
+    Eigen::MatrixXi& ListEdgeFaces = polyhedron.ListEdgeFaces;
+    
+    /* Creating the matrix containing the vertices of each edge and the matrix with the ids 
+        of each edge at the coordinates i and j, where i and j are its two vertices.
+        We do it by checking the distance between a vertex and all of the others, by using a for cycle 
+        that doesn't check for the last two vertices (that iteration would be useless) */
+    void NumberEdges(); // Create two matrices: one with the vertex IDs of each edge and one with
+                                        // the edge IDs of each pair of vertices
+
+    // vector<vector<int>> AdjacencyList(); // Create the adjacency list of the vertices in the polyhedron
+    
+    /* Creating the matrix containing the vertices of each face as its column and the matrix containing the ids 
+        of the edges of each face. */
+    void NumberFaces(); // Create two matrices: one with the vertex IDs and one with the edge IDs, 
+                                        // which uniquely identify each face of the polyhedron
     
     void Cell0Ds(); // Create Cell0Ds 
 
@@ -29,6 +48,8 @@ namespace PolyhedraLibrary{
         void DataPolyhedra(); // Gives all the important Data of the polyhedron
 
         void PointsPolyhedra(Eigen::MatrixXd& CoordVertices);  // Fills all the point of the polyhedron
+
+        void FillStructPolyhedra(); // Fills all the structures of GEOPolyhedron
 
         void CreateCells(); // First fill the structure then calls all the CellXDs functions  
 

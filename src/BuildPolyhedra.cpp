@@ -27,11 +27,12 @@ namespace PolyhedraLibrary{
         polyhedron.IdFaces.reserve(NumFaces);
 
         // Initialize all the Matrices 
-        polyhedron.CoordVertices = Eigen::MatrixXd(3, NumVertices);
-        polyhedron.ExtremaEdges = Eigen::MatrixXi(2, NumEdges);
-        polyhedron.MatrEdgeVertices = Eigen::MatrixXi::Constant(NumVertices, NumVertices, -1);
-        polyhedron.ListEdgeFaces = Eigen::MatrixXi(p, NumFaces);
-        polyhedron.ListVertFaces = Eigen::MatrixXi(p, NumFaces);
+        
+        CoordVertices = Eigen::MatrixXd(3, NumVertices);
+        ExtremaEdges = Eigen::MatrixXi(2, NumEdges);
+        MatrEdgeVertices = Eigen::MatrixXi::Constant(NumVertices, NumVertices, -1);
+        ListEdgeFaces = Eigen::MatrixXi(p, NumFaces);
+        ListVertFaces = Eigen::MatrixXi(p, NumFaces);
     }
 
     void BuildPolyhedra::DataPolyhedra()
@@ -101,17 +102,8 @@ namespace PolyhedraLibrary{
         FillStructPolyhedra();
     }
 
-    void BuildPolyhedra::FillStructPolyhedra()
-    {             
-        Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
-        Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
-        Eigen::MatrixXi& ListVertFaces = polyhedron.ListVertFaces;
-        Eigen::MatrixXi& ListEdgeFaces = polyhedron.ListEdgeFaces;
-        
-        /* Creating the matrix containing the vertices of each edge and the matrix with the ids 
-        of each edge at the coordinates i and j, where i and j are its two vertices.
-        We do it by checking the distance between a vertex and all of the others, by using a for cycle 
-        that doesn't check for the last two vertices (that iteration would be useless) */
+    void BuildPolyhedra::NumberEdges()
+    {
         int edgeIndex = 0;
         double length_edge_squared = Length_edge * Length_edge;
 
@@ -124,16 +116,16 @@ namespace PolyhedraLibrary{
                     ovvero la lunghezza del lato */
                 
                 // Saving in some variables the coordinates of the first vertex
-                double& x_point_1 = polyhedron.CoordVertices(0, i);
-                double& y_point_1 = polyhedron.CoordVertices(1, i);
-                double& z_point_1 = polyhedron.CoordVertices(2, i);
+                double& x_point_1 = CoordVertices(0, i);
+                double& y_point_1 = CoordVertices(1, i);
+                double& z_point_1 = CoordVertices(2, i);
 
                 for (int j = i + 1; j < NumVertices; j++)
                 {
                     // Saving in some variables the coordinates of the second vertex
-                    double& x_point_2 = polyhedron.CoordVertices(0, j);
-                    double& y_point_2 = polyhedron.CoordVertices(1, j);
-                    double& z_point_2 = polyhedron.CoordVertices(2, j);
+                    double& x_point_2 = CoordVertices(0, j);
+                    double& y_point_2 = CoordVertices(1, j);
+                    double& z_point_2 = CoordVertices(2, j);
 
                     // Calculating the distance(squared) between the two vertices
                     double distance_squared = (x_point_1 - x_point_2) * (x_point_1 - x_point_2) + 
@@ -148,7 +140,7 @@ namespace PolyhedraLibrary{
                         ExtremaEdges(0, edgeIndex) = i;
                         ExtremaEdges(1, edgeIndex) = j;
 
-                        // Se un lato ha id 0 allora non potremo mai vederlo in una matrice sparsa, 
+                        // Se un lato ha id 0 allora non potremo riconoscerlo in una matrice sparsa, 
                         // quindi la matrice è inizializzata con tutti valori pari a -1
                         MatrEdgeVertices(i,j) = edgeIndex;
                         MatrEdgeVertices(j,i) = edgeIndex;
@@ -171,9 +163,35 @@ namespace PolyhedraLibrary{
         //     edgeIndex++;
         // }
 
-        /* Creating the matrix containing the vertices of each face as its column and the matrix containing the ids 
-        of the edges of each face. */
+    }
 
+    // vector<vector<int>> AdjacencyList()
+    // {
+    //     vector<vector<int>> adjacencyList;
+    //     adjacencyList.reserve(NumVertices);
+    //     for(int& vertex : polyhedron.IdVertices)
+    //     {
+    //         vector<int> connectedVertices;
+    //         connectedVertices.reserve(q);
+    //         for (int& vertexIdToAdd : polyhedron.IdVertices)
+    //         {
+    //             if(int(connectedVertices.size()) < q)
+    //             {
+    //                 int& edgeIdToCheck = MatrEdgeVertices(vertex, vertexIdToAdd);
+    //                 if(edgeIdToCheck >= 0)
+    //                 {
+    //                     connectedVertices.push_back(vertexIdToAdd);
+    //                 }
+    //             }
+    //             else
+    //                 break;
+    //         }
+    //         adjacencyList.push_back(connectedVertices);
+    //     }
+    // }
+
+    void BuildPolyhedra::NumberFaces()
+    {
         int faceIndex = 0;
 
         vector<array<int, 3>> vecVertFaces; // This vector stores unique triangles (faces) as sorted arrays of 3 vertices
@@ -261,12 +279,17 @@ namespace PolyhedraLibrary{
         // Stampa finale per controllo
         cout << "ListVertFaces: " << endl << ListVertFaces << endl;
         cout << "ListEdgeFaces: " << endl << ListEdgeFaces << endl;
+    }
 
+    void BuildPolyhedra::FillStructPolyhedra()
+    {        
+        NumberEdges();
+
+        NumberFaces();
     }
 
     void BuildPolyhedra::Cell0Ds()
-    {   
-        Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
+    {
         ofstream file("../PolygonalData/Cell0Ds.txt"); // the program should be launched inside Debug or Release folders
         
         file << "Id,X,Y,Z\n";
@@ -285,8 +308,6 @@ namespace PolyhedraLibrary{
 
     void BuildPolyhedra::Cell1Ds()
     {   
-        Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
-
         ofstream file("../PolygonalData/Cell1Ds.txt"); // the program should be launched inside Debug or Release folders
         
         file << "Id,Origin,End\n";
@@ -303,8 +324,6 @@ namespace PolyhedraLibrary{
 
     void BuildPolyhedra::Cell2Ds()
     {   
-        Eigen::MatrixXi& ListVertFaces = polyhedron.ListVertFaces;
-        Eigen::MatrixXi& ListEdgeFaces = polyhedron.ListEdgeFaces;
         ofstream file("../PolygonalData/Cell2Ds.txt"); // the program needs to be launched inside Debug or Release folders
         
         file << "Id,NumVertices,Vertices,NumEdges,Edges\n";
@@ -365,10 +384,6 @@ namespace PolyhedraLibrary{
 
     void BuildPolyhedra::ExportPolyhedra()
     {
-        Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
-        Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
-        Eigen::MatrixXi& ListVertFaces = polyhedron.ListVertFaces;
-
         Eigen::VectorXi VerticesMarkers(NumVertices);
         for(int i = 0; i < NumVertices; i++)
         {

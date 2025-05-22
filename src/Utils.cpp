@@ -11,9 +11,9 @@ using namespace std;
 Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertFace)
 {
     Eigen::Vector3d barycenter_coordinates = Eigen::Vector3d::Zero(3); // initialyze a vector for the final coordinates
-    double Coord_x = 0;
-    double Coord_y = 0;
-    double Coord_z = 0;
+    double Coord_x = 0.0;
+    double Coord_y = 0.0;
+    double Coord_z = 0.0;
 
     // Finding the coordinates of each vertex 
     for (int i = 0; i < VertFace.size(); i++)
@@ -39,6 +39,8 @@ Eigen::Vector3d OntoTheUnitSphere(Eigen::Vector3d vertex)
     }
     return vertex;
 }
+
+
 
 vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2)
 {
