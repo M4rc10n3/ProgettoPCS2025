@@ -11,7 +11,9 @@ int main(){
     int n = 10;
     Matrix3Xd m = MatrixXd::Zero(3, n);
     cout << "m: " << m << endl;
-    Eigen::RowVector3d barycenter_coordinates = Eigen::RowVector3d::Zero(3);
+    Eigen::RowVector3d barycenter_coordinates;
+    barycenter_coordinates << 1, 1, 1;
+    cout << "barycenter_coordinates.normalized(): " << barycenter_coordinates.normalized() << endl;
     cout << "barycenter_coordinates: " << barycenter_coordinates << endl;
     vector<int> prova(5, 0);
     cout << "prova = { " << endl;
@@ -23,12 +25,9 @@ int main(){
     cout << "Hello world" << endl;
 
     int p = 3;
-    int q = 5;
+    int q = 4;
     cout << "p = " << p << endl;
     cout << "q = " << q << endl;
-    // BuildPolyhedra polyhedron(p, q);
-    // polyhedron.CreateCells();
-    // polyhedron.ExportPolyhedra();
 
     BuildPolyhedra Constructor(p, q); // create the structure of the Polyedron
     Constructor.DataPolyhedra();

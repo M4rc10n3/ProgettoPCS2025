@@ -33,6 +33,7 @@ namespace PolyhedraLibrary{
         MatrEdgeVertices = Eigen::MatrixXi::Constant(NumVertices, NumVertices, -1);
         ListEdgeFaces = Eigen::MatrixXi(p, NumFaces);
         ListVertFaces = Eigen::MatrixXi(p, NumFaces);
+        ListAdjacentFaces = Eigen::MatrixXi(p, NumFaces);
     }
 
     void BuildPolyhedra::DataPolyhedra()
@@ -111,9 +112,10 @@ namespace PolyhedraLibrary{
         {
             if(edgeIndex <= NumEdges) // Proceed only if all the edges have not been numbered yet
             {
-                /* Non c'è sequenzialità nel dare gli estremi dei vertici, perchè, per esempio nell'ottaedro lo 0 va conesso ai suoi 3 prossimi, 
-                    ma il vertice con id 1  va connesso ai vertici con id 2, 4 e 5, non connessi da alcuna logica. Quindi tocca unire i vertici che hanno la giusta distanza, 
-                    ovvero la lunghezza del lato */
+                /* Non c'è sequenzialità nel dare gli estremi dei vertici, perchè, per esempio nell'ottaedro lo 0 
+                va conesso ai suoi 3 prossimi,  ma il vertice con id 1  va connesso ai vertici con id 2, 4 e 5, 
+                non connessi da alcuna logica. Quindi tocca unire i vertici che hanno la giusta distanza, 
+                ovvero la lunghezza del lato */
                 
                 // Saving in some variables the coordinates of the first vertex
                 double& x_point_1 = CoordVertices(0, i);
@@ -281,11 +283,91 @@ namespace PolyhedraLibrary{
         cout << "ListEdgeFaces: " << endl << ListEdgeFaces << endl;
     }
 
+    /* FindAdjacentFaces is a function we'll need in order to avoid duplicating the edges and vertices 
+    in the tessellations. It finds the adjacent faces "i" for each face "j" and saves them in the matrix 
+    "ListAdjacentFaces" (which is part of the "polyhedron" class) at position (i,j)*/
+    void BuildPolyhedra::FindAdjacentFaces(){
+        /* We need to find the adjacent faces for each face: 
+        we'll do it by finding two columns of the matrix "ListVertFace" that contain 
+        the same two vertices ids */
+        for(int faceIndex = 0; faceIndex < NumFaces; faceIndex ++)
+        {
+            // Saving the vertices we'll need to find with an alias for code readability
+            int& vertexToFind1 = ListVertFaces(0, faceIndex);
+            int& vertexToFind2 = ListVertFaces(1, faceIndex);
+            int& vertexToFind3 = ListVertFaces(2, faceIndex);
+            
+            /* We need to save the id of the face we're checking somewhere in order to save it 
+            inside the matrix "ListAdjacentFaces" */
+            int faceWeAreChecking = 0;
+            int adjacentFacesFound = 0;
+            for(auto column : ListVertFaces.colwise()){
+                
+                /* We need to skip the face which we're looking the adjacent faces for */
+                if(faceWeAreChecking == faceIndex){
+                    faceWeAreChecking++;
+                    continue;
+                }
+                /* Checking that we haven't found all of the adjacent faces for the face with id "faceIndex" */
+                else if(adjacentFacesFound < q)
+                {
+                    if(find(column.begin(), column.end(), vertexToFind1) != column.end())
+                    {
+                        /* In this case we've found the first vertex inside one column of the 
+                        matrix "ListVertFace". We need to find another vertex */
+                        if(find(column.begin(), column.end(), vertexToFind2) != column.end() ||
+                           find(column.begin(), column.end(), vertexToFind3) != column.end())
+                        {
+                            /* In this case we've found one adjacent face for the face with id "faceIndex". 
+                            We can save it inside the matrix "ListAdjacentFaces" */
+                            ListAdjacentFaces(adjacentFacesFound, faceIndex) = faceWeAreChecking;
+                            adjacentFacesFound++;
+                        }
+                    }
+
+                    else if(find(column.begin(), column.end(), vertexToFind2) != column.end())
+                    {
+                        if(find(column.begin(), column.end(), vertexToFind1) != column.end() ||
+                           find(column.begin(), column.end(), vertexToFind3) != column.end())
+                        {
+                            ListAdjacentFaces(adjacentFacesFound, faceIndex) = faceWeAreChecking;
+                            adjacentFacesFound++;
+                        }
+                    }
+
+                    else if(find(column.begin(), column.end(), vertexToFind3) != column.end())
+                    {
+                        if(find(column.begin(), column.end(), vertexToFind1) != column.end() ||
+                           find(column.begin(), column.end(), vertexToFind2) != column.end())
+                        {
+                            ListAdjacentFaces(adjacentFacesFound, faceIndex) = faceWeAreChecking;
+                            adjacentFacesFound++;
+                        }
+                    }
+
+                }
+                else
+                {
+                    /* When we've found all of the adjacent faces for the face with id "faceIndex", 
+                    we can go on looking for the adjacent faces of face with the next "faceIndex" */
+                    break;
+                }
+                faceWeAreChecking++;
+            }
+        }
+
+        // Stampa finale per controllo
+        cout << "ListAdjacentFaces: " << endl << ListAdjacentFaces << endl;
+
+    }
+
     void BuildPolyhedra::FillStructPolyhedra()
     {        
         NumberEdges();
 
         NumberFaces();
+
+        FindAdjacentFaces();
     }
 
     void BuildPolyhedra::Cell0Ds()

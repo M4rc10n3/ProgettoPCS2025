@@ -28,8 +28,10 @@ Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertF
     return barycenter_coordinates;
 }
 
-Eigen::Vector3d OntoTheUnitSphere(Eigen::Vector3d vertex)
+Eigen::Vector3d OntoTheUnitSphere(Eigen::Vector3d& vertex)
 {
+    // Ricordo di aver letto che la norma "norm" della libreria Eigen non è la norma spettrale di una matrice,
+    // è la verma norma di un vettore?
     double norm = vertex.norm();
     if (norm > 1e-16) // Avoids ZeroDivision errors
     {
@@ -38,6 +40,10 @@ Eigen::Vector3d OntoTheUnitSphere(Eigen::Vector3d vertex)
         vertex.setZero();
     }
     return vertex;
+
+    // TODO: Pare che all'interno di Eigen esista la funzione che normalizza proprio il vettore, 
+    // credo sia meglio usarla nel caso in cui funzioni:
+    // return vertex.normalized();
 }
 
 
@@ -52,18 +58,20 @@ vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2)
     return Path;
 }
 
-void Dualise(GEOPolyhedron& polyhedron, const unsigned int& Schlafli_p, const unsigned int& Schlafli_q)
+void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlafli_q)
 {
     Eigen::MatrixXd CoordVertices(3, polyhedron.NumFaces);
-    BuildPolyhedra constructor(Schlafli_q, Schlafli_p); // p, q are switched becasue it's the dual polyhedron
+    BuildPolyhedra constructor(Schlafli_q, Schlafli_p); // p, q are switched because it's the dual polyhedron
+    // Eigen::MatrixXd CoordVertices;
+    // BuildPolyhedra constructor(Schlafli_q, Schlafli_p); // p, q are switched because it's the dual polyhedron
 
     cout << "\n DualPolyhedron \n" << endl;
 
     for (int i = 0; i < polyhedron.NumFaces; i++)
     {
         Eigen::Vector3i dual_vertex  = polyhedron.ListVertFaces.col(i);
-        Eigen::Vector3d barycenter_coordinates = OntoTheUnitSphere(FindBarycenter(polyhedron, dual_vertex));
-        CoordVertices.col(i) = barycenter_coordinates; 
+        // Eigen::Vector3d barycenter_coordinates = OntoTheUnitSphere(FindBarycenter(polyhedron, dual_vertex));
+        //CoordVertices.col(i) = barycenter_coordinates; 
     }
 
     constructor.PointsPolyhedra(CoordVertices);
@@ -71,12 +79,12 @@ void Dualise(GEOPolyhedron& polyhedron, const unsigned int& Schlafli_p, const un
     constructor.ExportPolyhedra();
 }
 
-// void TypeITassellation(GEOPolyhedron& polyhedron)
+// void TypeITessellation(GEOPolyhedron& polyhedron)
 // {
     
 // }
 
-// void TypeIITassellation(GEOPolyhedron& polyhedron)
+// void TypeIITessellation(GEOPolyhedron& polyhedron)
 // {
     
 // }

@@ -19,6 +19,7 @@ namespace PolyhedraLibrary{
     Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
     Eigen::MatrixXi& ListVertFaces = polyhedron.ListVertFaces;
     Eigen::MatrixXi& ListEdgeFaces = polyhedron.ListEdgeFaces;
+    Eigen::MatrixXi& ListAdjacentFaces = polyhedron.ListAdjacentFaces;
     
     /* Creating the matrix containing the vertices of each edge and the matrix with the ids 
         of each edge at the coordinates i and j, where i and j are its two vertices.
@@ -34,6 +35,10 @@ namespace PolyhedraLibrary{
     void NumberFaces(); // Create two matrices: one with the vertex IDs and one with the edge IDs, 
                                         // which uniquely identify each face of the polyhedron
     
+    /* Creating the matrix containing the adjacent faces of each face. 
+    Each column contains the ids of the adjacent faces for the face that has as id the column index */
+    void FindAdjacentFaces(); // Create one matrix as explained above
+
     void Cell0Ds(); // Create Cell0Ds 
 
     void Cell1Ds(); // Create Cell1Ds 

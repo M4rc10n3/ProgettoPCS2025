@@ -70,6 +70,7 @@ int main(int argc, char* argv[])
     GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
     // Constructor.CreateCells();
     // Constructor.ExportPolyhedra();
-    Dualise(polyhedron, p, q);
+    // Dualise(polyhedron, p, q);
+
     return 0;
 }

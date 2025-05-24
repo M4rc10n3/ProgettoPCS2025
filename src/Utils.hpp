@@ -38,10 +38,10 @@ void Dualise(GEOPolyhedron& polyhedron, const unsigned int& Schlafli_p, const un
 output its tassellations of type I regarding geodetic polyhedra 
 Inputs list:
 polyhedron: object of type "Polyhedron" that the function modifies. */
-void TypeITassellation(GEOPolyhedron& polyhedron);
+void TypeITessellation(GEOPolyhedron& polyhedron);
 
 /* TypeIITassellation is a function that modifies the attributes of the object <polyhedron> in order to 
 output its tassellations of type II regarding geodetic polyhedra 
 Inputs list:
 polyhedron: object of type "Polyhedron" that the function modifies. */
-void TypeIITassellation(GEOPolyhedron& polyhedron);
+void TypeIITessellation(GEOPolyhedron& polyhedron);
