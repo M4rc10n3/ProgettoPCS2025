@@ -469,13 +469,13 @@ namespace PolyhedraLibrary{
         Eigen::VectorXi VerticesMarkers(NumVertices);
         for(int i = 0; i < NumVertices; i++)
         {
-            VerticesMarkers[i] = 1;
+            VerticesMarkers[i] = 0;
         }
         
         Eigen::VectorXi EdgesMarkers(NumEdges);
         for(int i = 0; i < NumEdges; i++)
         {
-            EdgesMarkers[i] = 2;
+            EdgesMarkers[i] = 5;
         }
 
         Gedim::UCDUtilities utilities;
@@ -507,9 +507,18 @@ namespace PolyhedraLibrary{
             FacesVertices[i][2] = ListVertFaces(2, i);
         }
 
+        Eigen::VectorXi FacesMarkers(NumFaces);
+        for(int i = 0; i < NumFaces; i++)
+        {
+            FacesMarkers[i] = i;
+        }
+
         utilities.ExportPolygons("../PolygonalData/Cell2Ds.inp",
                                   CoordVertices,
-                                  FacesVertices);
+                                  FacesVertices,
+                                  {},
+                                  {},
+                                  FacesMarkers);
     
     }
 
