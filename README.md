@@ -32,6 +32,8 @@ Domande:
    Risposta: la prima formula delle due indica che, se la faccia ha 3 vertici, allora il vertice a cui si accede all'interno del vettore dei vertici tramite l'indice zero si connetterà a quello a cui si accede tramite indice 1, quello a cui si accede con indice 1 si connetterà a quello a cui si accede con indice 2, mentre quello con indice 2 si connetterà a quello con indice 0, che è (2 + 1) % 3 = 0.
    La seconda formula, invece, dice che il vertice della faccia a cui si accede nella lista/vettore tramite l'indice 0 deve essere l'origine (o la fine) del lato della faccia a cui si accede nella lista/vettore tramite l'indice 0.
 
+7. Le formule che danno vertici, lati e facce per i duali dei poliedri valgono per ciascuna faccia o per tutto il poliedro.
+
 Cose da fare:
 1. Creare algoritmo che crea il poliedro a partire da p e q;
 2. Creare algoritmo che ne fa la tassellazione a seconda della classe;

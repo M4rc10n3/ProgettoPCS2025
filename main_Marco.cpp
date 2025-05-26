@@ -25,7 +25,7 @@ int main(){
     cout << "Hello world" << endl;
 
     int p = 3;
-    int q = 5;
+    int q = 3;
     cout << "p = " << p << endl;
     cout << "q = " << q << endl;
 
