@@ -1,6 +1,9 @@
 # include <iostream>
+# include <vector>
+# include <numeric>
 # include "Sources.hpp"
 # include "Eigen/Eigen"
+# include "UCDUtilities.hpp"
 
 using namespace PolyhedraLibrary;
 using namespace std;
@@ -26,12 +29,19 @@ int main(){
 
     int p = 3;
     int q = 3;
+    int b = 3;
     cout << "p = " << p << endl;
     cout << "q = " << q << endl;
 
     BuildPolyhedra Constructor(p, q); // create the structure of the Polyedron
     Constructor.DataPolyhedra();
     GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
-    Constructor.ExportPolyhedra();
+    TypeITessellation(polyhedron, b);
+    Gedim::UCDUtilities utilities;
+    utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
+                               polyhedron.CoordVertices);
+    // Constructor.ExportPolyhedra();
+    cout << VectorXd::LinSpaced(5,0.0,1.0).transpose() << endl;
+
     return 0;
 }

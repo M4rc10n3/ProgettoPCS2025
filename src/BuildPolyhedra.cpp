@@ -49,6 +49,7 @@ namespace PolyhedraLibrary{
                 case 3:
                     cout << "Your Polyhedron is a Tetrahedron with:\n";
                     Length_edge = 2 * sqrt(6) / 3;
+                    polyhedron.lengthEdge = Length_edge;
                     polyhedron.CoordVertices << 0, -0.94, 0.47, 0.47,
                                                 0, 0, -0.82, 0.82,
                                                 1, -0.33, -0.33, -0.33;
@@ -56,6 +57,7 @@ namespace PolyhedraLibrary{
                 case 4:
                     cout << "Your Polyhedron is a Octahedron with:\n";
                     Length_edge = sqrt(2);
+                    polyhedron.lengthEdge = Length_edge;
                     polyhedron.CoordVertices << 0, 0, 0, 0, 1, -1,
                                                 0, 0, 1, -1, 0, 0,
                                                 1, -1, 0, 0, 0, 0;
@@ -63,6 +65,7 @@ namespace PolyhedraLibrary{
                 case 5:
                     cout << "Your Polyhedron is a Icosahedron with: \n";
                     Length_edge = 4 / sqrt(10 + 2*sqrt(5));
+                    polyhedron.lengthEdge = Length_edge;
                     polyhedron.CoordVertices << 0, 0.89, 0.28, 0.72, -0.28, 0, -0.89, -0.28, -0.72, 0.28, 0.72, -0.72,
                                                 0, 0, 0.85, 0.53, 0.85, 0, 0, -0.85, -0.53, -0.85, -0.53, 0.53,
                                                 1, 0.45, 0.45, -0.45, -0.45, -1, -0.45, -0.45, 0.45, 0.45, -0.45, 0.45;   
@@ -74,6 +77,7 @@ namespace PolyhedraLibrary{
                 {
                     cout << "Your Polyhedron is a Cube with: \n";
                     Length_edge = 2 / sqrt(3);
+                    polyhedron.lengthEdge = Length_edge;
                 }
                 break;
             case 5:
@@ -81,6 +85,7 @@ namespace PolyhedraLibrary{
                 {
                     cout << "Your Polyhedron is a Dodecahedron with: \n";
                     Length_edge = 4 / (sqrt(3) * (1 + sqrt(5)));
+                    polyhedron.lengthEdge = Length_edge;
                 }
                 break;
             }

@@ -38,10 +38,18 @@ void Dualise(GEOPolyhedron& polyhedron, const unsigned int& Schlafli_p, const un
 output its tassellations of type I regarding geodetic polyhedra 
 Inputs list:
 polyhedron: object of type "Polyhedron" that the function modifies. */
-GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions);
+void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions);
 
 /* TypeIITassellation is a function that modifies the attributes of the object <polyhedron> in order to 
 output its tassellations of type II regarding geodetic polyhedra 
 Inputs list:
 polyhedron: object of type "Polyhedron" that the function modifies. */
 void TypeIITessellation(GEOPolyhedron& polyhedron);
+
+/* distanceBetween id a method that calculates the squared distance between two vertices or points 
+just by using their ids 
+Inputs list:
+polyhedron: the polyhedron to which the points belong
+idPoint1: id of the first point 
+idPoint2: id of the second point */
+double distanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idPoint2);

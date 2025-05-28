@@ -14,6 +14,8 @@ namespace PolyhedraLibrary
 
     struct GEOPolyhedron
     {
+        double lengthEdge;
+
         int NumVertices; // Number of vertices
         std::vector<int> IdVertices; // Id of all vertices
         Eigen::MatrixXd CoordVertices; // Coordinates of the vertices, 3 x NumVertices matrix
