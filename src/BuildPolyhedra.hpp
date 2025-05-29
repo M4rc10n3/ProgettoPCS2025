@@ -54,6 +54,9 @@ namespace PolyhedraLibrary{
 
         void PointsPolyhedra(Eigen::MatrixXd& CoordVertices);  // Fills all the point of the polyhedron
 
+        vector<vector<int>> AdjacencyList(); // Creates the adjacency list, where each vertex is associated
+                                             // with a vector containing all vertices adjacent to it
+
         void FillStructPolyhedra(); // Fills all the structures of GEOPolyhedron
 
         void CreateCells(); // First fill the structure then calls all the CellXDs functions  

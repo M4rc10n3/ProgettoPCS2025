@@ -171,30 +171,34 @@ namespace PolyhedraLibrary{
         // }
 
     }
-
+ 
     vector<vector<int>> BuildPolyhedra::AdjacencyList()
     {
-        vector<vector<int>> adjacencyList;
-        adjacencyList.reserve(NumVertices);
-        for(int& vertex : polyhedron.IdVertices)
+        vector<vector<int>> adjacencyList(NumVertices);
+
+        for (int vertex = 0; vertex < NumVertices; vertex++)
         {
-            vector<int> connectedVertices;
-            connectedVertices.reserve(q);
-            for (int& vertexIdToAdd : polyhedron.IdVertices)
+            for (int adjVert = 0; adjVert < NumVertices; adjVert++)
             {
-                if(int(connectedVertices.size()) < q)
-                {
-                    int& edgeIdToCheck = MatrEdgeVertices(vertex, vertexIdToAdd);
-                    if(edgeIdToCheck >= 0)
+                if (vertex != adjVert) 
+                {                    
+                    int& edgeIdToCheck = MatrEdgeVertices(vertex, adjVert);
+                    if (edgeIdToCheck >= 0)
                     {
-                        connectedVertices.push_back(vertexIdToAdd);
+                        adjacencyList[vertex].push_back(adjVert);
                     }
                 }
-                else
-                    break;
             }
-            adjacencyList.push_back(connectedVertices);
         }
+
+        // Stampa per verifica
+        // for (int i = 0; i < NumVertices; i++) {
+        //     cout << "Vertice " << i << ": ";
+        //     for (int n : adjacencyList[i]) 
+        //         cout << n << " ";
+        //     cout << endl;
+        // }
+
         return adjacencyList;
     }
 
@@ -205,19 +209,16 @@ namespace PolyhedraLibrary{
         vector<array<int, 3>> vecVertFaces; // This vector stores unique triangles (faces) as sorted arrays of 3 vertices
         vecVertFaces.reserve(NumFaces);
 
-        vector<vector<int>>& adjacencyList = AdjacencyList();
+        const vector<vector<int>>& adjacencyList = AdjacencyList();
         
         for(int vertex = 0; vertex < NumVertices; vertex++)
         { 
-            if (faceIndex <= NumFaces) // Proceed only if all the faces have not been numbered yet
+            if (faceIndex < NumFaces) // Proceed only if all the faces have not been numbered yet
             {
-                for(int& vertexToCheck1 : adjacencyList[vertex])
+                for(auto& vertexToCheck1 : adjacencyList[vertex])
                 {
-                    // cout << "vertexToCheck1: " << vertexToCheck1 << endl;
-                    for(int& vertexToCheck2 : adjacencyList[vertex])
+                    for(auto& vertexToCheck2 : adjacencyList[vertex])
                     {
-                        // cout << "vertexToCheck2: " << vertexToCheck2 << endl;
-                        
                         // Check all three vertices are distinct
                         if(vertex != vertexToCheck1 && vertex != vertexToCheck2 && vertexToCheck1 != vertexToCheck2)
                         {                    
@@ -261,6 +262,7 @@ namespace PolyhedraLibrary{
                         }  
                         else
                             continue; 
+                        
                     }
                 }   
                 // Saving the vertices that are adjacent to "vertex"

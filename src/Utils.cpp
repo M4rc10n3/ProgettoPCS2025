@@ -85,7 +85,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     /* We'll need the number of triangles for some resizing, so let's calculate it using 
     the formulas given in "PCS_Project.pdf" */
     
-    /* Queste sono le formula per il poliedro, bosgna fare in modo di passare alla funzione 
+    /* Queste sono le formule per il poliedro, bisogna fare in modo di passare alla funzione 
     questi numeri oppure di calcolarli in base a q */
     int numberTrianglesForFace = numberDivisions * numberDivisions; // T = b^2
     // int numberNewVertices = 2 * numberTrianglesForFace + 2; // V = 2 * T + 2
