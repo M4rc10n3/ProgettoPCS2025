@@ -100,21 +100,21 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
     CoordVertices.conservativeResize(3, numberNewVertices);
 
-//     Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
-//     ExtremaEdges.conservativeResize(2, numberNewEdges);
+    Eigen::MatrixXi& ExtremaEdges = polyhedron.ExtremaEdges;
+    ExtremaEdges.conservativeResize(2, numberNewEdges);
 
-//     Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
-//     MatrEdgeVertices.conservativeResize(numberNewVertices, numberNewVertices);
+    Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
+    MatrEdgeVertices.conservativeResize(numberNewVertices, numberNewVertices);
 
     Eigen::MatrixXi& ListVertFaces = polyhedron.ListVertFaces;
     int& p = ListVertFaces.col.size();
     ListVertFaces.conservativeResize(p, numberNewFaces);
 
-//     Eigen::MatrixXi& ListEdgeFaces = polyhedron.ListEdgeFaces;
-//     ListEdgeFaces.conservativeResize(p, numberNewFaces);
+    Eigen::MatrixXi& ListEdgeFaces = polyhedron.ListEdgeFaces;
+    ListEdgeFaces.conservativeResize(p, numberNewFaces);
 
-//     Eigen::MatrixXi& ListAdjacentFaces = polyhedron.ListAdjacentFaces;
-//     ListAdjacentFaces.conservativeResize(p, numberNewFaces);
+    Eigen::MatrixXi& ListAdjacentFaces = polyhedron.ListAdjacentFaces;
+    ListAdjacentFaces.conservativeResize(p, numberNewFaces);
 
     int& oldNumFaces = polyhedron.NumFaces;
     // int& oldNumEdges = polyhedron.NumEdges;
@@ -211,8 +211,14 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         a distance equal to 3 times that of the edge, then we'll search for those that have a distance 
         equal to 2 times that of the edge.*/
 
+        /* We'll always start our search from the vertex on the edge with index 0 and we'll look for 
+        the vertices on just one other edge */
 
+        for(int i = 0; i < numberDivisions - 1; i++){
+            
+        }
     }
+}
 
 
 
