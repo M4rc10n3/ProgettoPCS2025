@@ -53,3 +53,8 @@ polyhedron: the polyhedron to which the points belong
 idPoint1: id of the first point 
 idPoint2: id of the second point */
 double distanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idPoint2);
+
+/* triangularNumber is a function that returns the b-th triangular number usign the Gauss formula 
+Inputs list:
+b: order of the triangular number, used as its seed */
+int triangularNumber(int& b);

@@ -126,8 +126,10 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     /* We need to tesselate each face of the polyhedron given as input */
     for(int faceIndex = 0; faceIndex < oldNumFaces; faceIndex++)
     {
-        // Investigare il bug che c'è nella successiva riga a questo commento
-        // Eigen::VectorXi& faceVertices = ListVertFaces.col(faceIndex);
+        Eigen::Vector<int, 2> verticesWeAreDividing = VectorXi::Zero(2);
+        Eigen::VectorXd newXCoordVerticesOnEdge = VectorXd::Zero(numberDivisions + 1);
+        Eigen::VectorXd newYCoordVerticesOnEdge = VectorXd::Zero(numberDivisions + 1);
+        Eigen::VectorXd newZCoordVerticesOnEdge = VectorXd::Zero(numberDivisions + 1);
 
         /* In order to tesselate, we need to divide each edge into "numberDivisions" parts */
         for(int edgeIndex = 0; edgeIndex < p; edgeIndex++)
@@ -146,7 +148,6 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
             {
                 verticesWeAreDividing(0) = ListVertFaces(edgeIndex, faceIndex);
                 verticesWeAreDividing(1) = ListVertFaces(edgeIndex + 1, faceIndex);
-
             }
                 /* Let's rename the vertices of the edge for code readability */
                 int& firstVertexWeAreDividing = verticesWeAreDividing(0);
@@ -170,6 +171,16 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                 double differenceXCoord = abs(firstVertexXCoord - secondVertexXCoord);
                 double differenceYCoord = abs(firstVertexYCoord - secondVertexYCoord);
                 double differenceZCoord = abs(firstVertexZCoord - secondVertexZCoord);
+                /* Calculating the coordinates of the new vertices using the function LinSpaced() of the Eigen library */
+                newXCoordVerticesOnEdge = VectorXd::LinSpaced(numberDivisions + 1, 
+                                                              firstVertexXCoord, 
+                                                              secondVertexXCoord);
+                newYCoordVerticesOnEdge = VectorXd::LinSpaced(numberDivisions + 1, 
+                                                              firstVertexYCoord,
+                                                              secondVertexYCoord);
+                newZCoordVerticesOnEdge = VectorXd::LinSpaced(numberDivisions + 1, 
+                                                              firstVertexZCoord, 
+                                                              secondVertexZCoord);
 
                 /* Let's add the coordinates of the new points on each edge to the matrix 
                 "CoordVertices" of the polyhedron we're modifying */
@@ -187,6 +198,21 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                 }
         }
         
+                    int newVertexId = oldNumVertices + (numberDivisions - 1) * edgeIndex + 
+                                  (triangularNumber(numberDivisions) - 3) * faceIndex+ division;
+                    /* The new vertices will be stored inside the same matrix CoordVertices, 
+                    so we need to access the correct column in order not to erase important data 
+                    from the old polyhedron */
+                    CoordVertices(0, newVertexId) = newXCoordVerticesOnEdge(division);
+                    CoordVertices(1, newVertexId) =  newYCoordVerticesOnEdge(division);
+                    CoordVertices(2, newVertexId) = newZCoordVerticesOnEdge(division);
+                }
+        }
+        cout << "CoordVertices:\n" << CoordVertices << endl;
+
+        cout << "Fino qui funziona" << endl;
+        cout << "Ora tocca assegnare le ultime 4 coordinate dei vertici, quelli centrali. " << endl;
+
         /* Now we need to find the coordinates of the vertices inside of the face of the 
         old polyhedron, then we'll look for the edges starting from each vertex using the 
         same algorithm we used to build the old polyhedron, using the length of the edges */
@@ -198,6 +224,105 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         che non viene diviso. Non credo che il modo per trovare i lati che ho scritto sopra e che usa il mio 
         algoritmo sia efficiente, ma è l'unica via che mi viene in mente. */
 
+        // /* Let's find the vertices on the edges that have a distance equal to the length of the side 
+        // of the tessellated polyhedron from the vertices with the two minor indexes ("0" and "1") of the face */
+        // int firstVertexWeNeedToContinueTessellating = 0;
+        // int secondVertexWeNeedToContinueTessellating = 0;
+        // double newLengthEdge = oldLengthEdge / numberDivisions;
+        // // Let's save somewhere the vertices which we'll calculate the distance from
+        // int& originVertex1 = ListVertFaces(0, faceIndex);
+        // int& originVertex2 = ListVertFaces(1, faceIndex);
+
+        // /* The tessellation forms a triangular number on each face. The triangular number generated 
+        // by b divisions of the edge is exoressed by Gauss formula where n = b + 1, so T_b = (b + 1) * (b + 2) / 2
+        // Then, we need to subtract 3 because we don't need to consider the old vertices of the polyhedron */
+        // // int numberInsideVertices = (numberDivisions + 1) * (numberDivisions + 2) / 2 - 3;
+        // int numberVerticesOntheEdgesWithoutExtremes = (numberDivisions - 1) * 3;
+        // cout << "numberVerticesOntheEdgesWithoutExtremes: " << numberVerticesOntheEdgesWithoutExtremes << endl;
+
+        // // C'è qualcosa che non va col numero di vertici: accede al numero 22, quando abbiamo solo 20 vertici
+        // // Il mio codice non tiene ancora conto della facce adiacenti, quindi il numero di vertici dato 
+        // // dalla Teora è più piccolo di quello che mi serve per vedere se il programma funziona o meno
+
+        // vector<int> verticesSaved = {0, 0, 0, 0};
+        // int indexOfVertexSaved = 0;
+        // for(int i = 0; i < (numberDivisions - 1)  * 3; i++){
+        //     // cout << "i: " << i << endl;
+        //     // cout << "faceIndex: " << faceIndex << endl;
+        //     int vertexToCheck = oldNumVertices + (numberVerticesOntheEdgesWithoutExtremes * faceIndex) + i;
+        //     // cout << "vertexToCheck: " << vertexToCheck << endl;
+            
+        //     if(distanceSquaredBetween(polyhedron, vertexToCheck, originVertex1) < 5e-2){
+        //         verticesSaved[indexOfVertexSaved] = vertexToCheck;
+        //         indexOfVertexSaved++;
+        //     }
+
+        //     if(distanceSquaredBetween(polyhedron, vertexToCheck, originVertex2) < 5e-2){
+        //         verticesSaved[indexOfVertexSaved] = vertexToCheck;
+        //         indexOfVertexSaved++;
+        //     }
+        // }
+
+        // /* Now we need to erase from verticesSaved those that are next to each other on the same edge */
+        // if(distanceSquaredBetween(polyhedron, verticesSaved[0], verticesSaved[1]) - 2 * newLengthEdge > -5e-2){
+        //     firstVertexWeNeedToContinueTessellating = verticesSaved[0];
+        //     secondVertexWeNeedToContinueTessellating = verticesSaved[1];
+        // }
+        // else if(distanceSquaredBetween(polyhedron, verticesSaved[0], verticesSaved[2]) - 2 * newLengthEdge > -5e-2){
+        //     firstVertexWeNeedToContinueTessellating = verticesSaved[0];
+        //     secondVertexWeNeedToContinueTessellating = verticesSaved[2];
+        // }
+        // else if(distanceSquaredBetween(polyhedron, verticesSaved[0], verticesSaved[3]) - 2 * newLengthEdge > -5e-2){
+        //     firstVertexWeNeedToContinueTessellating = verticesSaved[0];
+        //     secondVertexWeNeedToContinueTessellating = verticesSaved[3];
+        // }
+        // else if(distanceSquaredBetween(polyhedron, verticesSaved[1], verticesSaved[2]) - 2 * newLengthEdge > -5e-2){
+        //     firstVertexWeNeedToContinueTessellating = verticesSaved[1];
+        //     secondVertexWeNeedToContinueTessellating = verticesSaved[2];
+        // }
+        // else if(distanceSquaredBetween(polyhedron, verticesSaved[1], verticesSaved[3]) - 2 * newLengthEdge > -5e-2){
+        //     firstVertexWeNeedToContinueTessellating = verticesSaved[1];
+        //     secondVertexWeNeedToContinueTessellating = verticesSaved[3];
+        // }
+        // else{
+        //     firstVertexWeNeedToContinueTessellating = verticesSaved[2];
+        //     secondVertexWeNeedToContinueTessellating = verticesSaved[3];
+        // }
+
+        // /* Now that we have those vertices we need to divide thei distance in numberDivisions - 1 parts by using 
+        // the same algorithm as  above */
+        // double& firstVertexXCoord = CoordVertices(0, firstVertexWeNeedToContinueTessellating);
+        // double& firstVertexYCoord = CoordVertices(1, firstVertexWeNeedToContinueTessellating);
+        // double& firstVertexZCoord = CoordVertices(2, firstVertexWeNeedToContinueTessellating);
+
+        // double& secondVertexXCoord = CoordVertices(0, secondVertexWeNeedToContinueTessellating);
+        // double& secondVertexYCoord = CoordVertices(1, secondVertexWeNeedToContinueTessellating);
+        // double& secondVertexZCoord = CoordVertices(2, secondVertexWeNeedToContinueTessellating);
+
+        // /* We'll add the length of the new smaller edge to the minimum vertex between the two, 
+        // so let's find its coordinates */
+        // const double& vertexWeAreStartingFromXCoord = min(firstVertexXCoord, secondVertexXCoord);
+        // const double& vertexWeAreStartingFromYCoord = min(firstVertexYCoord, secondVertexYCoord);
+        // const double& vertexWeAreStartingFromZCoord = min(firstVertexZCoord, secondVertexZCoord);
+
+        // double differenceXCoord = abs(firstVertexXCoord - secondVertexXCoord);
+        // double differenceYCoord = abs(firstVertexYCoord - secondVertexYCoord);
+        // double differenceZCoord = abs(firstVertexZCoord - secondVertexZCoord);
+
+        // /* Let's add the coordinates of the new points on each edge to the matrix 
+        // "CoordVertices" of the polyhedron we're modifying */
+        // for(int division = 1; division < numberDivisions - 1; division++)
+        // {
+        //     /* The new vertices will be stored inside the same matrix CoordVertices, 
+        //     so we need to access the correct column in order not to erase important data 
+        //     from the old polyhedron */
+        //     CoordVertices(0, oldNumVertices + (numberDivisions - 1) * 3 * faceIndex + division) = 
+        //         vertexWeAreStartingFromXCoord + differenceXCoord / numberDivisions;
+        //     CoordVertices(1, oldNumVertices + (numberDivisions - 1) * 3 * faceIndex + division) = 
+        //         vertexWeAreStartingFromYCoord + differenceYCoord / numberDivisions;
+        //     CoordVertices(2, oldNumVertices + (numberDivisions - 1) * 3 * faceIndex + division) = 
+        //         vertexWeAreStartingFromZCoord + differenceZCoord / numberDivisions;
+        // }
     }
 }
 // void TypeIITessellation(GEOPolyhedron& polyhedron)
@@ -226,6 +351,8 @@ double distanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idP
                       differenceZCoord * differenceZCoord;
 
     return distanceSquared;
+}
 
-    
+int triangularNumber(int& b){
+    return ((b + 1) * (b + 2) / 2);
 }
