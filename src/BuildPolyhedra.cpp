@@ -191,7 +191,7 @@ namespace PolyhedraLibrary{
             }
         }
 
-        // Stampa per verifica
+        // Stampa per controllo
         // for (int i = 0; i < NumVertices; i++) {
         //     cout << "Vertice " << i << ": ";
         //     for (int n : adjacencyList[i]) 
@@ -261,81 +261,9 @@ namespace PolyhedraLibrary{
                             } 
                         }  
                         else
-                            continue; 
-                        
+                            continue;                         
                     }
                 }   
-                // Saving the vertices that are adjacent to "vertex"
-                // vector<int> connectedVertices;
-                // connectedVertices.reserve(q);
-
-                // int element = 0;
-                // while(element < NumVertices && int(connectedVertices.size()) < q)
-                // {
-                //     int& edgeIdToCheck = MatrEdgeVertices(vertex, element);
-                //     if(edgeIdToCheck >= 0){
-                //         connectedVertices.push_back(element);
-                //     }
-                //     element++;
-                // }
-
-                // Try forming triangles from combinations of connected vertices
-                // for(int i = 0; i < int(connectedVertices.size()); i++)
-                // {
-                //     int& vertexToCheck1 = connectedVertices[i];
-                //     // cout << "i: " << i << endl;
-                //     for(int j = i + 1; j < int(connectedVertices.size()); j++)
-                //     {
-                //         int& vertexToCheck2 = connectedVertices[j];
-                //         // cout << "j: " << j << endl;
-                        
-                //         // Check all three vertices are distinct
-                //         if(vertex != vertexToCheck1 && vertex != vertexToCheck2 && vertexToCheck1 != vertexToCheck2)
-                //         {                    
-                //             int& edgeIdToAdd = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);     
-                //             if (edgeIdToAdd >= 0) // Proceed only if there is an edge that connects the two vertices
-                //             {
-                //                 array<int, 3> sortedVertFace = {vertex, vertexToCheck1, vertexToCheck2};
-                //                 sort(sortedVertFace.begin(), sortedVertFace.end()); // Sorting avoids counting multiple times the same triangles with different vertex ordering
-
-                //                 // Check if the sorted triangle is already in the vector
-
-                //                 // Come funziona la funzione find?
-
-                //                 if(find(vecVertFaces.begin(), vecVertFaces.end(), sortedVertFace) == vecVertFaces.end())
-                //                 {
-                //                     vecVertFaces.push_back(sortedVertFace);
-
-                //                     // Find the edge IDs between the three vertices
-                //                     int& e1 = MatrEdgeVertices(vertex, vertexToCheck1);
-                //                     int& e2 = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);
-                //                     int& e3 = MatrEdgeVertices(vertexToCheck2, vertex);
-
-                //                     array<int, 3> edgesInFace = {e1, e2, e3}; 
-                //                     array<int, 3> verticesInFace = {vertex, vertexToCheck1, vertexToCheck2};
-
-                //                     // cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
-
-                //                     // Check face orientation consistency
-                //                     if (ExtremaEdges(1, e1) == ExtremaEdges(0, e2)) // e1.end == e2.origin
-                //                     {                                            
-                //                         ListVertFaces(0, faceIndex) = verticesInFace[0];
-                //                         ListVertFaces(1, faceIndex) = verticesInFace[1];
-                //                         ListVertFaces(2, faceIndex) = verticesInFace[2];
-
-                //                         ListEdgeFaces(0, faceIndex) = edgesInFace[0];
-                //                         ListEdgeFaces(1, faceIndex) = edgesInFace[1];
-                //                         ListEdgeFaces(2, faceIndex) = edgesInFace[2];
-                                        
-                //                         faceIndex++; // Passing to the next face only if we saved a face during this iteration
-                //                     }
-                //                 }  
-                //             } 
-                //         }  
-                //         else
-                //             continue; 
-                //     }
-                // }   
             }
             else
                 break; 
