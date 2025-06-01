@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
         c << ")" << endl; 
     }
 
-    BuildPolyhedra Constructor(p, q); // create the structure of the Polyedron
+    BuildPolyhedra Constructor(p, q); // create the structure of the Polyhedron
     Constructor.DataPolyhedra();
     GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
     // Constructor.CreateCells();

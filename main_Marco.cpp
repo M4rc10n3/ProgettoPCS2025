@@ -40,8 +40,11 @@ int main(){
     Gedim::UCDUtilities utilities;
     utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
                                polyhedron.CoordVertices);
+    utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
+                                 polyhedron.CoordVertices,
+                                 polyhedron.ExtremaEdges);
     // Constructor.ExportPolyhedra();
-    cout << VectorXd::LinSpaced(5,0.0,1.0).transpose() << endl;
+    // cout << VectorXd::LinSpaced(5,0.0,1.0).transpose() << endl;
 
     return 0;
 }

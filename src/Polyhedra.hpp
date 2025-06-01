@@ -14,6 +14,7 @@ namespace PolyhedraLibrary
 
     struct GEOPolyhedron
     {
+        int p, q;
         double lengthEdge;
 
         int NumVertices; // Number of vertices

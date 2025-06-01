@@ -7,6 +7,7 @@
 # include "Eigen/Eigen"
 # include "Polyhedra.hpp"
 # include "BuildPolyhedra.hpp"
+# include "Utils.hpp"
 # include "UCDUtilities.hpp"
 
 using namespace std;
@@ -22,7 +23,10 @@ namespace PolyhedraLibrary{
         NumVertices = (p * NumFaces) / q;
 
         // Reserves the exact amount of memory for the differents IDs
-        polyhedron.IdVertices.reserve(NumVertices);
+        polyhedron.IdVertices.resize(NumVertices);
+        for(unsigned int i = 0; i < polyhedron.IdVertices.size(); i++){
+            polyhedron.IdVertices[i] = i;
+        }
         polyhedron.IdEdges.reserve(NumEdges);
         polyhedron.IdFaces.reserve(NumFaces);
 
@@ -38,7 +42,6 @@ namespace PolyhedraLibrary{
 
     void BuildPolyhedra::DataPolyhedra()
     {
-        // Entering DataPolyhedra
         if ((p - 2) * (q - 2) < 4)
         {
             switch (p) // finds the correct polyhedron requested
@@ -104,56 +107,54 @@ namespace PolyhedraLibrary{
     void BuildPolyhedra::PointsPolyhedra(Eigen::MatrixXd& CoordVertices)
     {   
         polyhedron.CoordVertices = CoordVertices;
-        Length_edge = 2 * sqrt(6) / 3; // TODO we need to call the Length Edge inside PointPolyhedra
+        Length_edge = 2 * sqrt(6) / 3; // TODO we need to call the Length Edge inside PointsPolyhedra
         FillStructPolyhedra();
     }
 
     void BuildPolyhedra::NumberEdges()
     {
-        int edgeIndex = 0;
-        double length_edge_squared = Length_edge * Length_edge;
+        // Per questa funzione ci servono "lenghtEdge", "NumEdges" e il poliedro da cui partire e su cui salvare
+       
+        /* We didn't find any sequentiality in the ids of the edges, so we decided to find 
+        them using their length (which stays always the same)*/
+        double lengthEdgeSquared = Length_edge * Length_edge;
+        
+        /* We need to keep track of how many edges we've found, in order not to find repeating edges: */
+        int edgeIndexFound = 0;
 
-        for(int i = 0; i < NumVertices - 1; i++)
+        /* We need to find the edges that start from each vertex (except for the last one, 
+        because that would be a certain useless iteration: we'll have already found all of the edges 
+        that have the last vertex as an extrema) */
+        for(int firstVertexIndex = 0; firstVertexIndex < NumVertices - 1; firstVertexIndex++)
         {
-            if(edgeIndex <= NumEdges) // Proceed only if all the edges have not been numbered yet
+            /* Proceed only if all the edges have not been numbered yet */
+            if(edgeIndexFound <= NumEdges)
             {
-                /* Non c'è sequenzialità nel dare gli estremi dei vertici, perchè, per esempio nell'ottaedro lo 0 
-                va conesso ai suoi 3 prossimi,  ma il vertice con id 1  va connesso ai vertici con id 2, 4 e 5, 
-                non connessi da alcuna logica. Quindi tocca unire i vertici che hanno la giusta distanza, 
-                ovvero la lunghezza del lato */
-                
-                // Saving in some variables the coordinates of the first vertex
-                double& x_point_1 = CoordVertices(0, i);
-                double& y_point_1 = CoordVertices(1, i);
-                double& z_point_1 = CoordVertices(2, i);
-
-                for (int j = i + 1; j < NumVertices; j++)
+                /* We'll check every other vertex of the polyhedron (for which we don't have already 
+                found all edges) in order to find the ones with the exact distance from the vertex 
+                with index "firsteVertexIndex" */
+                for(int secondVertexIndex = firstVertexIndex + 1; secondVertexIndex < NumVertices; secondVertexIndex++)
                 {
-                    // Saving in some variables the coordinates of the second vertex
-                    double& x_point_2 = CoordVertices(0, j);
-                    double& y_point_2 = CoordVertices(1, j);
-                    double& z_point_2 = CoordVertices(2, j);
+                    /* We'll use a function we have implemented in "Utils.cpp" in order to find the 
+                    distance squared between the two vertices: */
+                    double distanceSquared = distanceSquaredBetween(polyhedron, firstVertexIndex, secondVertexIndex);
 
-                    // Calculating the distance(squared) between the two vertices
-                    double distance_squared = (x_point_1 - x_point_2) * (x_point_1 - x_point_2) + 
-                                                (y_point_1 - y_point_2) * (y_point_1 - y_point_2) +
-                                                (z_point_1 - z_point_2) * (z_point_1 - z_point_2);
-
-                    // When the two vertices have the correct distance between them we save them as an 
-                    // edge of the polyhedron (we decided to set this small tolerance because the data 
-                    // we used to create the polygons has two decimal digits)
-                    if(abs(distance_squared - length_edge_squared) < 5e-2)
+                    /* When the two vertices have the correct distance squared between them we save them as an 
+                    edge of the polyhedron (we decided to set this small tolerance because the data 
+                    we used to create the polygons has two decimal digits) */
+                    if(abs(distanceSquared - lengthEdgeSquared) < 5e-2)
                     {
-                        ExtremaEdges(0, edgeIndex) = i;
-                        ExtremaEdges(1, edgeIndex) = j;
+                        ExtremaEdges(0, edgeIndexFound) = firstVertexIndex;
+                        ExtremaEdges(1, edgeIndexFound) = secondVertexIndex;
 
-                        // Se un lato ha id 0 allora non potremo riconoscerlo in una matrice sparsa, 
-                        // quindi la matrice è inizializzata con tutti valori pari a -1
-                        MatrEdgeVertices(i,j) = edgeIndex;
-                        MatrEdgeVertices(j,i) = edgeIndex;
+                        /* We also save the index of the edge inside the matrix "MatrEdgeVertices": 
+                        we'll use it in order to find the adjacent vertices for each vertex and 
+                        the faces of the polyhedron */
+                        MatrEdgeVertices(firstVertexIndex, secondVertexIndex) = edgeIndexFound;
+                        MatrEdgeVertices(secondVertexIndex, firstVertexIndex) = edgeIndexFound;
 
-                        // Passing to the next edge only if we saved an edge during this iteration
-                        edgeIndex++;
+                        /* Now that we've found an edge we can go on to the next edge: */
+                        edgeIndexFound++;
                     }
                 }
             }
@@ -161,24 +162,15 @@ namespace PolyhedraLibrary{
         
         cout << "ExtremaEdges: " << endl << ExtremaEdges << endl;
         cout << "MatrEdgeVertices: " << endl << MatrEdgeVertices << endl;
-        
-        // for(int i = 0; i < NumEdges; i++){
-        //     int a = ExtremaEdges[i, 0];
-        //     int b = ExtremaEdges[i, 1];
-        //     MatrEdgeVertices(a,b) = edgeIndex;
-        //     MatrEdgeVertices(b,a) = edgeIndex;
-        //     edgeIndex++;
-        // }
-
     }
  
     vector<vector<int>> BuildPolyhedra::AdjacencyList()
     {
         vector<vector<int>> adjacencyList(NumVertices);
 
-        for (int vertex = 0; vertex < NumVertices; vertex++)
+        for(int vertex = 0; vertex < NumVertices; vertex++)
         {
-            for (int adjVert = 0; adjVert < NumVertices; adjVert++)
+            for(int adjVert = 0; adjVert < NumVertices; adjVert++)
             {
                 if (vertex != adjVert) 
                 {                    
@@ -190,15 +182,6 @@ namespace PolyhedraLibrary{
                 }
             }
         }
-
-        // Stampa per controllo
-        // for (int i = 0; i < NumVertices; i++) {
-        //     cout << "Vertice " << i << ": ";
-        //     for (int n : adjacencyList[i]) 
-        //         cout << n << " ";
-        //     cout << endl;
-        // }
-
         return adjacencyList;
     }
 
@@ -209,7 +192,7 @@ namespace PolyhedraLibrary{
         vector<array<int, 3>> vecVertFaces; // This vector stores unique triangles (faces) as sorted arrays of 3 vertices
         vecVertFaces.reserve(NumFaces);
 
-        const vector<vector<int>>& adjacencyList = AdjacencyList();
+        vector<vector<int>> adjacencyList = AdjacencyList();
         
         for(int vertex = 0; vertex < NumVertices; vertex++)
         { 
@@ -217,8 +200,11 @@ namespace PolyhedraLibrary{
             {
                 for(auto& vertexToCheck1 : adjacencyList[vertex])
                 {
-                    for(auto& vertexToCheck2 : adjacencyList[vertex])
+                    // cout << "vertexToCheck1: " << vertexToCheck1 << endl;
+                    for(int& vertexToCheck2 : adjacencyList[vertex])
                     {
+                        // cout << "vertexToCheck2: " << vertexToCheck2 << endl;
+                        
                         // Check all three vertices are distinct
                         if(vertex != vertexToCheck1 && vertex != vertexToCheck2 && vertexToCheck1 != vertexToCheck2)
                         {                    
@@ -242,7 +228,7 @@ namespace PolyhedraLibrary{
                                     array<int, 3> edgesInFace = {e1, e2, e3}; 
                                     array<int, 3> verticesInFace = {vertex, vertexToCheck1, vertexToCheck2};
 
-                                    // cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
+                                    cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
 
                                     // Check face orientation consistency
                                     if (ExtremaEdges(1, e1) == ExtremaEdges(0, e2)) // e1.end == e2.origin
@@ -371,8 +357,6 @@ namespace PolyhedraLibrary{
             CoordVertices(0, i) << "," << 
             CoordVertices(1, i) << "," << 
             CoordVertices(2, i) << "\n";
-            
-            polyhedron.IdVertices.push_back(i);
         }
 
         file.close();

@@ -7,7 +7,8 @@ namespace PolyhedraLibrary{
     {
     private: 
     GEOPolyhedron polyhedron;
-    int p, q;
+    int& p = polyhedron.p;
+    int& q = polyhedron.q;
     int& NumFaces = polyhedron.NumFaces; 
     int& NumEdges = polyhedron.NumEdges;
     int& NumVertices = polyhedron.NumVertices;
@@ -28,8 +29,6 @@ namespace PolyhedraLibrary{
     void NumberEdges(); // Create two matrices: one with the vertex IDs of each edge and one with
                                         // the edge IDs of each pair of vertices
 
-    // vector<vector<int>> AdjacencyList(); // Create the adjacency list of the vertices in the polyhedron
-    
     /* Creating the matrix containing the vertices of each face as its column and the matrix containing the ids 
         of the edges of each face. */
     void NumberFaces(); // Create two matrices: one with the vertex IDs and one with the edge IDs, 
@@ -38,6 +37,8 @@ namespace PolyhedraLibrary{
     /* Creating the matrix containing the adjacent faces of each face. 
     Each column contains the ids of the adjacent faces for the face that has as id the column index */
     void FindAdjacentFaces(); // Create one matrix as explained above
+
+    
 
     void Cell0Ds(); // Create Cell0Ds 
 
@@ -65,7 +66,6 @@ namespace PolyhedraLibrary{
 
         void ExportPolyhedra(); // Export the structures using the code of Mr. Vicini in order 
                                 // to create a file readable by ParaView
-
     };
 
 }

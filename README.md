@@ -37,6 +37,17 @@ Tali formule valgono solo per i poliedri di tipo I, mentre quella di tipo II val
 
 Il caso in cui p = q = 3 non è detto come gestirlo, si può gestire come si vuole (magari chiedendo all'utente di specificare quale desidera)
 
+8: Formule per il numero di componenti del secondo tipo di tassellazione? 
+Risposta:
+ V = numV + numE*(2b-1)+numF((3b^2)/2-3b/2+1)
+ E = numE(2b)+numF((9b^2)/2+3b/2)
+ F = numF((3b^2)+3b)
+
+ Relazione di Eulero: 
+ V+F=E+2
+ 
+ numV,numE,numF del solido platonico di partenza
+
 Cose da fare:
 1. Creare algoritmo che crea il poliedro a partire da p e q;
 2. Creare algoritmo che ne fa la tassellazione a seconda della classe;
