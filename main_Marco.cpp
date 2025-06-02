@@ -29,7 +29,7 @@ int main(){
 
     int p = 3;
     int q = 3;
-    int b = 3;
+    int b = 4;
     cout << "p = " << p << endl;
     cout << "q = " << q << endl;
 
@@ -43,6 +43,31 @@ int main(){
     utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
                                  polyhedron.CoordVertices,
                                  polyhedron.ExtremaEdges);
+    vector<vector<unsigned int>> FacesVertices;
+    FacesVertices.resize(polyhedron.NumFaces);
+
+    for(int i = 0; i < polyhedron.NumFaces; i++)
+    {
+        FacesVertices[i].resize(3);
+        
+        // Salvo i vertici di ciascuna faccia con indice "i" all'interno del vettore con indice "i"
+        FacesVertices[i][0] = polyhedron.ListVertFaces(0, i);
+        FacesVertices[i][1] = polyhedron.ListVertFaces(1, i);
+        FacesVertices[i][2] = polyhedron.ListVertFaces(2, i);
+    }
+
+    Eigen::VectorXi FacesMarkers(polyhedron.NumFaces);
+    for(int i = 0; i < polyhedron.NumFaces; i++)
+    {
+        FacesMarkers[i] = i;
+    }
+
+    utilities.ExportPolygons("../PolygonalData/Cell2Ds.inp",
+                                polyhedron.CoordVertices,
+                                FacesVertices,
+                                {},
+                                {},
+                                FacesMarkers);
     // Constructor.ExportPolyhedra();
     // cout << VectorXd::LinSpaced(5,0.0,1.0).transpose() << endl;
 

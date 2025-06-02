@@ -70,9 +70,9 @@ namespace PolyhedraLibrary{
                     cout << "Your Polyhedron is a Icosahedron with: \n";
                     Length_edge = 4 / sqrt(10 + 2*sqrt(5));
                     polyhedron.lengthEdge = Length_edge;
-                    polyhedron.CoordVertices << 0, 0.89, 0.28, 0.72, -0.28, 0, -0.89, -0.28, -0.72, 0.28, 0.72, -0.72,
-                                                0, 0, 0.85, 0.53, 0.85, 0, 0, -0.85, -0.53, -0.85, -0.53, 0.53,
-                                                1, 0.45, 0.45, -0.45, -0.45, -1, -0.45, -0.45, 0.45, 0.45, -0.45, 0.45;   
+                    polyhedron.CoordVertices << 0, 0.894427190999916, 0.276393202250021, 0.723606797749979, -0.276393202250021, 0, -0.894427190999916, -0.276393202250021, -0.723606797749979, 0.276393202250021, 0.723606797749979, -0.723606797749979,
+                                                0, 0, 0.85065080835204, 0.525731112119134, 0.85065080835204, 0, 0, -0.85065080835204, -0.525731112119134, -0.85065080835204, -0.525731112119133, 0.525731112119134,
+                                                1, 0.447213595499958, 0.447213595499958, -0.447213595499958, -0.447213595499958, -1, -0.447213595499958, -0.447213595499958, 0.447213595499958, 0.447213595499957, -0.447213595499958, 0.447213595499958;   
                     break;
                 }
                 break;
@@ -142,8 +142,7 @@ namespace PolyhedraLibrary{
 
                     // cout << "distance edge:" << abs(distanceSquared - lengthEdgeSquared) << endl;
                     /* When the two vertices have the correct distance squared between them we save them as an 
-                    edge of the polyhedron (we decided to set this small tolerance because the data 
-                    we used to create the polygons has two decimal digits) */
+                    edge of the polyhedron (the tolerance was set arbitrarily after some trial and error) */
                     if(abs(distanceSquared - lengthEdgeSquared) < 5e-15)
                     {
                         ExtremaEdges(0, edgeIndexFound) = firstVertexIndex;

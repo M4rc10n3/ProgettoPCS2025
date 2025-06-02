@@ -101,6 +101,7 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
             numberNewEdges = 6 * numberTrianglesForFace; // E = 6 * T
             numberNewFaces = 4 * numberTrianglesForFace; // F = 4 * T
 
+            // Stampe poi da togliere
             cout << "numberNewVertices: " << numberNewVertices << endl;
             cout << "numberNewEdges: " << numberNewEdges << endl;
             cout << "numberNewFaces: " << numberNewFaces << endl;
@@ -171,8 +172,7 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
 
     /* We'll need the length of the edge of the new polyhedron in order to find the inner vertices 
     of each face and most importantly all of its edges, so let's compute it: */
-    double newLengthEdge = oldLengthEdge / numberDivisions; 
-    cout << setprecision(16) << "newLengthEdge: " << newLengthEdge << endl;
+    double newLengthEdge = oldLengthEdge / numberDivisions;
 
     int numberVerticesOnFace = triangularNumber(numberDivisions);
 
@@ -316,40 +316,98 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         /* Let's find the vertices that have the exact distance we need to create the internal points. 
         For example, for b = 3, we'll search for the vertices on the edges (except for their extrema) 
         that have distance equal to two times the length of the new smaller edge. 
-        For b = 4, we'll firstly look for those that have a distance equal to 3 times that of the edge, 
-        then we'll search for those that have a distance equal to 2 times that of the edge.
-        Once we'll have found the two vertices, we'll use the same algorithm as above to find the inner 
-        vertices subdividing the segment that has the two vertices as extrema */
-
-        cout << "faceIndex: " << faceIndex << endl;
+        For b = 4, we'll firstly look for the vertex that has a distance equal to 3 times that of the edge, 
+        then we'll save the edge index and search on it for the vertex that has a distance equal to 2 times 
+        that of the edge.
+        Once we'll have found the two etrema of the inner segment, we'll use the same algorithm as above 
+        to find the inner vertices subdividing the segment into the exact number of parts */
 
         /* We'll always start our search from the vertices on the first edge of the face and we'll look for 
         the vertices on the other edges of the same face */
         int& edgeWeStartFromIndex = ListEdgeFaces(0, faceIndex);
-        cout << "edgeWeStartFromIndex: " << edgeWeStartFromIndex << endl;
+
+        /* Let's create the variable that will save the index of the opposing edge to the one with index 
+        "edgeWeStartFromIndex" which has the vertex we found with the first search for the vertex with the 
+        exact distance we're looking for */
+        int minimumDistanceOpposingEdge = -1;
+
         for(int time = 0; time < numberDivisions - 2; time++)
         /* "time" represents the number of inner segments that each face has */
         {
+            /* Let's set a "minimumDistance" we'll use to find the exact vertex we're looking for. 
+            Unfortunately, a tolerance wasn't feasible because on some faces the distance from the 
+            first vertex and the vertex we're looking for was of the order of e-15 and on some other 
+            faces it was of the order of e-16 without folloqing an understandable logic */
             double minimumDistance = newLengthEdge;
-            //TODO: dovrei salvare il lato su cui ho trovato il primo vertice opposto in modo tale da 
-            // cerca solo su di esso i successivi vertici opposti, altrimenti potrei prendere vertici 
-            // che si trovano sull'altro lato opposto e ritrovare vertici già trovati precedentemente.
 
-            cout << "time: " << time << endl;
-            /* We'll look for the right vertex on both the opposing vertices: */
-            for(int opposingEdgeIndex = 1; opposingEdgeIndex < p; opposingEdgeIndex++){
-                /* Let's find the right index of the edge accessing our data structures:  */
-                int& opposingEdge = ListEdgeFaces(opposingEdgeIndex, faceIndex);
+            /* Let's create here the variable that save the indexes of the vertices which we'll divide
+             into the exact number of parts at each iteration of "time" */
+            int minimumDistanceIdVertexWeStartFrom = -1;
+            int minimumDistanceIdOpposingVertex = -1;
 
-                cout << "opposingEdge: " << opposingEdge << endl;
-                
-                int minimumDistanceIdVertexWeStartFrom = -1;
-                int minimumDistanceIdOpposingVertex = -1;
+            /* At the first iteration of "time" we'll look for the edge with the vertex we're looking 
+            for and then we'll save it inside "minimumDistanceOpposingEdge" in order to use it afterwards.
+            After the second iteration we'll look for the vertex only on the edge with index "minimumDistanceOpposingEdge"
+            in order not to create repeating sides.*/
+            if(time == 0)
+            {
+                /* We'll look for the right vertex on both the opposing vertices: */
+                for(int opposingEdgeIndex = 1; opposingEdgeIndex < p; opposingEdgeIndex++)
+                {
+                    /* Let's find the right index of the edge accessing our data structures:  */
+                    int& opposingEdge = ListEdgeFaces(opposingEdgeIndex, faceIndex);
+                    
+                    /* Now we can look for the right vertex on the edge: */
+                    for(int idVertexOnEdge = 0; idVertexOnEdge < (numberDivisions - 1); idVertexOnEdge++)
+                    {
+                        /* In order to access the proper vertex where we'll start from, we should ignore:
+                            - the vertices of the old polyhedron;
+                            - the vertices we found above on the edges before the current one; 
+                        then we should access the vertex with id "time". 
+                        Each of these members is represented in a line in the next sum for code readability: */
+                        int idVertexWeStartFrom = oldNumVertices + 
+                                                  (numberDivisions - 1) * edgeWeStartFromIndex +
+                                                  time;
+    
+                        /* In order to access the proper vertex where we'll end at, we should ignore:
+                            - the vertices of the old polyhedron;
+                            - the vertices we found above on the edges before the current one; 
+                        then we should access the vertex with id "idVertexOnEdge". 
+                        Each of these members is represented in a line in the next sum for code readability: */
+                        int idOpposingVertex = oldNumVertices + 
+                                               (numberDivisions - 1) * opposingEdge +
+                                               idVertexOnEdge;
+    
+                        /* "distance" is the variable contanining the difference between the distance squared 
+                        between the vertices and the length of the segment we're looking for */
+                        double distance = abs(distanceSquaredBetween(polyhedron, idVertexWeStartFrom, idOpposingVertex) - 
+                            newLengthEdge * (numberDivisions - 1 - time) * newLengthEdge * (numberDivisions - 1 - time));
+    
+                        /* When we found a vertex with a "distance" that's less than that we've already saved, 
+                        then we update the value of "minimumDistance", the indexes of the vertices of the segment we 
+                        will divide and the index of the edge where we'll look for the vertices after the first 
+                        iteration of "time" */
+                        if(distance < minimumDistance)
+                        {
+                            minimumDistance = distance;
 
-                /* Now we can look for the right vertex on the edge: */
+                            minimumDistanceIdVertexWeStartFrom = idVertexWeStartFrom;
+                            minimumDistanceIdOpposingVertex = idOpposingVertex;
+
+                            minimumDistanceOpposingEdge = opposingEdge;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                /* After the first iteration, so for "time" > 0, we already know the index of the opposing edge, 
+                which is saved in the variable initialised outside the "for" cycle on the "time" variable */
+                int& opposingEdge = minimumDistanceOpposingEdge;
+                    
+                /* Now we can look for the right vertex on the edge we saved: */
                 for(int idVertexOnEdge = 0; idVertexOnEdge < (numberDivisions - 1); idVertexOnEdge++)
                 {
-                    cout << "Searching for right opposing vertex " << idVertexOnEdge << endl;
                     /* In order to access the proper vertex where we'll start from, we should ignore:
                         - the vertices of the old polyhedron;
                         - the vertices we found above on the edges before the current one; 
@@ -368,152 +426,75 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                                            (numberDivisions - 1) * opposingEdge +
                                            idVertexOnEdge;
                     
-                    /* We'll go on with the algorithm only if the distance between to the two vertices 
-                    is equal to that we're looking for: */
-                    cout << "distanceSquaredBetween(" << idVertexWeStartFrom << ", " << idOpposingVertex << "): " <<
-                        distanceSquaredBetween(polyhedron, idVertexWeStartFrom, idOpposingVertex) << endl;
-                    cout << "distance: " << abs(distanceSquaredBetween(polyhedron, idVertexWeStartFrom, idOpposingVertex) - 
-                        newLengthEdge * (numberDivisions - 1 - time) * newLengthEdge * (numberDivisions - 1 - time)) << endl;
-                    
-                    // Per b=4, il punto che sto cercando ha una distanza intermedia tra massima e minima. 
-                    // Trovo distanza minima coi vertici che sono affianco a lui, mentre lui stesso 
-                    // ha distanza più alta. Che si tratti di cancellazione numerica?
-
+                    /* "distance" is the variable contanining the difference between the distance squared 
+                    between the vertices and the length of the segment we're looking for */
                     double distance = abs(distanceSquaredBetween(polyhedron, idVertexWeStartFrom, idOpposingVertex) - 
                         newLengthEdge * (numberDivisions - 1 - time) * newLengthEdge * (numberDivisions - 1 - time));
 
+                    /* When we found a vertex with a "distance" that's less than that we've already saved, 
+                    then we update the value of "minimumDistance" and the indexes of the vertices of the segment we 
+                    will divide (we don't know to update the variable "minimumDistanceOpposingEdge" anymore) */
                     if(distance < minimumDistance){
                             minimumDistance = distance;
                             minimumDistanceIdVertexWeStartFrom = idVertexWeStartFrom;
                             minimumDistanceIdOpposingVertex = idOpposingVertex;
                         }
-
-                    // if(abs(distanceSquaredBetween(polyhedron, idVertexWeStartFrom, idOpposingVertex) - 
-                    //     newLengthEdge * (numberDivisions - 1 - time) * newLengthEdge * (numberDivisions - 1 - time)) < 5e-16)
-                    //     {
-                    //         cout << "Saving inner vertices" << endl;
-                    //         /* Now that we've found the 2 vertices, we'll repeat the algorithm 
-                    //         as above in order to find the coordinates of the inner vertices */
-                    //         int& firstVertexWeAreDividing = idVertexWeStartFrom;
-                    //         int& secondVertexWeAreDividing = idOpposingVertex;
-
-                    //         double& firstVertexXCoord = CoordVertices(0, firstVertexWeAreDividing);
-                    //         double& firstVertexYCoord = CoordVertices(1, firstVertexWeAreDividing);
-                    //         double& firstVertexZCoord = CoordVertices(2, firstVertexWeAreDividing);
-
-                    //         double& secondVertexXCoord = CoordVertices(0, secondVertexWeAreDividing);
-                    //         double& secondVertexYCoord = CoordVertices(1, secondVertexWeAreDividing);
-                    //         double& secondVertexZCoord = CoordVertices(2, secondVertexWeAreDividing);
-
-                    //         newXCoordVerticesOnEdge = VectorXd::LinSpaced(numberDivisions - time, 
-                    //                                                     firstVertexXCoord, 
-                    //                                                     secondVertexXCoord);
-                    //         newYCoordVerticesOnEdge = VectorXd::LinSpaced(numberDivisions - time, 
-                    //                                                     firstVertexYCoord,
-                    //                                                     secondVertexYCoord);
-                    //         newZCoordVerticesOnEdge = VectorXd::LinSpaced(numberDivisions - time, 
-                    //                                                     firstVertexZCoord, 
-                    //                                                     secondVertexZCoord);
-
-                    //         /* We also need to save the new vertices, with a different algorithm compared 
-                    //         to the one above: */
-                    //         for(int vertexSaved = 0; vertexSaved < numberDivisions - 2 - time; vertexSaved++)
-                    //         {
-                    //             /* In order to access the proper vertex where we'll end at, we should ignore:
-                    //                 - the vertices of the old polyhedron;
-                    //                 - all of the vertices we found above on the edges of the old polyhedron; 
-                    //             then we should access the vertex with id "innerVerticesSaved", variable 
-                    //             initialised outside the "for" cycle on the faces of the old polyhedron. 
-                    //             Each of these members is represented in a line in the next sum for 
-                    //             code readability: */
-                    //             int newVertexId = oldNumVertices + 
-                    //                               (numberDivisions - 1) * oldNumEdges + 
-                    //                               innerVerticesSaved;
-                    //             cout << "newVertexId: " << newVertexId << endl;
-                    //             CoordVertices(0, newVertexId) = newXCoordVerticesOnEdge(vertexSaved + 1);
-                    //             CoordVertices(1, newVertexId) = newYCoordVerticesOnEdge(vertexSaved + 1);
-                    //             CoordVertices(2, newVertexId) = newZCoordVerticesOnEdge(vertexSaved + 1);
-
-                    //             /* Now that we've found an inner vertex, we can increase the variable 
-                    //             that counts them: */
-                    //             innerVerticesSaved++;
-
-                    //             /* Let's also add the id of the new vertex to the vector "verticesOnFace": */
-                    //             verticesOnFace.push_back(newVertexId);
-                    //         }
-                    //     break;
-                    // }
                 }
-                cout << "Saving inner vertices" << endl;
-                /* Now that we've found the 2 vertices, we'll repeat the algorithm 
-                as above in order to find the coordinates of the inner vertices */
-                int& firstVertexWeAreDividing = minimumDistanceIdVertexWeStartFrom;
-                int& secondVertexWeAreDividing = minimumDistanceIdOpposingVertex;
+            }
+            /* After we've found the vertices with the minimum "distance" we'll divide them using
+            the same algorithm as above (used for the vertices on the edges) in order to find 
+            the coordinates of the inner vertices */
+            int& firstVertexWeAreDividing = minimumDistanceIdVertexWeStartFrom;
+            int& secondVertexWeAreDividing = minimumDistanceIdOpposingVertex;
 
-                double& firstVertexXCoord = CoordVertices(0, firstVertexWeAreDividing);
-                double& firstVertexYCoord = CoordVertices(1, firstVertexWeAreDividing);
-                double& firstVertexZCoord = CoordVertices(2, firstVertexWeAreDividing);
+            double& firstVertexXCoord = CoordVertices(0, firstVertexWeAreDividing);
+            double& firstVertexYCoord = CoordVertices(1, firstVertexWeAreDividing);
+            double& firstVertexZCoord = CoordVertices(2, firstVertexWeAreDividing);
 
-                double& secondVertexXCoord = CoordVertices(0, secondVertexWeAreDividing);
-                double& secondVertexYCoord = CoordVertices(1, secondVertexWeAreDividing);
-                double& secondVertexZCoord = CoordVertices(2, secondVertexWeAreDividing);
+            double& secondVertexXCoord = CoordVertices(0, secondVertexWeAreDividing);
+            double& secondVertexYCoord = CoordVertices(1, secondVertexWeAreDividing);
+            double& secondVertexZCoord = CoordVertices(2, secondVertexWeAreDividing);
 
-                newXCoordVerticesOnEdge = VectorXd::LinSpaced(numberDivisions - time, 
-                                                            firstVertexXCoord, 
-                                                            secondVertexXCoord);
-                newYCoordVerticesOnEdge = VectorXd::LinSpaced(numberDivisions - time, 
-                                                            firstVertexYCoord,
-                                                            secondVertexYCoord);
-                newZCoordVerticesOnEdge = VectorXd::LinSpaced(numberDivisions - time, 
-                                                            firstVertexZCoord, 
-                                                            secondVertexZCoord);
+            newXCoordVerticesOnEdge = VectorXd::LinSpaced(numberDivisions - time, 
+                                                        firstVertexXCoord, 
+                                                        secondVertexXCoord);
+            newYCoordVerticesOnEdge = VectorXd::LinSpaced(numberDivisions - time, 
+                                                        firstVertexYCoord,
+                                                        secondVertexYCoord);
+            newZCoordVerticesOnEdge = VectorXd::LinSpaced(numberDivisions - time, 
+                                                        firstVertexZCoord, 
+                                                        secondVertexZCoord);
 
-                /* We also need to save the new vertices, with a different algorithm compared 
-                to the one above: */
-                for(int vertexSaved = 0; vertexSaved < numberDivisions - 2 - time; vertexSaved++)
-                {
-                    /* In order to access the proper vertex where we'll end at, we should ignore:
-                        - the vertices of the old polyhedron;
-                        - all of the vertices we found above on the edges of the old polyhedron; 
-                    then we should access the vertex with id "innerVerticesSaved", variable 
-                    initialised outside the "for" cycle on the faces of the old polyhedron. 
-                    Each of these members is represented in a line in the next sum for 
-                    code readability: */
-                    int newVertexId = oldNumVertices + 
-                                        (numberDivisions - 1) * oldNumEdges + 
-                                        innerVerticesSaved;
-                    cout << "newVertexId: " << newVertexId << endl;
-                    CoordVertices(0, newVertexId) = newXCoordVerticesOnEdge(vertexSaved + 1);
-                    CoordVertices(1, newVertexId) = newYCoordVerticesOnEdge(vertexSaved + 1);
-                    CoordVertices(2, newVertexId) = newZCoordVerticesOnEdge(vertexSaved + 1);
+            /* We need to save the coordinates of the new vertices with a different 
+            algorithm compared to the one used above: */
+            for(int vertexSaved = 0; vertexSaved < numberDivisions - 2 - time; vertexSaved++)
+            {
+                /* In order to find the proper index of the new vertex, we should ignore:
+                    - the vertices of the old polyhedron;
+                    - all of the vertices we found above on the edges of the old polyhedron; 
+                then we should access the vertex with id "innerVerticesSaved", variable 
+                initialised outside the "for" cycle on the faces of the old polyhedron. 
+                Each of these members is represented in a line in the next sum for 
+                code readability: */
+                int newVertexId = oldNumVertices + 
+                                    (numberDivisions - 1) * oldNumEdges + 
+                                    innerVerticesSaved;
+                CoordVertices(0, newVertexId) = newXCoordVerticesOnEdge(vertexSaved + 1);
+                CoordVertices(1, newVertexId) = newYCoordVerticesOnEdge(vertexSaved + 1);
+                CoordVertices(2, newVertexId) = newZCoordVerticesOnEdge(vertexSaved + 1);
 
-                    /* Now that we've found an inner vertex, we can increase the variable 
-                    that counts them: */
-                    innerVerticesSaved++;
+                /* Now that we've found an inner vertex, we can increase the variable 
+                that counts them: */
+                innerVerticesSaved++;
 
-                    /* Let's also add the id of the new vertex to the vector "verticesOnFace": */
-                    verticesOnFace.push_back(newVertexId);
-                }
-
-
+                /* Let's also add the id of the new vertex to the vector "verticesOnFace": */
+                verticesOnFace.push_back(newVertexId);
             }
         }
-
-        cout << "CoordVertices:\n" << CoordVertices << endl;
-
-        cout << "verticesOnFace: { ";
-        for(auto elem : verticesOnFace){
-            cout << elem << " ";
-        }
-        cout << "}" << endl;
-
-        Gedim::UCDUtilities utilities;
-        utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
-                               polyhedron.CoordVertices);
        
-        /* Now we'll find the polyhedron new edges using the same algorithm used for the old polyhedra 
-        based on the length of the edge. We will modify it because using the original algorithm 
-        we would also find internal edges that we don't need. */
+        /* Now we'll find the polyhedron new edges using a similar algorithm used for the old polyhedra 
+        based on the length of the edge. It will be modified because we would also find internal edges 
+        that we don't need using the original algorithm . */
     
         /* We need to find the edges that start from each vertex of the face (except for the last one, 
         because that would be a certain useless iteration: we'll have already found all of the edges 
@@ -538,9 +519,9 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                     double distanceSquared = distanceSquaredBetween(polyhedron, firstVertexIndex, secondVertexIndex);
 
                     /* When the two vertices have the correct distance squared between them we could save them 
-                    as an edge of the polyhedron if they have not been saved yet (we decided to set this 
-                    tolerance because the data we used to create the polygons has two decimal digits) */
-                    if(abs(distanceSquared - newLengthEdge * newLengthEdge) <= 5e-2)
+                    as an edge of the polyhedron if they have not been saved yet (the tolerance was set arbitrarily 
+                    after some trial and error) */
+                    if(abs(distanceSquared - newLengthEdge * newLengthEdge) < 5e-15)
                     {
                         /* We need to check whether we have already saved the two vertices as the extrema of 
                         an edge, therefore we need to check whether inside the matrix "newMatrEdgeVertices" 
@@ -568,10 +549,10 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     MatrEdgeVertices = newMatrEdgeVertices;
     ExtremaEdges = newExtremaEdges;
 
-    // cout << "ExtremaEdges:\n " << ExtremaEdges << endl;
-    // cout << "MatrEdgeVertices:\n " << MatrEdgeVertices << endl;
-
-
+    // Stampe poi da togliere
+    cout << "CoordVertices:\n" << CoordVertices << endl;
+    cout << "ExtremaEdges:\n " << ExtremaEdges << endl;
+    cout << "MatrEdgeVertices:\n " << MatrEdgeVertices << endl;
 }
 
 
