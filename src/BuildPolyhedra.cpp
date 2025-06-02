@@ -53,10 +53,11 @@ namespace PolyhedraLibrary{
                     cout << "Your Polyhedron is a Tetrahedron with:\n";
                     Length_edge = 2 * sqrt(6) / 3;
                     polyhedron.lengthEdge = Length_edge;
-                    polyhedron.CoordVertices << 0, -0.94, 0.47, 0.47,
-                                                0, 0, -0.82, 0.82,
-                                                1, -0.33, -0.33, -0.33;
+                    polyhedron.CoordVertices << 0, -0.942809041582063, 0.471404520791031, 0.471404520791031,
+                                                0, 0, -0.816496580927726, 0.816496580927726,
+                                                1, -0.333333333333333, -0.333333333333333, -0.333333333333333;
                     break;
+                    
                 case 4:
                     cout << "Your Polyhedron is a Octahedron with:\n";
                     Length_edge = sqrt(2);
@@ -139,10 +140,11 @@ namespace PolyhedraLibrary{
                     distance squared between the two vertices: */
                     double distanceSquared = distanceSquaredBetween(polyhedron, firstVertexIndex, secondVertexIndex);
 
+                    // cout << "distance edge:" << abs(distanceSquared - lengthEdgeSquared) << endl;
                     /* When the two vertices have the correct distance squared between them we save them as an 
                     edge of the polyhedron (we decided to set this small tolerance because the data 
                     we used to create the polygons has two decimal digits) */
-                    if(abs(distanceSquared - lengthEdgeSquared) < 5e-2)
+                    if(abs(distanceSquared - lengthEdgeSquared) < 5e-15)
                     {
                         ExtremaEdges(0, edgeIndexFound) = firstVertexIndex;
                         ExtremaEdges(1, edgeIndexFound) = secondVertexIndex;
@@ -228,7 +230,7 @@ namespace PolyhedraLibrary{
                                     array<int, 3> edgesInFace = {e1, e2, e3}; 
                                     array<int, 3> verticesInFace = {vertex, vertexToCheck1, vertexToCheck2};
 
-                                    cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
+                                    // cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
 
                                     // Check face orientation consistency
                                     if (ExtremaEdges(1, e1) == ExtremaEdges(0, e2)) // e1.end == e2.origin
