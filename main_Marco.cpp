@@ -28,8 +28,8 @@ int main(){
     cout << "Hello world" << endl;
 
     int p = 3;
-    int q = 3;
-    int b = 4;
+    int q = 5;
+    int b = 5;
     cout << "p = " << p << endl;
     cout << "q = " << q << endl;
 

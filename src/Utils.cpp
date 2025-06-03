@@ -133,10 +133,14 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     let's rename them for code readability and resize them (conservatively) using the values 
     calculated above. */
 
-    const int& oldNumFaces = polyhedron.NumFaces;
-    const int& oldNumEdges = polyhedron.NumEdges;
-    const int& oldNumVertices = polyhedron.NumVertices;
-    double& oldLengthEdge = polyhedron.lengthEdge;
+    const int oldNumFaces = polyhedron.NumFaces;
+    const int oldNumEdges = polyhedron.NumEdges;
+    const int oldNumVertices = polyhedron.NumVertices;
+    const double oldLengthEdge = polyhedron.lengthEdge;
+
+    polyhedron.NumVertices = numberNewVertices;
+    polyhedron.NumEdges = numberNewEdges;
+    polyhedron.NumFaces = numberNewFaces;
 
     Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
     CoordVertices.conservativeResize(3, numberNewVertices);
@@ -172,9 +176,10 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
 
     /* We'll need the length of the edge of the new polyhedron in order to find the inner vertices 
     of each face and most importantly all of its edges, so let's compute it: */
-    double newLengthEdge = oldLengthEdge / numberDivisions;
+    const double newLengthEdge = oldLengthEdge / numberDivisions;
+    polyhedron.lengthEdge = newLengthEdge;
 
-    int numberVerticesOnFace = triangularNumber(numberDivisions);
+    const int numberVerticesOnFace = triangularNumber(numberDivisions);
 
     /* Let's initialize a vector that will save all of the edges that we have already divided.
     It will start with just "-1" as its elements. Then, we'll also need to keep track of its 
@@ -191,6 +196,15 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     This variable will be used to access the right column of the matrix "newExtremaEdges" and as an 
     element saved into the matrix "newMatrEdgeVertices". */
     int edgeIndexFound = 0;
+
+    int newFacesFound = 0;
+
+    vector<vector<int>> verticesOnAllFaces;
+    verticesOnAllFaces.reserve(oldNumFaces);
+    for(int i = 0; i < oldNumFaces; i++){
+        verticesOnAllFaces[i].reserve(numberVerticesOnFace);
+    }
+
 
     /* We need to tesselate each face of the polyhedron given as input, so we need a "for" 
     cycle on the old polyhedron faces: */
@@ -545,14 +559,220 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                 }
             }
         }
+        // Struttura inutile:
+        verticesOnAllFaces.push_back(verticesOnFace);
     }
+
+    cout << "verticesOnAllFaces after the egdes: " << endl;
+    for(unsigned int i = 0; i < verticesOnAllFaces.size(); i++){
+        for(int j = 0; j < numberVerticesOnFace; j++){
+            cout << verticesOnAllFaces[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    // cout << "verticesOnFace: { ";
+    // for(auto elem : verticesOnFace){
+    //     cout << elem << " ";
+    // }
+    // cout << "}" << endl;
+
     MatrEdgeVertices = newMatrEdgeVertices;
     ExtremaEdges = newExtremaEdges;
-
     // Stampe poi da togliere
     cout << "CoordVertices:\n" << CoordVertices << endl;
     cout << "ExtremaEdges:\n " << ExtremaEdges << endl;
     cout << "MatrEdgeVertices:\n " << MatrEdgeVertices << endl;
+    /* Now we'll search for the faces of the polyhedron using the same algorithm used
+    for the original polyhedron but using it on each face in order not to find inner 
+    faces of the polyhedron*/
+
+    vector<array<int, 3>> vecVertFaces; // This vector stores unique triangles (faces) as sorted arrays of 3 vertices
+    vecVertFaces.reserve(numberNewFaces);
+
+    for(int faceIndex = 0; faceIndex < oldNumFaces; faceIndex++){
+        /* Creating the adjacency list for the vertices */
+        vector<vector<int>> adjacencyList(numberNewVertices);
+        // for(int i = 0; i < numberNewVertices; i++){
+        //     adjacencyList[i].reserve(6);
+        // }
+
+        for(int vertexId = 0; vertexId < numberVerticesOnFace; vertexId++)
+        {
+            int& vertex = verticesOnAllFaces[faceIndex][vertexId];
+            cout << "vertex: " << vertex << endl;
+            adjacencyList[vertex].reserve(6);
+    
+            for(int adjVertId = 0; adjVertId < numberVerticesOnFace; adjVertId++)
+            {
+                int& adjVert = verticesOnAllFaces[faceIndex][adjVertId];
+                cout << "adjVert: " << adjVert << endl;
+                if(vertex != adjVert) 
+                {                    
+                    int& edgeIdToCheck = MatrEdgeVertices(vertex, adjVert);
+                    cout << "edgeIdToCheck: " << edgeIdToCheck << endl;
+                    if(edgeIdToCheck >= 0)
+                    {
+                        adjacencyList[vertex].push_back(adjVert);
+                        
+                    }
+                }
+            }
+        }
+
+        //Stampa per controllo
+        cout << "adjacencyList: " << endl;
+        for(int i = 0; i < numberNewVertices; i++){
+            for(unsigned int j = 0; j < adjacencyList[i].size();j++){
+                cout << adjacencyList[i][j] << " ";
+            }
+            cout << endl;
+        }
+    
+        cout << "adjacencyList: " << endl;
+        for(int i = 0; i < numberNewVertices; i++){
+            for(unsigned int j = 0; j < adjacencyList[i].size();j++){
+                cout << adjacencyList[i][j] << " ";
+            }
+            cout << endl;
+        }
+    
+        /* AdjacencyList for the first face: 
+        4 6 
+        5 10 
+        11 7 
+    
+        0 5 6 16 
+        1 4 10 16 
+        0 4 7 16 
+        2 11 6 16 
+    
+    
+        1 5 11 16 
+        2 10 7 16 
+    
+    
+    
+    
+        4 5 10 11 6 7 
+    
+    
+    
+        */
+        cout << "adjacencyList[19].capacity(): " << adjacencyList[19].capacity() << endl;
+        cout << "adjacencyList[19].size(): " << adjacencyList[19].size() << endl;
+    
+        cout << "faceIndex: " << faceIndex << endl;
+        // We need to check for the vertices on the same face
+        
+        for(int vertexId = 0; vertexId < numberVerticesOnFace; vertexId++)
+        {
+            int& vertex = verticesOnAllFaces[faceIndex][vertexId];
+            if(newFacesFound < numberNewFaces && adjacencyList[vertex].size() > 0) // Proceed only if all the faces have not been numbered yet
+            {
+                for(int& vertexToCheck1 : adjacencyList[vertex])
+                {
+                    // cout << "vertexToCheck1: " << vertexToCheck1 << endl;
+                    for(int& vertexToCheck2 : adjacencyList[vertex])
+                    {
+                        // cout << "vertexToCheck2: " << vertexToCheck2 << endl;
+                        
+                        // Check all three vertices are distinct
+                        if(vertex != vertexToCheck1 && vertex != vertexToCheck2 && vertexToCheck1 != vertexToCheck2)
+                        {                    
+                            cout << "vertexToCheck1: " << vertexToCheck1 << endl;
+                            cout << "vertexToCheck2: " << vertexToCheck2 << endl;
+    
+                            // int& edgeIdToAdd = MatrEdgeVertices(vertexToCheck1, vertexToCheck2); 
+    
+                            int& e1 = MatrEdgeVertices(vertex, vertexToCheck1);
+                            int& e2 = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);
+                            int& e3 = MatrEdgeVertices(vertexToCheck2, vertex);
+    
+                            cout << "e1: " << e1 << endl;
+                            cout << "e2: " << e2 << endl;
+                            cout << "e3: " << e3 << endl;
+    
+                            
+                            if(e1 >= 0 && e2 >= 0 && e3 >= 0) // Proceed only if there is an edge that connects the vertices
+                            {
+                                array<int, 3> sortedVertFace = {vertex, vertexToCheck1, vertexToCheck2};
+                                sort(sortedVertFace.begin(), sortedVertFace.end()); // Sorting avoids counting multiple times the same triangles with different vertex ordering
+    
+                                cout << "sortedVertFace: { ";
+                                for(auto elem : sortedVertFace){
+                                    cout << elem << " ";
+                                } 
+                                cout << "}" << endl;
+    
+                                // Check if the sorted triangle is already in the vector
+    
+                                if(find(vecVertFaces.begin(), vecVertFaces.end(), sortedVertFace) == vecVertFaces.end())
+                                {
+                                    cout << "Aggiungo alla lista delle facce." << endl;
+                                    vecVertFaces.push_back(sortedVertFace);
+    
+                                    cout << "vecVertFaces: " << endl;
+                                    for(unsigned int i = 0; i < vecVertFaces.size(); i++){
+                                        for(unsigned int j = 0; j < vecVertFaces[i].size();j++){
+                                            cout << vecVertFaces[i][j] << " ";
+                                        }
+                                        cout << endl;
+                                    }
+    
+                                    // Find the edge IDs between the three vertices
+                                    // int& e1 = MatrEdgeVertices(vertex, vertexToCheck1);
+                                    // int& e2 = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);
+                                    // int& e3 = MatrEdgeVertices(vertexToCheck2, vertex);
+                                    // cout << "e1: " << e1 << endl;
+                                    // cout << "e2: " << e2 << endl;
+                                    // cout << "e3: " << e3 << endl;
+    
+                                    array<int, 3> edgesInFace = {e1, e2, e3}; 
+                                    array<int, 3> verticesInFace = {vertex, vertexToCheck1, vertexToCheck2};
+    
+                                    cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
+    
+                                    // Check face orientation consistency
+                                    cout << "ExtremaEdges(1, " << e1 << "): " << ExtremaEdges(1, e1) << endl;
+                                    cout << "ExtremaEdges(1, " << e1 << "): " << ExtremaEdges(1, e1) << endl;
+                                    // if(ExtremaEdges(1, e1) == ExtremaEdges(0, e2)) // e1.end == e2.origin
+                                    // {                                            
+                                        // cout << "C'è consistenza nei lati" << endl;
+                                        ListVertFaces(0, newFacesFound) = verticesInFace[0];
+                                        ListVertFaces(1, newFacesFound) = verticesInFace[1];
+                                        ListVertFaces(2, newFacesFound) = verticesInFace[2];
+    
+                                        ListEdgeFaces(0, newFacesFound) = edgesInFace[0];
+                                        ListEdgeFaces(1, newFacesFound) = edgesInFace[1];
+                                        ListEdgeFaces(2, newFacesFound) = edgesInFace[2];
+                                        
+                                        newFacesFound++; // Passing to the next face only if we saved a face during this iteration
+                                    // }
+                                    cout << "ListVertFaces: " << endl << ListVertFaces << endl;
+                                }  
+                            } 
+                        }  
+                        else
+                        {
+                            continue;    
+                        }                     
+                    }
+                }   
+            }
+            else{
+                break; 
+            }
+        } 
+    
+        // Stampa finale per controllo
+        cout << "ListVertFaces: " << endl << ListVertFaces << endl;
+        cout << "ListEdgeFaces: " << endl << ListEdgeFaces << endl;
+    }
+
+    
+
+
 }
 
 
