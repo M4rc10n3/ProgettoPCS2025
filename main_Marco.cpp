@@ -28,8 +28,8 @@ int main(){
     cout << "Hello world" << endl;
 
     int p = 3;
-    int q = 5;
-    int b = 5;
+    int q = 3;
+    int b = 3;
     cout << "p = " << p << endl;
     cout << "q = " << q << endl;
 
@@ -38,11 +38,38 @@ int main(){
     GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
     TypeITessellation(polyhedron, b);
     Gedim::UCDUtilities utilities;
+    Eigen::VectorXi VerticesMarkers(polyhedron.NumVertices);
+    for(int i = 0; i < polyhedron.NumVertices; i++)
+    {
+        VerticesMarkers[i] = i;
+    }
+    
+    Eigen::VectorXi EdgesMarkers(polyhedron.NumEdges);
+    for(int i = 0; i < polyhedron. NumEdges; i++)
+    {
+        EdgesMarkers[i] = polyhedron. NumEdges - i;
+    }
+    Eigen::VectorXi FacesMarkers(polyhedron.NumFaces);
+    for(int i = 0; i < polyhedron.NumFaces; i++)
+    {
+        FacesMarkers[i] = i;
+    }
+
+    // cout << "VerticesMarkers: \n" << VerticesMarkers << endl;
+    // cout << "EdgesMarkers: \n" << EdgesMarkers << endl;
+    // cout << "FacesMarkers: \n" << FacesMarkers << endl;
+
     utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
-                               polyhedron.CoordVertices);
+                            polyhedron.CoordVertices,
+                            {},
+                            VerticesMarkers);
     utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
-                                 polyhedron.CoordVertices,
-                                 polyhedron.ExtremaEdges);
+                             polyhedron.CoordVertices,
+                             polyhedron.ExtremaEdges,
+                             {},
+                             {},
+                            EdgesMarkers);
+
     vector<vector<unsigned int>> FacesVertices;
     FacesVertices.resize(polyhedron.NumFaces);
 
@@ -54,12 +81,6 @@ int main(){
         FacesVertices[i][0] = polyhedron.ListVertFaces(0, i);
         FacesVertices[i][1] = polyhedron.ListVertFaces(1, i);
         FacesVertices[i][2] = polyhedron.ListVertFaces(2, i);
-    }
-
-    Eigen::VectorXi FacesMarkers(polyhedron.NumFaces);
-    for(int i = 0; i < polyhedron.NumFaces; i++)
-    {
-        FacesMarkers[i] = i;
     }
 
     utilities.ExportPolygons("../PolygonalData/Cell2Ds.inp",

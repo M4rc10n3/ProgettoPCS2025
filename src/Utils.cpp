@@ -100,32 +100,16 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
             numberNewVertices = 2 * numberTrianglesForFace + 2; // V = 2 * T + 2
             numberNewEdges = 6 * numberTrianglesForFace; // E = 6 * T
             numberNewFaces = 4 * numberTrianglesForFace; // F = 4 * T
-
-            // Stampe poi da togliere
-            cout << "numberNewVertices: " << numberNewVertices << endl;
-            cout << "numberNewEdges: " << numberNewEdges << endl;
-            cout << "numberNewFaces: " << numberNewFaces << endl;
-
             break;
         case 4:
             numberNewVertices = 4 * numberTrianglesForFace + 2; // V = 4 * T + 2
             numberNewEdges = 12 * numberTrianglesForFace; // E = 12 * T
             numberNewFaces = 8 * numberTrianglesForFace; // F = 8 * T
-
-            cout << "numberNewVertices: " << numberNewVertices << endl;
-            cout << "numberNewEdges: " << numberNewEdges << endl;
-            cout << "numberNewFaces: " << numberNewFaces << endl;
-
             break;
         case 5:
             numberNewVertices = 10 * numberTrianglesForFace + 2; // V = 10 * T + 2
             numberNewEdges = 30 * numberTrianglesForFace; // E = 30 * T
             numberNewFaces = 20 * numberTrianglesForFace; // F = 20 * T
-
-            cout << "numberNewVertices: " << numberNewVertices << endl;
-            cout << "numberNewEdges: " << numberNewEdges << endl;
-            cout << "numberNewFaces: " << numberNewFaces << endl;
-
             break;
     }
     
@@ -559,219 +543,141 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                 }
             }
         }
-        // Struttura inutile:
         verticesOnAllFaces.push_back(verticesOnFace);
+
+        /* Mettere qui dentro il prossimo algoritmo è complesso e fa creare strutture in più su 
+        ListVertFaces, ListeEdgeFaces e ExtremaEdges, magari poi ci proverò. Infatti, l'algoritmo 
+        ha bisogno della matrice MatrEdgeVertices aggiornata, eppure aggiornando le altre 3 strutture 
+        tutto l'algoritmo smette di funzionare, perché accediamo a strutture ormai modificate */
     }
 
-    cout << "verticesOnAllFaces after the egdes: " << endl;
-    for(unsigned int i = 0; i < verticesOnAllFaces.size(); i++){
-        for(int j = 0; j < numberVerticesOnFace; j++){
-            cout << verticesOnAllFaces[i][j] << " ";
-        }
-        cout << endl;
-    }
-
-    // cout << "verticesOnFace: { ";
-    // for(auto elem : verticesOnFace){
-    //     cout << elem << " ";
-    // }
-    // cout << "}" << endl;
-
+    /* Now that we've found all of the vertices and the edges of the new polyhedron 
+    we can update the data structures of the polyhedron itself */
     MatrEdgeVertices = newMatrEdgeVertices;
     ExtremaEdges = newExtremaEdges;
-    // Stampe poi da togliere
-    cout << "CoordVertices:\n" << CoordVertices << endl;
-    cout << "ExtremaEdges:\n " << ExtremaEdges << endl;
-    cout << "MatrEdgeVertices:\n " << MatrEdgeVertices << endl;
+
+
     /* Now we'll search for the faces of the polyhedron using the same algorithm used
     for the original polyhedron but using it on each face in order not to find inner 
-    faces of the polyhedron*/
+    faces of the polyhedron */
+    for(int faceIndex = 0; faceIndex < oldNumFaces; faceIndex++)
+    {   
+        /* Let's initialise the vector which stores unique triangles (the faces of the polyhedron) 
+        as sorted arrays of 3 vertices. It will store the unique new faces found on the old polyhedron 
+        face with index "faceIndex" */
+        vector<array<int, 3>> vecVertFaces;
+        vecVertFaces.reserve(numberNewFaces / oldNumFaces);
 
-    vector<array<int, 3>> vecVertFaces; // This vector stores unique triangles (faces) as sorted arrays of 3 vertices
-    vecVertFaces.reserve(numberNewFaces);
-
-    for(int faceIndex = 0; faceIndex < oldNumFaces; faceIndex++){
-        /* Creating the adjacency list for the vertices */
+        /* Creating the adjacency list for the vertices. We don't care which vertex has the maximum 
+        index on the face, so we need to initialise it using more memory than what I need in order to avoid
+        segmentation faults */
         vector<vector<int>> adjacencyList(numberNewVertices);
-        // for(int i = 0; i < numberNewVertices; i++){
-        //     adjacencyList[i].reserve(6);
-        // }
-
+        /* We need to find the adjacent vertices for each vertex on the face of the old polyhedron */
         for(int vertexId = 0; vertexId < numberVerticesOnFace; vertexId++)
         {
+            /* Let's access the right "adjVert" for our data structures index using the 
+            structure "verticesOnAllFaces" */
             int& vertex = verticesOnAllFaces[faceIndex][vertexId];
-            cout << "vertex: " << vertex << endl;
             adjacencyList[vertex].reserve(6);
     
             for(int adjVertId = 0; adjVertId < numberVerticesOnFace; adjVertId++)
             {
+                /* Let's access the right "adjVert" for our data structures index using the 
+                structure "verticesOnAllFaces" */
                 int& adjVert = verticesOnAllFaces[faceIndex][adjVertId];
-                cout << "adjVert: " << adjVert << endl;
+                /* We don't care about the iteration during which "vertex" and "adjVert" are equal, 
+                so we skip it */
                 if(vertex != adjVert) 
                 {                    
+                    /* Let's access the right "edgeIdToCheck" in our data structures */
                     int& edgeIdToCheck = MatrEdgeVertices(vertex, adjVert);
-                    cout << "edgeIdToCheck: " << edgeIdToCheck << endl;
                     if(edgeIdToCheck >= 0)
                     {
+                        /* If the edge exists, then the vertex with index "adjVert" is one of the 
+                        adjacent vertices for the vertex with index "vertex" and we can add it to its 
+                        vector inside "adjacencyList" */
                         adjacencyList[vertex].push_back(adjVert);
                         
                     }
                 }
             }
         }
-
-        //Stampa per controllo
-        cout << "adjacencyList: " << endl;
-        for(int i = 0; i < numberNewVertices; i++){
-            for(unsigned int j = 0; j < adjacencyList[i].size();j++){
-                cout << adjacencyList[i][j] << " ";
-            }
-            cout << endl;
-        }
-    
-        cout << "adjacencyList: " << endl;
-        for(int i = 0; i < numberNewVertices; i++){
-            for(unsigned int j = 0; j < adjacencyList[i].size();j++){
-                cout << adjacencyList[i][j] << " ";
-            }
-            cout << endl;
-        }
-    
-        /* AdjacencyList for the first face: 
-        4 6 
-        5 10 
-        11 7 
-    
-        0 5 6 16 
-        1 4 10 16 
-        0 4 7 16 
-        2 11 6 16 
-    
-    
-        1 5 11 16 
-        2 10 7 16 
-    
-    
-    
-    
-        4 5 10 11 6 7 
-    
-    
-    
-        */
-        cout << "adjacencyList[19].capacity(): " << adjacencyList[19].capacity() << endl;
-        cout << "adjacencyList[19].size(): " << adjacencyList[19].size() << endl;
-    
-        cout << "faceIndex: " << faceIndex << endl;
-        // We need to check for the vertices on the same face
         
+        /* Now we can look for the new faces of the polyhedron starting from each of the vertices 
+        on the face of the old polyhedron */
         for(int vertexId = 0; vertexId < numberVerticesOnFace; vertexId++)
         {
+            /* Let's access the right "vertex" for our data structures index using the 
+            structure "verticesOnAllFaces" */
             int& vertex = verticesOnAllFaces[faceIndex][vertexId];
-            if(newFacesFound < numberNewFaces && adjacencyList[vertex].size() > 0) // Proceed only if all the faces have not been numbered yet
+            /* We'll proceed only if all the faces have not been numbered yet and 
+            there are adjacent vertices to "vertex" */
+            if(newFacesFound < numberNewFaces && adjacencyList[vertex].size() > 0) 
             {
+                /* We'll look for the extrema of the face inside the adjacent vertices of vertex */
                 for(int& vertexToCheck1 : adjacencyList[vertex])
                 {
-                    // cout << "vertexToCheck1: " << vertexToCheck1 << endl;
                     for(int& vertexToCheck2 : adjacencyList[vertex])
                     {
-                        // cout << "vertexToCheck2: " << vertexToCheck2 << endl;
-                        
-                        // Check all three vertices are distinct
+                        /* We'll proceed only if all of the three vertices are distinct */
                         if(vertex != vertexToCheck1 && vertex != vertexToCheck2 && vertexToCheck1 != vertexToCheck2)
-                        {                    
-                            cout << "vertexToCheck1: " << vertexToCheck1 << endl;
-                            cout << "vertexToCheck2: " << vertexToCheck2 << endl;
-    
-                            // int& edgeIdToAdd = MatrEdgeVertices(vertexToCheck1, vertexToCheck2); 
-    
+                        {
+                            /*Let's rename the "edges" of the face for code readability */
                             int& e1 = MatrEdgeVertices(vertex, vertexToCheck1);
                             int& e2 = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);
                             int& e3 = MatrEdgeVertices(vertexToCheck2, vertex);
-    
-                            cout << "e1: " << e1 << endl;
-                            cout << "e2: " << e2 << endl;
-                            cout << "e3: " << e3 << endl;
-    
-                            
-                            if(e1 >= 0 && e2 >= 0 && e3 >= 0) // Proceed only if there is an edge that connects the vertices
+
+                            /* We'll proceed only if the edges that connect the vertices exist */
+                            if(e1 >= 0 && e2 >= 0 && e3 >= 0) 
                             {
                                 array<int, 3> sortedVertFace = {vertex, vertexToCheck1, vertexToCheck2};
-                                sort(sortedVertFace.begin(), sortedVertFace.end()); // Sorting avoids counting multiple times the same triangles with different vertex ordering
+                                /* We'll sort the face (based on the indexes of its vertices) 
+                                in order to avoid counting multiple times the same faces 
+                                with different vertex ordering */
+                                sort(sortedVertFace.begin(), sortedVertFace.end()); 
     
-                                cout << "sortedVertFace: { ";
-                                for(auto elem : sortedVertFace){
-                                    cout << elem << " ";
-                                } 
-                                cout << "}" << endl;
-    
-                                // Check if the sorted triangle is already in the vector
-    
+                                /* We'll proceed only if the sorted triangle is not already in the vector */
                                 if(find(vecVertFaces.begin(), vecVertFaces.end(), sortedVertFace) == vecVertFaces.end())
                                 {
-                                    cout << "Aggiungo alla lista delle facce." << endl;
+                                    /* We add the face the the structure storing unique faces (in order 
+                                    to find its copies after this iteration) */
                                     vecVertFaces.push_back(sortedVertFace);
-    
-                                    cout << "vecVertFaces: " << endl;
-                                    for(unsigned int i = 0; i < vecVertFaces.size(); i++){
-                                        for(unsigned int j = 0; j < vecVertFaces[i].size();j++){
-                                            cout << vecVertFaces[i][j] << " ";
-                                        }
-                                        cout << endl;
-                                    }
-    
-                                    // Find the edge IDs between the three vertices
-                                    // int& e1 = MatrEdgeVertices(vertex, vertexToCheck1);
-                                    // int& e2 = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);
-                                    // int& e3 = MatrEdgeVertices(vertexToCheck2, vertex);
-                                    // cout << "e1: " << e1 << endl;
-                                    // cout << "e2: " << e2 << endl;
-                                    // cout << "e3: " << e3 << endl;
-    
+                                    
+                                    // Just to have the edges with the smaller indexes on the top 
+                                    // (we can also erase this next two lines and add to ListEdgeFaces e1, e2 and e3)
                                     array<int, 3> edgesInFace = {e1, e2, e3}; 
-                                    array<int, 3> verticesInFace = {vertex, vertexToCheck1, vertexToCheck2};
-    
-                                    cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
-    
-                                    // Check face orientation consistency
-                                    cout << "ExtremaEdges(1, " << e1 << "): " << ExtremaEdges(1, e1) << endl;
-                                    cout << "ExtremaEdges(1, " << e1 << "): " << ExtremaEdges(1, e1) << endl;
-                                    // if(ExtremaEdges(1, e1) == ExtremaEdges(0, e2)) // e1.end == e2.origin
-                                    // {                                            
-                                        // cout << "C'è consistenza nei lati" << endl;
-                                        ListVertFaces(0, newFacesFound) = verticesInFace[0];
-                                        ListVertFaces(1, newFacesFound) = verticesInFace[1];
-                                        ListVertFaces(2, newFacesFound) = verticesInFace[2];
-    
-                                        ListEdgeFaces(0, newFacesFound) = edgesInFace[0];
-                                        ListEdgeFaces(1, newFacesFound) = edgesInFace[1];
-                                        ListEdgeFaces(2, newFacesFound) = edgesInFace[2];
-                                        
-                                        newFacesFound++; // Passing to the next face only if we saved a face during this iteration
-                                    // }
-                                    cout << "ListVertFaces: " << endl << ListVertFaces << endl;
+                                    sort(edgesInFace.begin(), edgesInFace.end()); 
+
+                                    // array<int, 3> verticesInFace = {vertex, vertexToCheck1, vertexToCheck2};
+
+                                    /* We add the vertices and edges to the old polyhedron data structures, 
+                                    modifying them */
+                                    ListVertFaces(0, newFacesFound) = vertex;
+                                    ListVertFaces(1, newFacesFound) = vertexToCheck1;
+                                    ListVertFaces(2, newFacesFound) = vertexToCheck2;
+
+                                    ListEdgeFaces(0, newFacesFound) = edgesInFace[0];
+                                    ListEdgeFaces(1, newFacesFound) = edgesInFace[1];
+                                    ListEdgeFaces(2, newFacesFound) = edgesInFace[2];
+                                    
+                                    /* Passing to the next face only if we saved a face during this iteration */
+                                    newFacesFound++;
                                 }  
                             } 
-                        }  
-                        else
-                        {
-                            continue;    
-                        }                     
+                        }                    
                     }
                 }   
             }
-            else{
-                break; 
-            }
-        } 
-    
-        // Stampa finale per controllo
-        cout << "ListVertFaces: " << endl << ListVertFaces << endl;
-        cout << "ListEdgeFaces: " << endl << ListEdgeFaces << endl;
+        }
     }
 
-    
+    cout << "CoordVertices: \n" << CoordVertices << endl;
+    cout << "ExtremaEdges: \n" << ExtremaEdges << endl;
+    cout << "MatrEdgeVertices: \n" << MatrEdgeVertices << endl;
+    cout << "ListVertFaces: \n" << ListVertFaces << endl;
+    cout << "ListEdgeFaces: \n" << ListEdgeFaces << endl;
 
+    /* La lista delle facce adiacenti servirà? */
 
 }
 
