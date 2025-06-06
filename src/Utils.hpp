@@ -15,7 +15,7 @@ Eigen::Vector3d FindBarycenter(Eigen::Vector3i& VertFace);
 
 /* OntoTheSphere is a function that takes a point as input and projects it onto the unit sphere 
 Inputs list:
-vertex: the point that the function will projects onto the sphere normalising its vector*/
+vertex: the point that the function will projects onto the sphere normalising its vector */
 Eigen::Vector3d OntoTheUnitSphere(Eigen::Vector3d vertex);
 // Pensavo di usare la normalizzazione per proiettare sulla sfera unitaria, a voi viene in mente un modo migliore? Pensate che il mio funzioni?
 // La variabile vertex ha come tipo vertex, ma in realtà non so ancora cosa sarà, probabilmente un vettore.
@@ -25,7 +25,17 @@ by the ids given as inputs
 Inputs list:
 id_vertex_1: the id associated to the first vertex of the minimum path we're looking for 
 id_vertex_2: the id associated to the second/last vertex of the minimum path we're looking for*/
-vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2);
+// vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2);
+
+/*BFS is a function that finds the minimum path between the two vertices marked by the ids given as inputs
+using the BFS algorithm (for unweighted graphs, therefore useful for type I tessellation)
+Inputs list:
+adjList: adjacency list that contains the adjacent vertices for each vertex in the polyhedron
+v1: the id associated to the first vertex of the minimum path we're looking for 
+v2: the id associated to the last vertex of the minimum path we're looking for 
+n: number of vertices of the polyhedron
+lengthEdge: length of the edges of the polyhedron (all equal to each other) */
+vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& n, const double& lengthEdge);
 
 /* Dualise is a function that outputs the dual, expressed as the type "Polyhedron", of a <polyhedron> given as input 
 Inputs list:

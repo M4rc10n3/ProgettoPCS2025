@@ -132,6 +132,25 @@ int main(int argc, char* argv[])
     // Constructor.CreateCells();
     // Constructor.ExportPolyhedra();
     // Dualise(polyhedron, p, q);
+    BFS(Constructor.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices, polyhedron.lengthEdge);
+    
+    // cout << polyhedron.NumVertices << endl;
+    // for(auto i : polyhedron.IdVertices)
+    // {
+    //     cout << i << " ";
+    // }
+    // cout << endl;
+    // const auto& adjList = Constructor.AdjacencyList();
+    // if (id_vertex_2 >= 0 && id_vertex_2 < adjList.size()) {
+    //     cout << "AdjList di " << id_vertex_2 << endl;
+    //     for (auto i : adjList[id_vertex_2]) {
+    //         cout << i << " ";
+    //     }
+    //     cout << endl;
+    // } else {
+    //     cerr << "Indice " << id_vertex_2 << " fuori dai limiti!" << endl;
+    // }
+
 
     return 0;
 }

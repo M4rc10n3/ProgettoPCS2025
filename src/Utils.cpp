@@ -5,6 +5,7 @@
 # include "BuildPolyhedra.hpp"
 # include "UCDUtilities.hpp"
 # include <vector>
+# include <queue>
 
 using namespace PolyhedraLibrary;
 using namespace std;
@@ -48,17 +49,67 @@ Eigen::Vector3d OntoTheUnitSphere(Eigen::Vector3d& vertex)
     // return vertex.normalized();
 }
 
-
-
-vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2)
+vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& n, const double& lengthEdge)
 {
-    // Le due prossime righe servono a rimuovere solo i warning dalla compilazione
-    id_vertex_1 = 0;
-    id_vertex_2 = 0;
-
-    vector<int> Path;
-    return Path;
+    queue<int> q;
+    vector<bool> reached(n); // boolean vector to save visited vertices
+    vector<int> adjacent(n); // save the predecessor of each vertex in order to reconstruct the minimum path
+    for(int i = 0; i < n; i++) // initialize reached and adjacent vectors
+    {
+        reached[i] = false;
+        adjacent[i] = -1;
+    }
+    q.push(v1);
+    reached[v1] = true;
+    while(!q.empty())
+    {
+        int u = q.front();
+        q.pop();
+        for(int w : adjList[u])
+        {
+            if(!reached[w]) // if the adjacent vertex hasn't been visited yet
+            {
+                reached[w] = true; // mark as visited
+                adjacent[w] = u; // save the predecessor of w
+                q.push(w); // add to the queue
+            }    
+            if(w == v2)
+            {
+                vector<int> minPath;
+                int v = v2;
+                while(v != -1) // reconstruct the path from v2 back to v1
+                {
+                    minPath.push_back(v);
+                    v = adjacent[v];                  
+                }
+                reverse(minPath.begin(), minPath.end());
+                if (minPath[0] == v1) // check if the path starts at v1
+                    cout << "The minimum path length is ";
+                    for(int i : minPath)
+                        cout << i << " ";
+                    cout << endl;cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
+                    cout << "The minimum path length is " << (minPath.size() - 1) * lengthEdge << endl;
+                    return minPath;
+            }
+        }
+    }
+    
+    return {}; // if no path was found, return an empty vector   
 }
+
+
+// vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2, )
+// {
+//     // Le due prossime righe servono a rimuovere solo i warning dalla compilazione
+//     // id_vertex_1 = 0;
+//     // id_vertex_2 = 0;
+    
+
+
+
+//     vector<int> Path;
+//     return Path;
+// }
 
 void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlafli_q)
 {
@@ -166,7 +217,7 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     const int numberVerticesOnFace = triangularNumber(numberDivisions);
 
     /* Let's initialize a vector that will save all of the edges that we have already divided.
-    It will start with just "-1" as its elements. Then, we'll also need to keep track of its 
+    It will v1 with just "-1" as its elements. Then, we'll also need to keep track of its 
     index in order to increase it and to access the right element of the vector. */
     vector<int> edgesDone(oldNumEdges, -1);
     int edgesDoneIndex = 0;
@@ -320,12 +371,12 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         Once we'll have found the two etrema of the inner segment, we'll use the same algorithm as above 
         to find the inner vertices subdividing the segment into the exact number of parts */
 
-        /* We'll always start our search from the vertices on the first edge of the face and we'll look for 
+        /* We'll always v1 our search from the vertices on the first edge of the face and we'll look for 
         the vertices on the other edges of the same face */
-        int& edgeWeStartFromIndex = ListEdgeFaces(0, faceIndex);
+        int& edgeWev1FromIndex = ListEdgeFaces(0, faceIndex);
 
         /* Let's create the variable that will save the index of the opposing edge to the one with index 
-        "edgeWeStartFromIndex" which has the vertex we found with the first search for the vertex with the 
+        "edgeWev1FromIndex" which has the vertex we found with the first search for the vertex with the 
         exact distance we're looking for */
         int minimumDistanceOpposingEdge = -1;
 
@@ -340,7 +391,7 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
 
             /* Let's create here the variable that save the indexes of the vertices which we'll divide
              into the exact number of parts at each iteration of "time" */
-            int minimumDistanceIdVertexWeStartFrom = -1;
+            int minimumDistanceIdVertexWev1From = -1;
             int minimumDistanceIdOpposingVertex = -1;
 
             /* At the first iteration of "time" we'll look for the edge with the vertex we're looking 
@@ -358,13 +409,13 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                     /* Now we can look for the right vertex on the edge: */
                     for(int idVertexOnEdge = 0; idVertexOnEdge < (numberDivisions - 1); idVertexOnEdge++)
                     {
-                        /* In order to access the proper vertex where we'll start from, we should ignore:
+                        /* In order to access the proper vertex where we'll v1 from, we should ignore:
                             - the vertices of the old polyhedron;
                             - the vertices we found above on the edges before the current one; 
                         then we should access the vertex with id "time". 
                         Each of these members is represented in a line in the next sum for code readability: */
-                        int idVertexWeStartFrom = oldNumVertices + 
-                                                  (numberDivisions - 1) * edgeWeStartFromIndex +
+                        int idVertexWev1From = oldNumVertices + 
+                                                  (numberDivisions - 1) * edgeWev1FromIndex +
                                                   time;
     
                         /* In order to access the proper vertex where we'll end at, we should ignore:
@@ -378,7 +429,7 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     
                         /* "distance" is the variable contanining the difference between the distance squared 
                         between the vertices and the length of the segment we're looking for */
-                        double distance = abs(distanceSquaredBetween(polyhedron, idVertexWeStartFrom, idOpposingVertex) - 
+                        double distance = abs(distanceSquaredBetween(polyhedron, idVertexWev1From, idOpposingVertex) - 
                             newLengthEdge * (numberDivisions - 1 - time) * newLengthEdge * (numberDivisions - 1 - time));
     
                         /* When we found a vertex with a "distance" that's less than that we've already saved, 
@@ -389,7 +440,7 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                         {
                             minimumDistance = distance;
 
-                            minimumDistanceIdVertexWeStartFrom = idVertexWeStartFrom;
+                            minimumDistanceIdVertexWev1From = idVertexWev1From;
                             minimumDistanceIdOpposingVertex = idOpposingVertex;
 
                             minimumDistanceOpposingEdge = opposingEdge;
@@ -406,13 +457,13 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                 /* Now we can look for the right vertex on the edge we saved: */
                 for(int idVertexOnEdge = 0; idVertexOnEdge < (numberDivisions - 1); idVertexOnEdge++)
                 {
-                    /* In order to access the proper vertex where we'll start from, we should ignore:
+                    /* In order to access the proper vertex where we'll v1 from, we should ignore:
                         - the vertices of the old polyhedron;
                         - the vertices we found above on the edges before the current one; 
                     then we should access the vertex with id "time". 
                     Each of these members is represented in a line in the next sum for code readability: */
-                    int idVertexWeStartFrom = oldNumVertices + 
-                                              (numberDivisions - 1) * edgeWeStartFromIndex +
+                    int idVertexWev1From = oldNumVertices + 
+                                              (numberDivisions - 1) * edgeWev1FromIndex +
                                               time;
 
                     /* In order to access the proper vertex where we'll end at, we should ignore:
@@ -426,7 +477,7 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                     
                     /* "distance" is the variable contanining the difference between the distance squared 
                     between the vertices and the length of the segment we're looking for */
-                    double distance = abs(distanceSquaredBetween(polyhedron, idVertexWeStartFrom, idOpposingVertex) - 
+                    double distance = abs(distanceSquaredBetween(polyhedron, idVertexWev1From, idOpposingVertex) - 
                         newLengthEdge * (numberDivisions - 1 - time) * newLengthEdge * (numberDivisions - 1 - time));
 
                     /* When we found a vertex with a "distance" that's less than that we've already saved, 
@@ -434,7 +485,7 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                     will divide (we don't know to update the variable "minimumDistanceOpposingEdge" anymore) */
                     if(distance < minimumDistance){
                             minimumDistance = distance;
-                            minimumDistanceIdVertexWeStartFrom = idVertexWeStartFrom;
+                            minimumDistanceIdVertexWev1From = idVertexWev1From;
                             minimumDistanceIdOpposingVertex = idOpposingVertex;
                         }
                 }
@@ -442,7 +493,7 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
             /* After we've found the vertices with the minimum "distance" we'll divide them using
             the same algorithm as above (used for the vertices on the edges) in order to find 
             the coordinates of the inner vertices */
-            int& firstVertexWeAreDividing = minimumDistanceIdVertexWeStartFrom;
+            int& firstVertexWeAreDividing = minimumDistanceIdVertexWev1From;
             int& secondVertexWeAreDividing = minimumDistanceIdOpposingVertex;
 
             double& firstVertexXCoord = CoordVertices(0, firstVertexWeAreDividing);
@@ -494,7 +545,7 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         based on the length of the edge. It will be modified because we would also find internal edges 
         that we don't need using the original algorithm . */
     
-        /* We need to find the edges that start from each vertex of the face (except for the last one, 
+        /* We need to find the edges that v1 from each vertex of the face (except for the last one, 
         because that would be a certain useless iteration: we'll have already found all of the edges 
         that have the last vertex as an extrema). We will use the "verticesOnFace" vector to find 
         the right index of each vertex in our data structures */
@@ -603,7 +654,7 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
             }
         }
         
-        /* Now we can look for the new faces of the polyhedron starting from each of the vertices 
+        /* Now we can look for the new faces of the polyhedron v1ing from each of the vertices 
         on the face of the old polyhedron */
         for(int vertexId = 0; vertexId < numberVerticesOnFace; vertexId++)
         {
