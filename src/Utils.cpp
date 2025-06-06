@@ -79,7 +79,6 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
     return {}; // if no path was found, return an empty vector   
 }
 
-
 void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlafli_q)
 {
     /* Non ci serve una funzione che dualizzi un poliedro di base, poiché basta che partiamo proprio 
