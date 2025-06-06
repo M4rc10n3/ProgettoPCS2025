@@ -11,21 +11,7 @@ using namespace std;
 of each triangular face
 Inputs list:
 ListVertFace: object of type "MatrixXi" containing the ids of each vertex of the face */
-Eigen::Vector3d FindBarycenter(Eigen::Vector3i& VertFace);
-
-/* OntoTheSphere is a function that takes a point as input and projects it onto the unit sphere 
-Inputs list:
-vertex: the point that the function will projects onto the sphere normalising its vector */
-Eigen::Vector3d OntoTheUnitSphere(Eigen::Vector3d vertex);
-// Pensavo di usare la normalizzazione per proiettare sulla sfera unitaria, a voi viene in mente un modo migliore? Pensate che il mio funzioni?
-// La variabile vertex ha come tipo vertex, ma in realtà non so ancora cosa sarà, probabilmente un vettore.
-
-/* WhichIsTheMinimumPathBetween is a function that calculates the minimum path between the two vertices marked 
-by the ids given as inputs 
-Inputs list:
-id_vertex_1: the id associated to the first vertex of the minimum path we're looking for 
-id_vertex_2: the id associated to the second/last vertex of the minimum path we're looking for*/
-// vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2);
+Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertFace);
 
 /*BFS is a function that finds the minimum path between the two vertices marked by the ids given as inputs
 using the BFS algorithm (for unweighted graphs, therefore useful for type I tessellation)
@@ -40,7 +26,7 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
 /* Dualise is a function that outputs the dual, expressed as the type "Polyhedron", of a <polyhedron> given as input 
 Inputs list:
 polyhedron: object of type "Polyhedron" that the function uses to create its dual */
-void Dualise(GEOPolyhedron& polyhedron, const unsigned int& Schlafli_p, const unsigned int& Schlafli_q);
+void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlafli_q);
 // Che sia meglio dare come output il tipo void? Se facciamo return Polyhedron sarà una grossa e lenta operazione, vero? 
 // Forse è meglio definire un nuovo poliedro prima di chiamare questa funzione e mettiamo come altro input della funzione il poliedro stesso in cui dobbiamo fare output?
 

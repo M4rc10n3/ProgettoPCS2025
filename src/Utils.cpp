@@ -3,7 +3,7 @@
 # include "Utils.hpp"
 # include "Polyhedra.hpp"
 # include "BuildPolyhedra.hpp"
-# include "UCDUtilities.hpp"
+# include "../ExportParaview/UCDUtilities.hpp"
 # include <vector>
 # include <queue>
 
@@ -29,24 +29,6 @@ Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertF
     barycenter_coordinates = {Coord_x/3.0, Coord_y/3.0, Coord_z/3.0};
 
     return barycenter_coordinates;
-}
-
-Eigen::Vector3d OntoTheUnitSphere(Eigen::Vector3d& vertex)
-{
-    // Ricordo di aver letto che la norma "norm" della libreria Eigen non è la norma spettrale di una matrice,
-    // è la verma norma di un vettore?
-    double norm = vertex.norm();
-    if (norm > 1e-16) // Avoids ZeroDivision errors
-    {
-        vertex /= norm;
-    } else {
-        vertex.setZero();
-    }
-    return vertex;
-
-    // TODO: Pare che all'interno di Eigen esista la funzione che normalizza proprio il vettore, 
-    // credo sia meglio usarla nel caso in cui funzioni:
-    // return vertex.normalized();
 }
 
 vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& n, const double& lengthEdge)
@@ -98,33 +80,18 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
 }
 
 
-// vector<int> WhichIsTheMinimumPathBetween(int& id_vertex_1, int& id_vertex_2, )
-// {
-//     // Le due prossime righe servono a rimuovere solo i warning dalla compilazione
-//     // id_vertex_1 = 0;
-//     // id_vertex_2 = 0;
-    
-
-
-
-//     vector<int> Path;
-//     return Path;
-// }
-
 void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlafli_q)
 {
     Eigen::MatrixXd CoordVertices(3, polyhedron.NumFaces);
     BuildPolyhedra constructor(Schlafli_q, Schlafli_p); // p, q are switched because it's the dual polyhedron
-    // Eigen::MatrixXd CoordVertices;
-    // BuildPolyhedra constructor(Schlafli_q, Schlafli_p); // p, q are switched because it's the dual polyhedron
 
     cout << "\n DualPolyhedron \n" << endl;
 
     for (int i = 0; i < polyhedron.NumFaces; i++)
     {
-        // Eigen::Vector3i dual_vertex  = polyhedron.ListVertFaces.col(i);
-        // Eigen::Vector3d barycenter_coordinates = OntoTheUnitSphere(FindBarycenter(polyhedron, dual_vertex));
-        //CoordVertices.col(i) = barycenter_coordinates; 
+        Eigen::Vector3i dual_vertex  = polyhedron.ListVertFaces.col(i);
+        Eigen::Vector3d barycenter_coordinates = FindBarycenter(polyhedron, dual_vertex);
+        CoordVertices.col(i) = barycenter_coordinates.normalized(); // project the point into the 3D sphere
     }
 
     constructor.PointsPolyhedra(CoordVertices);
@@ -732,14 +699,13 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
 
 }
 
-
-
 // void TypeIITessellation(GEOPolyhedron& polyhedron)
 // {
     
 // }
 
-double distanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idPoint2){
+double distanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idPoint2)
+{
 
     Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
 
@@ -762,7 +728,7 @@ double distanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idP
     return distanceSquared;
 }
 
-// Funzione inutile al momento, ma magari in futuro potrebbe servire
-int triangularNumber(int& b){
+int triangularNumber(int& b) // Funzione inutile al momento, ma magari in futuro potrebbe servire
+{
     return ((b + 1) * (b + 2) / 2);
 }
