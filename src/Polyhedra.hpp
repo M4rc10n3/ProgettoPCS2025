@@ -11,7 +11,6 @@ using namespace std;
 
 namespace PolyhedraLibrary
 {
-
     struct GEOPolyhedron
     {
         int p, q;
@@ -40,9 +39,11 @@ namespace PolyhedraLibrary
         // Finds the adjacency list of the vertices 
         vector<vector<int>> AdjacencyList();
     };
-    /* TODO Path can be useful if we want a particular structure for the minimum path between
-    two vertices */
-    struct Path {
+
+    struct Path 
+    {
+        std::vector<int> VerticesShortPath; // Binary vector for the vertices used in the minimum path
+        std::vector<int> EdgesShortPath; // Binary vector for the edges used in the minimum path
     };
 
 }

@@ -71,6 +71,7 @@ int main(int argc, char* argv[])
     BuildPolyhedra Constructor(p, q); // create the structure of the Polyhedron
     Constructor.DataPolyhedra();
     GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
+    Path MinimumPath;
     // TypeITessellation(polyhedron, b);
 
     // Gedim::UCDUtilities utilities;

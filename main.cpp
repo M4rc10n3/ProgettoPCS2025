@@ -133,6 +133,7 @@ int main(int argc, char* argv[])
     // Constructor.ExportPolyhedra();
     // Dualise(polyhedron, p, q);
     cout << "polyhedron.NumVertices: " << polyhedron.NumVertices << endl;
+    Path MinimumPath;
     BFS(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices, polyhedron.lengthEdge);
 
     return 0;
