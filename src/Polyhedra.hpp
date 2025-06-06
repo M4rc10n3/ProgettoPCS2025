@@ -33,6 +33,12 @@ namespace PolyhedraLibrary
         Eigen::MatrixXi ListAdjacentFaces; // All the adjacent faces for the face with index i, 
                                            // where i is the index of the column of the matrix, p x NumFaces matrix
 
+        /* Creating the matrix containing the adjacent faces of each face. 
+        Each column contains the ids of the adjacent faces for the face that has as id the column index */
+        void FindAdjacentFaces(); // Create one matrix as explained above
+        
+        // Finds the adjacency list of the vertices 
+        vector<vector<int>> AdjacencyList();
     };
     /* TODO Path can be useful if we want a particular structure for the minimum path between
     two vertices */

@@ -113,6 +113,10 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
 
 void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlafli_q)
 {
+    /* Non ci serve una funzione che dualizzi un poliedro di base, poiché basta che partiamo proprio 
+    dal duale, ovvero, se dovessimo avere bisogno del duale del cubo, partiamo direttamente dall'ottaedro.
+    Ciò che ci serve è il duale del poliedro tassellato */
+    
     Eigen::MatrixXd CoordVertices(3, polyhedron.NumFaces);
     BuildPolyhedra constructor(Schlafli_q, Schlafli_p); // p, q are switched because it's the dual polyhedron
     // Eigen::MatrixXd CoordVertices;
@@ -124,7 +128,7 @@ void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlaf
     {
         // Eigen::Vector3i dual_vertex  = polyhedron.ListVertFaces.col(i);
         // Eigen::Vector3d barycenter_coordinates = OntoTheUnitSphere(FindBarycenter(polyhedron, dual_vertex));
-        //CoordVertices.col(i) = barycenter_coordinates; 
+        // CoordVertices.col(i) = barycenter_coordinates; 
     }
 
     constructor.PointsPolyhedra(CoordVertices);
@@ -205,9 +209,6 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
 
     Eigen::MatrixXi& ListEdgeFaces = polyhedron.ListEdgeFaces;
     ListEdgeFaces.conservativeResize(p, numberNewFaces);
-
-    Eigen::MatrixXi& ListAdjacentFaces = polyhedron.ListAdjacentFaces;
-    ListAdjacentFaces.conservativeResize(p, numberNewFaces);
 
     /* We'll need the length of the edge of the new polyhedron in order to find the inner vertices 
     of each face and most importantly all of its edges, so let's compute it: */
@@ -727,6 +728,10 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     cout << "MatrEdgeVertices: \n" << MatrEdgeVertices << endl;
     cout << "ListVertFaces: \n" << ListVertFaces << endl;
     cout << "ListEdgeFaces: \n" << ListEdgeFaces << endl;
+
+    Eigen::MatrixXi& ListAdjacentFaces = polyhedron.ListAdjacentFaces;
+    ListAdjacentFaces.resize(p, numberNewFaces);
+    polyhedron.FindAdjacentFaces();
 
     /* La lista delle facce adiacenti servirà? */
 

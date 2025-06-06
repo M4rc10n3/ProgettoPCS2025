@@ -37,13 +37,17 @@ int main(){
     Constructor.DataPolyhedra();
     GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
     TypeITessellation(polyhedron, b);
+
+    int idVertex1 = 0;
+    int idVertex2 = 13;
+    BFS(polyhedron.AdjacencyList(), idVertex1, idVertex2, polyhedron.NumVertices, polyhedron.lengthEdge);
+
     Gedim::UCDUtilities utilities;
     Eigen::VectorXi VerticesMarkers(polyhedron.NumVertices);
     for(int i = 0; i < polyhedron.NumVertices; i++)
     {
         VerticesMarkers[i] = i;
     }
-    
     Eigen::VectorXi EdgesMarkers(polyhedron.NumEdges);
     for(int i = 0; i < polyhedron. NumEdges; i++)
     {

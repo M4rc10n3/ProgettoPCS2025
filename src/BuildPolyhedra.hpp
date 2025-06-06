@@ -36,7 +36,7 @@ namespace PolyhedraLibrary{
     
     /* Creating the matrix containing the adjacent faces of each face. 
     Each column contains the ids of the adjacent faces for the face that has as id the column index */
-    void FindAdjacentFaces(); // Create one matrix as explained above
+    // void FindAdjacentFaces(); // Create one matrix as explained above
 
     
 
@@ -55,7 +55,7 @@ namespace PolyhedraLibrary{
 
         void PointsPolyhedra(Eigen::MatrixXd& CoordVertices);  // Fills all the point of the polyhedron
 
-        vector<vector<int>> AdjacencyList(); // Creates the adjacency list, where each vertex is associated
+        // vector<vector<int>> AdjacencyList(); // Creates the adjacency list, where each vertex is associated
                                              // with a vector containing all vertices adjacent to it
 
         void FillStructPolyhedra(); // Fills all the structures of GEOPolyhedron
