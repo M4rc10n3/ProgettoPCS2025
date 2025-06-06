@@ -8,6 +8,7 @@ list(APPEND PlatonicSolids_headers ${CMAKE_CURRENT_SOURCE_DIR}/../ExportParaview
 list(APPEND PlatonicSolids_sources ${CMAKE_CURRENT_SOURCE_DIR}/../ExportParaview/UCDUtilities.cpp)
 
 list(APPEND PlatonicSolids_headers ${CMAKE_CURRENT_SOURCE_DIR}/Polyhedra.hpp)
+list(APPEND PlatonicSolids_sources ${CMAKE_CURRENT_SOURCE_DIR}/Polyhedra.cpp)
 
 list(APPEND PlatonicSolids_headers ${CMAKE_CURRENT_SOURCE_DIR}/Sources.hpp)
 
