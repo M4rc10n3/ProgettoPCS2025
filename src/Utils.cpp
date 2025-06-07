@@ -91,20 +91,6 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
                         }
                     }
 
-                    // Stampa finale per controllo
-                    cout << "Vertices short path: " << endl;
-                    for(int i : vertShortPath)
-                    {
-                        cout << i << " ";
-                    }
-                    cout << endl;
-                    cout << "Edges short path: " << endl;
-                    for(int i : edgeShortPath)
-                    {
-                        cout << i << " ";
-                    }
-                    cout << endl;
-
                     cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
                     cout << "The minimum path length is " << (minPath.size() - 1) * lengthEdge << endl;  
 
@@ -137,27 +123,6 @@ void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlaf
     constructor.PointsPolyhedra(CoordVertices);
     constructor.CreateCells();
     constructor.ExportPolyhedra();
-}
-
-void CheckTypeTessellation(const GEOPolyhedron& polyhedron, const int& b, const int& c)
-{
-	//imposto i vari casi in base al valore di b e c in input_iterator
-	if((b == 0 && c >= 1) || (b >= 1 && c == 0))
-    {
-		int numberDivisions = max(b,c);
-		cout << "Tessellation type I" << endl;
-		TypeITessellation(polyhedron, numberDivisions);
-	}
-	else if(b == c && b != 0)
-    {
-		int numberDivisions = b;
-		cout << "Tessellation type II'" << endl;
-		TypeIITessellation(polyhedron);
-	}
-	else 
-    {
-		cout << "Invalid values for b and c" << endl;
-	}
 }
 
 void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
@@ -631,6 +596,8 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     we can update the data structures of the polyhedron itself */
     MatrEdgeVertices = newMatrEdgeVertices;
     ExtremaEdges = newExtremaEdges;
+
+    // MatrEdgeVertices.makeCompressed(); // in tal caso creandola bisogna incrementare tutti gli indici per averla sparsa
 
 
     /* Now we'll search for the faces of the polyhedron using the same algorithm used

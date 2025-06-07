@@ -48,6 +48,8 @@ int main(int argc, char* argv[])
     b = stoi(parameters[2]);
     c = stoi(parameters[3]);
 
+    bool findMinPath = false;
+
     if (argc == 7) // prints the tuple 
     {
         id_vertex_1 = stoi(parameters[4]);
@@ -59,6 +61,7 @@ int main(int argc, char* argv[])
         c << "," <<
         id_vertex_1 << "," <<
         id_vertex_2 << ")" << endl;
+        findMinPath = true;
     } else {
         cout << "Your tuple is: (p,q,b,c) = (" <<
         p << "," << 
@@ -70,16 +73,20 @@ int main(int argc, char* argv[])
     BuildPolyhedra Constructor(p, q); // create the structure of the Polyhedron
     Constructor.DataPolyhedra();
     GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
-    if (c == 0)
+    Path minimumPath;
+    
+    // check the validity for the values b and c and perform the requested tessellation
+    if((b == 0 && c >= 1) || (b >= 1 && c == 0))
     {
-        TypeITessellation(polyhedron, b);
-    } else if (b == c)
+		cout << "Tessellation type I" << endl;
+		int n = max(b,c);
+		TypeITessellation(polyhedron, n);
+	} else if(b == c && b != 0)
     {
-        TypeITessellation(polyhedron, b);
-        TypeIITessellation(polyhedron, b);
-    } else {
-        cout << "invalid values for b and c" << endl;
-    }
+		cout << "Tessellation type II'" << endl;
+		TypeIITessellation(polyhedron, b);
+	} else 
+		cout << "Invalid values for b and c" << endl;
 
     Gedim::UCDUtilities utilities;
 
@@ -142,8 +149,13 @@ int main(int argc, char* argv[])
     // Dualise(polyhedron, p, q);
     cout << "polyhedron.NumVertices: " << polyhedron.NumVertices << endl;
 
-    Path minimumPath;
-    BFS(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices, polyhedron.NumEdges, polyhedron.lengthEdge, polyhedron.MatrEdgeVertices, minimumPath.VerticesShortPath, minimumPath.EdgesShortPath);
+    if(findMinPath)
+    {
+        if(id_vertex_1 >= 0 && id_vertex_1 < polyhedron.NumVertices && id_vertex_2 >= 0 && id_vertex_2 < polyhedron.NumVertices)
+            BFS(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices, polyhedron.NumEdges, polyhedron.lengthEdge, polyhedron.MatrEdgeVertices, minimumPath.VerticesShortPath, minimumPath.EdgesShortPath);
+        else
+            cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
+    }
 
     return 0;
 }

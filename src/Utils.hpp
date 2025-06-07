@@ -30,11 +30,6 @@ void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlaf
 // Che sia meglio dare come output il tipo void? Se facciamo return Polyhedron sarà una grossa e lenta operazione, vero? 
 // Forse è meglio definire un nuovo poliedro prima di chiamare questa funzione e mettiamo come altro input della funzione il poliedro stesso in cui dobbiamo fare output?
 
-
-/* CheckTypeTessellation is a function that checks the validity of the values of b and c from the command line,
-and if they are valid, it calls the function that performs the requested tessellation (I or II)*/
-void CheckTypeTessellation(const GEOPolyhedron& polyhedron, const int& b, const int& c);
-
 /* TypeITassellation is a function that modifies the attributes of the object <polyhedron> in order to 
 output its tassellations of type I regarding geodetic polyhedra 
 Inputs list:
