@@ -761,10 +761,30 @@ void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
 
 }
 
-// void TypeIITessellation(GEOPolyhedron& polyhedron)
-// {
+Eigen::VectorXi SortVertices(Eigen::Vector3d& Listvertices)
+{
+    Eigen::VectorXi SortedVertices;
+    double max_height = Listvertices.row(2).maxCoeff();
+    double avg_height = Listvertices.row(2).sum()/(Listvertices.size());
+    if (max_height > avg_height)
+        for (int i = 0; i < Listvertices.row(0).size(); i++)
+        {
+            for (int j = 0; j < Listvertices.row(0).size() - i - 1; j++)
+            {
+                if (Listvertices(2, j) > Listvertices(2, j + 1))
+                break;
+            }
+        }
+
+    return SortedVertices;
+}
+
+void TypeIITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
+{
+    vector<int> Vertices;
+
     
-// }
+}
 
 double distanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idPoint2)
 {

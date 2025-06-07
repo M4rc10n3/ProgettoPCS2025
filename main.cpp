@@ -10,7 +10,6 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    // unsigned int p, q, b, c, id_vertex_1, id_vertex_2; // initialize all the variables
     int p, q, b, c, id_vertex_1, id_vertex_2; // initialize all the variables
     string executable;
     vector<string> parameters;
@@ -71,7 +70,16 @@ int main(int argc, char* argv[])
     BuildPolyhedra Constructor(p, q); // create the structure of the Polyhedron
     Constructor.DataPolyhedra();
     GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
-    TypeITessellation(polyhedron, b);
+    if (c == 0)
+    {
+        TypeITessellation(polyhedron, b);
+    } else if (b == c)
+    {
+        TypeITessellation(polyhedron, b);
+        TypeIITessellation(polyhedron, b);
+    } else {
+        cout << "invalid values for b and c" << endl;
+    }
 
     Gedim::UCDUtilities utilities;
 
@@ -135,7 +143,7 @@ int main(int argc, char* argv[])
     cout << "polyhedron.NumVertices: " << polyhedron.NumVertices << endl;
 
     Path minimumPath;
-    BFS(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices, polyhedron.NumEdges, polyhedron.lengthEdge, polyhedron.MatrEdgeVertices, minimumPath.VertShortPath, minimumPath.EdgeShortPath);
+    BFS(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices, polyhedron.NumEdges, polyhedron.lengthEdge, polyhedron.MatrEdgeVertices, minimumPath.VerticesShortPath, minimumPath.EdgesShortPath);
 
     return 0;
 }
