@@ -31,22 +31,15 @@ Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertF
     return barycenter_coordinates;
 }
 
-vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const int& numEdge, const double& lengthEdge, Eigen::MatrixXi& MatrEdgeVertices, vector<int>& vertShortPath, vector<int>& edgeShortPath)
+vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const double& lengthEdge)
 {
     queue<int> q;
     vector<bool> reached(numVert); // boolean vector to save visited vertices
-    vector<int> predecessor(numVert); // save the predecessor of each vertex in order to reconstruct the minimum path
-    vertShortPath.resize(numVert);
-    edgeShortPath.resize(numEdge);
-    for(int i = 0; i < numVert; i++) // initialize reached, predecessor and vertShortPath vectors
+    vector<int> predecessor(numVert); // vector to save the predecessor of each vertex in order to reconstruct the minimum path
+    for(int i = 0; i < numVert; i++) // initialize reached and predecessor vectors
     {
         reached[i] = false;
         predecessor[i] = -1;
-        vertShortPath[i] = 0;
-    }
-    for(int i = 0; i < numEdge; i++) // initialize edgeShortPath vector
-    {
-        edgeShortPath[i] = 0;
     }
     q.push(v1);
     reached[v1] = true;
@@ -76,21 +69,8 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
                 { 
                     cout << "The minimum path is: ";
                     for(int i : minPath)
-                    {
                         cout << i << " ";
-                        vertShortPath[i] = 1; //set the property ShortPath = 1 to the vertices that compose the minimum path
-                    }
                     cout << endl;
-
-                    for(int i = 1; i < minPath.size(); i++)
-                    {
-                        int& idEdge = MatrEdgeVertices(minPath[i-1], minPath[i]);
-                        if(idEdge > -1)
-                        {
-                            edgeShortPath[idEdge] = 1; //set the property ShortPath = 1 to the edges that compose the minimum path
-                        }
-                    }
-
                     cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
                     cout << "The minimum path length is " << (minPath.size() - 1) * lengthEdge << endl;  
 
@@ -100,6 +80,93 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
         }
     }
     return {}; // if no path was found, return an empty vector  
+}
+
+// vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, Eigen::MatrixXd& matrWeights)
+// {
+//     queue<int> pq;
+//     vector<int> predecessor(numVert); // vector to save the predecessor of each vertex
+//     vector<double> distance(numVert);
+//     for(int i = 0; i < numVert; i++) // initialize predecessor and distance vectors
+//     {
+//         predecessor[i] = -1;
+//         distance[i] = -1.0;
+        
+//     }
+//     predecessor[v1] = v1;
+//     distance[v1] = 0.0;
+
+//     while(!pq.empty())
+//     {
+//         int u = pq.front();
+//         pq.pop();
+//         for(int w : adjList[u])
+//         {
+//             if(distance[w] > distance[u] + matrWeights(u,w)) // check if the predecessor vertex hasn't been visited yet
+//             {
+//                 distance[w] = distance[u] + matrWeights(u,w); // mark as visited
+//                 predecessor[w] = u; // save the predecessor of w
+//                 pq.push(w); // add to the queue
+//             }    
+//             if(w == v2)
+//             {
+//                 vector<int> minPath;
+//                 int v = v2;
+//                 while(v != -1) // reconstruct the path from v2 back to v1
+//                 {
+//                     minPath.push_back(v);
+//                     v = predecessor[v];                  
+//                 }
+//                 reverse(minPath.begin(), minPath.end());
+//                 if (minPath[0] == v1) // check if the path starts at v1
+//                 { 
+//                     double lengthPath = 0.0;
+//                     cout << "The minimum path is: " << minPath[0];
+//                     for(int i = 1; i < minPath.size(); i++)
+//                     {
+//                         cout << " " << minPath[i];
+//                         lengthPath += matrWeigths(minPath[i-1], minPath[i]);
+//                     }                        
+//                     cout << endl;
+//                     cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
+//                     cout << "The minimum path length is " << lengthPath << endl;  
+
+//                     return minPath;             
+//                 }
+//             }
+//         }
+//     }
+//     return {}; // if no path was found, return an empty vector  
+// }
+
+void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVertices, const int& numVert, const int& numEdge, vector<int>& vertShortPath, vector<int>& edgeShortPath)
+{
+    vertShortPath.resize(numVert);
+    edgeShortPath.resize(numEdge);
+    for(int i = 0; i < numVert; i++) // initialize vertShortPath vectors
+    {
+        vertShortPath[i] = 0;
+    }
+    for(int i = 0; i < numEdge; i++) // initialize edgeShortPath vector
+    {
+        edgeShortPath[i] = 0;
+    }
+
+    // set the property ShortPath = 1 to the vertices and the edges that compose the minimum path
+    for(int i : minPath)
+    {
+        vertShortPath[i] = 1; 
+    }
+    cout << endl;
+
+    for(int i = 1; i < minPath.size(); i++)
+    {
+        const int& idEdge = MatrEdgeVertices(minPath[i-1], minPath[i]);
+        if(idEdge > -1)
+        {
+            edgeShortPath[idEdge] = 1;
+        }
+    }
 }
 
 void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlafli_q)

@@ -73,16 +73,20 @@ int main(int argc, char* argv[])
     BuildPolyhedra Constructor(p, q); // create the structure of the Polyhedron
     Constructor.DataPolyhedra();
     GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
-    Path minimumPath;
-    
+
+    bool tessI = false;
+    bool tessII = false;
+
     // check the validity for the values b and c and perform the requested tessellation
     if((b == 0 && c >= 1) || (b >= 1 && c == 0))
     {
+        tessI = true;
 		cout << "Tessellation type I" << endl;
 		int n = max(b,c);
 		TypeITessellation(polyhedron, n);
 	} else if(b == c && b != 0)
     {
+        tessII = true;
 		cout << "Tessellation type II'" << endl;
 		TypeIITessellation(polyhedron, b);
 	} else 
@@ -149,10 +153,22 @@ int main(int argc, char* argv[])
     // Dualise(polyhedron, p, q);
     cout << "polyhedron.NumVertices: " << polyhedron.NumVertices << endl;
 
+    Path minimumPath;
+    
     if(findMinPath)
     {
         if(id_vertex_1 >= 0 && id_vertex_1 < polyhedron.NumVertices && id_vertex_2 >= 0 && id_vertex_2 < polyhedron.NumVertices)
-            BFS(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices, polyhedron.NumEdges, polyhedron.lengthEdge, polyhedron.MatrEdgeVertices, minimumPath.VerticesShortPath, minimumPath.EdgesShortPath);
+        {
+            vector<int> minPath;
+            if(tessI)
+            {
+                minPath = BFS(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices, polyhedron.lengthEdge);
+            } else if(tessII)
+            {
+                //minPath = Dijkstra(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices);
+            }
+            MinimumPath(minPath, polyhedron.MatrEdgeVertices, polyhedron.NumVertices, polyhedron.NumEdges, minimumPath.VerticesShortPath, minimumPath.EdgesShortPath);
+        }
         else
             cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
     }
