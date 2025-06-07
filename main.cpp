@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
         tessI = true;
 		cout << "Tessellation type I" << endl;
 		int n = max(b,c);
-		TypeITessellation(polyhedron, n);
+		 GEOPolyhedron tessellatedPolyhedron = TypeITessellation(polyhedron, n);
 	} else if(b == c && b != 0)
     {
         tessII = true;
@@ -94,54 +94,52 @@ int main(int argc, char* argv[])
 
     Gedim::UCDUtilities utilities;
 
-    Eigen::VectorXi VerticesMarkers(polyhedron.NumVertices);
-    for(int i = 0; i < polyhedron.NumVertices; i++)
+    Eigen::VectorXi VerticesMarkers(tessellatedPolyhedron.NumVertices);
+    for(int i = 0; i < tessellatedPolyhedron.NumVertices; i++)
     {
         VerticesMarkers[i] = 0;
     }
-    cout << "VerticesMarkers: \n" << VerticesMarkers << endl;
     
-    Eigen::VectorXi EdgesMarkers(polyhedron.NumEdges);
-    for(int i = 0; i < polyhedron.NumEdges; i++)
+    Eigen::VectorXi EdgesMarkers(tessellatedPolyhedron.NumEdges);
+    for(int i = 0; i < tessellatedPolyhedron.NumEdges; i++)
     {
-        EdgesMarkers[i] = 10;
+        EdgesMarkers[i] = tessellatedPolyhedron.NumEdges - i;
     }
-    cout << "EdgesMarkers: \n" << EdgesMarkers << endl;
  
 
     utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
-                            polyhedron.CoordVertices,
+                            tessellatedPolyhedron.CoordVertices,
                             {},
                             VerticesMarkers);
 
     utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
-                                polyhedron.CoordVertices,
-                                polyhedron.ExtremaEdges,
+                                tessellatedPolyhedron.CoordVertices,
+                                tessellatedPolyhedron.ExtremaEdges,
                                 {},
                                 {},
                                 EdgesMarkers);
     
     vector<vector<unsigned int>> FacesVertices;
-    FacesVertices.resize(polyhedron.NumFaces);
+    FacesVertices.resize(tessellatedPolyhedron.NumFaces);
 
-    for(int i = 0; i < polyhedron.NumFaces; i++)
+    for(int i = 0; i < tessellatedPolyhedron.NumFaces; i++)
     {
         FacesVertices[i].resize(3);
         
         // Salvo i vertici di ciascuna faccia con indice "i" all'interno del vettore con indice "i"
-        FacesVertices[i][0] = polyhedron.ListVertFaces(0, i);
-        FacesVertices[i][1] = polyhedron.ListVertFaces(1, i);
-        FacesVertices[i][2] = polyhedron.ListVertFaces(2, i);
+        FacesVertices[i][0] = tessellatedPolyhedron.ListVertFaces(0, i);
+        FacesVertices[i][1] = tessellatedPolyhedron.ListVertFaces(1, i);
+        FacesVertices[i][2] = tessellatedPolyhedron.ListVertFaces(2, i);
     }
 
-    Eigen::VectorXi FacesMarkers(polyhedron.NumFaces);
-    for(int i = 0; i < polyhedron.NumFaces; i++)
+    Eigen::VectorXi FacesMarkers(tessellatedPolyhedron.NumFaces);
+    for(int i = 0; i < tessellatedPolyhedron.NumFaces; i++)
     {
         FacesMarkers[i] = i;
     }
 
     utilities.ExportPolygons("../PolygonalData/Cell2Ds.inp",
-                                polyhedron.CoordVertices,
+                                tessellatedPolyhedron.CoordVertices,
                                 FacesVertices,
                                 {},
                                 {},

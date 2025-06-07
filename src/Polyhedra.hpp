@@ -29,15 +29,21 @@ namespace PolyhedraLibrary
         std::vector<int> IdFaces; // Id of all faces
         Eigen::MatrixXi ListVertFaces; // All the vertices of each face, p x NumFaces matrix
         Eigen::MatrixXi ListEdgeFaces; // All the edges of each face, p x NumFaces matrix
+        
         Eigen::MatrixXi ListAdjacentFaces; // All the adjacent faces for the face with index i, 
                                            // where i is the index of the column of the matrix, p x NumFaces matrix
-
+        vector<vector<int>> ListFacesWithVertex; // All the faces containing the vertex that has the index of 
+                                            // the column of the matrix
         /* Creating the matrix containing the adjacent faces of each face. 
         Each column contains the ids of the adjacent faces for the face that has as id the column index */
         void FindAdjacentFaces(); // Create one matrix as explained above
         
         // Finds the adjacency list of the vertices 
         vector<vector<int>> AdjacencyList();
+
+        // Algorithm that saves inside "ListFacesWithVertex" at each column the faces containing the vertex 
+        // whose index is that of the column
+        void FindFacesWithVertex();
     };
 
     struct Path 

@@ -57,7 +57,6 @@ namespace PolyhedraLibrary{
                                                 0, 0, -0.816496580927726, 0.816496580927726,
                                                 1, -0.333333333333333, -0.333333333333333, -0.333333333333333;
                     break;
-                    
                 case 4:
                     cout << "Your Polyhedron is a Octahedron with:\n";
                     Length_edge = sqrt(2);
@@ -69,7 +68,7 @@ namespace PolyhedraLibrary{
                 case 5:
                     cout << "Your Polyhedron is a Icosahedron with: \n";
                     Length_edge = 4 / sqrt(10 + 2*sqrt(5));
-                    polyhedron.lengthEdge = Length_edge;
+                    polyhedron.lengthEdge = Length_edge; 
                     polyhedron.CoordVertices << 0, 0.894427190999916, 0.276393202250021, 0.723606797749979, -0.276393202250021, 0, -0.894427190999916, -0.276393202250021, -0.723606797749979, 0.276393202250021, 0.723606797749979, -0.723606797749979,
                                                 0, 0, 0.85065080835204, 0.525731112119134, 0.85065080835204, 0, 0, -0.85065080835204, -0.525731112119134, -0.85065080835204, -0.525731112119133, 0.525731112119134,
                                                 1, 0.447213595499958, 0.447213595499958, -0.447213595499958, -0.447213595499958, -1, -0.447213595499958, -0.447213595499958, 0.447213595499958, 0.447213595499957, -0.447213595499958, 0.447213595499958;   
@@ -161,8 +160,8 @@ namespace PolyhedraLibrary{
             }
         }
         
-        cout << "ExtremaEdges: " << endl << ExtremaEdges << endl;
-        cout << "MatrEdgeVertices: " << endl << MatrEdgeVertices << endl;
+        // cout << "ExtremaEdges: " << endl << ExtremaEdges << endl;
+        // cout << "MatrEdgeVertices: " << endl << MatrEdgeVertices << endl;
     }
  
     // vector<vector<int>> BuildPolyhedra::AdjacencyList()
@@ -256,8 +255,8 @@ namespace PolyhedraLibrary{
                 break; 
         } 
         // Stampa finale per controllo
-        cout << "ListVertFaces: " << endl << ListVertFaces << endl;
-        cout << "ListEdgeFaces: " << endl << ListEdgeFaces << endl;
+        // cout << "ListVertFaces: " << endl << ListVertFaces << endl;
+        // cout << "ListEdgeFaces: " << endl << ListEdgeFaces << endl;
     }
 
     /* FindAdjacentFaces is a function we'll need in order to avoid duplicating the edges and vertices 
