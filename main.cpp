@@ -76,6 +76,7 @@ int main(int argc, char* argv[])
 
     bool tessI = false;
     bool tessII = false;
+    GEOPolyhedron tessellatedPolyhedron;
 
     // check the validity for the values b and c and perform the requested tessellation
     if((b == 0 && c >= 1) || (b >= 1 && c == 0))
@@ -83,7 +84,7 @@ int main(int argc, char* argv[])
         tessI = true;
 		cout << "Tessellation type I" << endl;
 		int n = max(b,c);
-		 GEOPolyhedron tessellatedPolyhedron = TypeITessellation(polyhedron, n);
+		tessellatedPolyhedron = TypeITessellation(polyhedron, n);
 	} else if(b == c && b != 0)
     {
         tessII = true;
