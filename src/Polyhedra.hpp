@@ -43,6 +43,8 @@ namespace PolyhedraLibrary
     /* TODO Path can be useful if we want a particular structure for the minimum path between
     two vertices */
     struct Path {
+        std::vector<int> VertShortPath;
+        std::vector<int> EdgeShortPath;
     };
 
 }

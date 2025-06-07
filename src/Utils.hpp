@@ -21,7 +21,7 @@ v1: the id associated to the first vertex of the minimum path we're looking for
 v2: the id associated to the last vertex of the minimum path we're looking for 
 n: number of vertices of the polyhedron
 lengthEdge: length of the edges of the polyhedron (all equal to each other) */
-vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& n, const double& lengthEdge);
+vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const int& numEdge, const double& lengthEdge, Eigen::MatrixXi& MatrEdgeVertices, vector<int>& vertShortPath, vector<int>& edgeShortPath);
 
 /* Dualise is a function that outputs the dual, expressed as the type "Polyhedron", of a <polyhedron> given as input 
 Inputs list:
@@ -29,6 +29,11 @@ polyhedron: object of type "Polyhedron" that the function uses to create its dua
 void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlafli_q);
 // Che sia meglio dare come output il tipo void? Se facciamo return Polyhedron sarà una grossa e lenta operazione, vero? 
 // Forse è meglio definire un nuovo poliedro prima di chiamare questa funzione e mettiamo come altro input della funzione il poliedro stesso in cui dobbiamo fare output?
+
+
+/* CheckTypeTessellation is a function that checks the validity of the values of b and c from the command line,
+and if they are valid, it calls the function that performs the requested tessellation (I or II)*/
+void CheckTypeTessellation(const GEOPolyhedron& polyhedron, const int& b, const int& c);
 
 /* TypeITassellation is a function that modifies the attributes of the object <polyhedron> in order to 
 output its tassellations of type I regarding geodetic polyhedra 

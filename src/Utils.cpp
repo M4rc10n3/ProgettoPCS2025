@@ -31,15 +31,22 @@ Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertF
     return barycenter_coordinates;
 }
 
-vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& n, const double& lengthEdge)
+vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const int& numEdge, const double& lengthEdge, Eigen::MatrixXi& MatrEdgeVertices, vector<int>& vertShortPath, vector<int>& edgeShortPath)
 {
     queue<int> q;
-    vector<bool> reached(n); // boolean vector to save visited vertices
-    vector<int> adjacent(n); // save the predecessor of each vertex in order to reconstruct the minimum path
-    for(int i = 0; i < n; i++) // initialize reached and adjacent vectors
+    vector<bool> reached(numVert); // boolean vector to save visited vertices
+    vector<int> predecessor(numVert); // save the predecessor of each vertex in order to reconstruct the minimum path
+    vertShortPath.resize(numVert);
+    edgeShortPath.resize(numEdge);
+    for(int i = 0; i < numVert; i++) // initialize reached, predecessor and vertShortPath vectors
     {
         reached[i] = false;
-        adjacent[i] = -1;
+        predecessor[i] = -1;
+        vertShortPath[i] = 0;
+    }
+    for(int i = 0; i < numEdge; i++) // initialize edgeShortPath vector
+    {
+        edgeShortPath[i] = 0;
     }
     q.push(v1);
     reached[v1] = true;
@@ -49,10 +56,10 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
         q.pop();
         for(int w : adjList[u])
         {
-            if(!reached[w]) // if the adjacent vertex hasn't been visited yet
+            if(!reached[w]) // check if the predecessor vertex hasn't been visited yet
             {
                 reached[w] = true; // mark as visited
-                adjacent[w] = u; // save the predecessor of w
+                predecessor[w] = u; // save the predecessor of w
                 q.push(w); // add to the queue
             }    
             if(w == v2)
@@ -62,21 +69,51 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
                 while(v != -1) // reconstruct the path from v2 back to v1
                 {
                     minPath.push_back(v);
-                    v = adjacent[v];                  
+                    v = predecessor[v];                  
                 }
                 reverse(minPath.begin(), minPath.end());
                 if (minPath[0] == v1) // check if the path starts at v1
-                    cout << "The minimum path length is ";
+                { 
+                    cout << "The minimum path is: ";
                     for(int i : minPath)
+                    {
                         cout << i << " ";
-                    cout << endl;cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
-                    cout << "The minimum path length is " << (minPath.size() - 1) * lengthEdge << endl;
-                    return minPath;
+                        vertShortPath[i] = 1; //set the property ShortPath = 1 to the vertices that compose the minimum path
+                    }
+                    cout << endl;
+
+                    for(int i = 1; i < minPath.size(); i++)
+                    {
+                        int& idEdge = MatrEdgeVertices(minPath[i-1], minPath[i]);
+                        if(idEdge > -1)
+                        {
+                            edgeShortPath[idEdge] = 1; //set the property ShortPath = 1 to the edges that compose the minimum path
+                        }
+                    }
+
+                    // Stampa finale per controllo
+                    cout << "Vertices short path: " << endl;
+                    for(int i : vertShortPath)
+                    {
+                        cout << i << " ";
+                    }
+                    cout << endl;
+                    cout << "Edges short path: " << endl;
+                    for(int i : edgeShortPath)
+                    {
+                        cout << i << " ";
+                    }
+                    cout << endl;
+
+                    cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
+                    cout << "The minimum path length is " << (minPath.size() - 1) * lengthEdge << endl;  
+
+                    return minPath;             
+                }
             }
         }
     }
-    
-    return {}; // if no path was found, return an empty vector   
+    return {}; // if no path was found, return an empty vector  
 }
 
 void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlafli_q)
@@ -100,6 +137,27 @@ void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlaf
     constructor.PointsPolyhedra(CoordVertices);
     constructor.CreateCells();
     constructor.ExportPolyhedra();
+}
+
+void CheckTypeTessellation(const GEOPolyhedron& polyhedron, const int& b, const int& c)
+{
+	//imposto i vari casi in base al valore di b e c in input_iterator
+	if((b == 0 && c >= 1) || (b >= 1 && c == 0))
+    {
+		int numberDivisions = max(b,c);
+		cout << "Tessellation type I" << endl;
+		TypeITessellation(polyhedron, numberDivisions);
+	}
+	else if(b == c && b != 0)
+    {
+		int numberDivisions = b;
+		cout << "Tessellation type II'" << endl;
+		TypeIITessellation(polyhedron);
+	}
+	else 
+    {
+		cout << "Invalid values for b and c" << endl;
+	}
 }
 
 void TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
