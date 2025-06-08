@@ -914,30 +914,108 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     return tessellatedPolyhedron;
 }
 
-Eigen::VectorXi SortVertices(Eigen::Vector3d& Listvertices)
+GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tessellatedPolyhedron, int& numberDivisions)
 {
-    Eigen::VectorXi SortedVertices;
-    double max_height = Listvertices.row(2).maxCoeff();
-    double avg_height = Listvertices.row(2).sum()/(Listvertices.size());
-    if (max_height > avg_height)
-        for (int i = 0; i < Listvertices.row(0).size(); i++)
+    GEOPolyhedron GEOSolid;
+
+    const int T = 3 * numberDivisions * numberDivisions; // T = b^2 + b*c + c^2
+    int& NumVertices = GEOSolid.NumVertices;
+    int& NumEdges = GEOSolid.NumEdges;
+    int& NumFaces = GEOSolid.NumFaces;
+    NumVertices = 0;
+    NumEdges = 0; 
+    NumFaces = 0; 
+
+    int& q = polyhedron.q;
+
+    switch (q)
+    {
+        case 3:
+            NumVertices = 2 * T + 2; // V = 2 * T + 2
+            NumEdges = 6 * T; // E = 6 * T
+            NumFaces = 4 * T; // F = 4 * T
+            break;
+        case 4:
+            NumVertices = 4 * T + 2; // V = 4 * T + 2
+            NumEdges = 12 * T; // E = 12 * T
+            NumFaces = 8 * T; // F = 8 * T
+            break;
+        case 5:
+            NumVertices = 10 * T + 2; // V = 10 * T + 2
+            NumEdges = 30 * T; // E = 30 * T
+            NumFaces = 20 * T; // F = 20 * T
+            break;
+    }
+
+    unsigned int FacesperFace = tessellatedPolyhedron.NumFaces/polyhedron.NumFaces; // Number of polygons per face derived by Tasselation I
+
+    GEOSolid.CoordVertices.resize(3, NumVertices);
+    GEOSolid.lengthEdge = polyhedron.lengthEdge/(2 * numberDivisions);
+
+
+    for (int i = 0; i < polyhedron.NumFaces; i++)
+    {
+        // First we divide points between edgepoints and innerpoints
+        vector<Vector3d> innerpoints;
+        vector<Vector3d> edgepoints;
+
+        for(int j = 0; j < FacesperFace; j++) // generates the innerpoints of a Face
         {
-            for (int j = 0; j < Listvertices.row(0).size() - i - 1; j++)
+            Vector3i VertFace = Vector3i::Zero();
+            Vector3d barycenter;
+
+            VertFace(0) = tessellatedPolyhedron.ListEdgeFaces(0, j + i * FacesperFace);
+            VertFace(1) = tessellatedPolyhedron.ListEdgeFaces(1, j + i * FacesperFace);
+            VertFace(2) = tessellatedPolyhedron.ListEdgeFaces(2, j + i * FacesperFace);
+
+            barycenter = findBarycenter(tessellatedPolyhedron, VertFace);
+
+            GEOSolid.CoordVertices.col(j + i * FacesperFace) = barycenter;
+            innerpoints.push_back(barycenter);
+
+        }
+
+        for (int k = 0; k < polyhedron.NumEdges/polyhedron.NumFaces; k++) // generates the edgepoints of a Face
+        {
+            int edge = polyhedron.ListEdgeFaces(k, i);
+            int IDVertex_1 = polyhedron.ExtremaEdges(edge, 0);
+            int IDVertex_2 = polyhedron.ExtremaEdges(edge, 1);
+
+            double x_1 = polyhedron.CoordVertices(0, IDVertex_1);
+            double y_1 = polyhedron.CoordVertices(1, IDVertex_1);
+            double z_1 = polyhedron.CoordVertices(2, IDVertex_1);
+
+            double x_2 = polyhedron.CoordVertices(0, IDVertex_2);
+            double y_2 = polyhedron.CoordVertices(1, IDVertex_2);
+            double z_2 = polyhedron.CoordVertices(2, IDVertex_2);
+
+            Vector3d angularcoefficient; // angular coeefficient of the line between the two vertices
+            angularcoefficient(0) = x_1 - x_2;
+            angularcoefficient(1) = y_1 - y_2;
+            angularcoefficient(2) = z_1 - z_2;
+
+            //TODO enumarate the initial Vertices
+            for (int w = 0; w < (2 * numberDivisions - 1); w++)
             {
-                if (Listvertices(2, j) > Listvertices(2, j + 1))
-                break;
+                double t = GEOSolid.lengthEdge / sqrt(angularcoefficient.squaredNorm());
+                double x = x_2 + t * angularcoefficient(0);
+                double y = y_2 + t * angularcoefficient(1);
+                double z = z_2 + t * angularcoefficient(2);
+
+                GEOSolid.CoordVertices.col((NumFaces * FacesperFace) + (k * (2 * numberDivisions - 1)) + w) = Vector3d(x, y, z);
+                edgepoints.push_back(Vector3d(x, y, z));
+                
+                x_2 = x;
+                y_2 = y;
+                z_2 = z;
             }
         }
 
-    return SortedVertices;
+        
+    }
+
+    return GEOSolid;
 }
-
-// void TypeIITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
-// {
-//     vector<int> Vertices;
-
-    
-// }
 
 double distanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idPoint2)
 {
@@ -966,4 +1044,22 @@ double distanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idP
 int triangularNumber(int& b) // Funzione inutile al momento, ma magari in futuro potrebbe servire
 {
     return ((b + 1) * (b + 2) / 2);
+}
+
+Eigen::VectorXi SortVertices(Eigen::Vector3d& Listvertices)
+{
+    Eigen::VectorXi SortedVertices;
+    double max_height = Listvertices.row(2).maxCoeff();
+    double avg_height = Listvertices.row(2).sum()/(Listvertices.size());
+    if (max_height > avg_height)
+        for (int i = 0; i < Listvertices.row(0).size(); i++)
+        {
+            for (int j = 0; j < Listvertices.row(0).size() - i - 1; j++)
+            {
+                if (Listvertices(2, j) > Listvertices(2, j + 1))
+                break;
+            }
+        }
+
+    return SortedVertices;
 }

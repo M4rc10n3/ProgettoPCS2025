@@ -64,7 +64,7 @@ output its tassellations of type II regarding geodetic polyhedra
 Inputs list:
 polyhedron: object of type "Polyhedron" that the function modifies.
 numberDivisions */
-// void TypeIITessellation(GEOPolyhedron& polyhedron, int& numberDivisions);
+GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tessellatedPolyhedron, int& numberDivisions);
 
 /* distanceBetween id a method that calculates the squared distance between two vertices or points 
 just by using their ids 
