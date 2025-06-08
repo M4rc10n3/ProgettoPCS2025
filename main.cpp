@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
         tessI = true;
 		cout << "Tessellation type I" << endl;
 		int n = max(b,c);
-		GEOPolyhedron tessellatedPolyhedron = TypeITessellation(polyhedron, n);
+		tessellatedPolyhedron = TypeITessellation(polyhedron, n);
         
         // Nel caso in cui volessimo far visualizzare il poliedro tassellato da cui la dualizzazione 
         // parte, lasciare la prossima riga, altrikmenti è inutile
@@ -183,14 +183,13 @@ int main(int argc, char* argv[])
             // }
             if(tessI)
             {
-                minPath = BFS(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices, polyhedron.lengthEdge);
+                minPath = BFS(tessellatedPolyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.lengthEdge);
             } 
             else if(tessII)
             {
                 //minPath = Dijkstra(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices);
             }
-            MinimumPath(minPath, polyhedron.MatrEdgeVertices, polyhedron.NumVertices, polyhedron.NumEdges, minimumPath.VerticesShortPath, minimumPath.EdgesShortPath);
-            minPath = BFS(tessellatedPolyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.lengthEdge);
+            MinimumPath(minPath, tessellatedPolyhedron.MatrEdgeVertices, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.NumEdges, minimumPath.VerticesShortPath, minimumPath.EdgesShortPath);
 
                 // cout << "BFS" << endl;
                 // int num_experiment = 500;
@@ -218,15 +217,10 @@ int main(int argc, char* argv[])
                 // }
                 // time_elapsed_heap /= num_experiment;
                 // cout << "Tempo medio: " << time_elapsed_heap << " µs" << endl;
-            } 
-            // else if(tessII)
-            // {
-            //     minPath = Dijkstra(tessellatedPolyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, tessellatedPolyhedron.NumVertices);
-            // }
-            MinimumPath(minPath, tessellatedPolyhedron.MatrEdgeVertices, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.NumEdges, minimumPath.VerticesShortPath, minimumPath.EdgesShortPath);
         } else {
             cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
         }
+    }
 
     return 0;
 }
