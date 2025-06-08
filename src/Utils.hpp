@@ -31,7 +31,7 @@ v1: the id associated to the first vertex of the minimum path we're looking for
 v2: the id associated to the last vertex of the minimum path we're looking for 
 numVert: number of vertices of the polyhedron
 matrWeights: matrix with the lengths of each edge of the polyhedron */
-// vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, Eigen::MatrixXd& matrWeights);
+vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, Eigen::MatrixXd& matrWeights);
 
 /* MinimumPath is a function that sets the property ShortPath = 1 to the vertices and the edges that compose 
 the minimum path and ShortPath = 0 to the other vertices and edges

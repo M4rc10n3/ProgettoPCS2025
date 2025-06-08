@@ -57,87 +57,103 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
             }    
             if(w == v2)
             {
+                // Reconstruct the path from v2 back to v1  (using the predecessor of each vertex and finally reversing the created vector)
                 vector<int> minPath;
                 int v = v2;
-                while(v != -1) // reconstruct the path from v2 back to v1
+                while(v != -1) 
                 {
                     minPath.push_back(v);
                     v = predecessor[v];                  
                 }
                 reverse(minPath.begin(), minPath.end());
-                if (minPath[0] == v1) // check if the path starts at v1
-                { 
-                    cout << "The minimum path is: ";
-                    for(int i : minPath)
-                        cout << i << " ";
-                    cout << endl;
-                    cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
-                    cout << "The minimum path length is " << (minPath.size() - 1) * lengthEdge << endl;  
+                
+                // Output the path and calculate total length
+                cout << "The minimum path (using BFS algorithm) is: ";
+                for(int i : minPath)
+                    cout << i << " ";
+                cout << endl;
+                cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
+                cout << "The minimum path length is " << (minPath.size() - 1) * lengthEdge << endl;  
 
-                    return minPath;             
-                }
+                return minPath; // return the list of vertices in the minimum path            
             }
         }
     }
     return {}; // if no path was found, return an empty vector  
 }
 
-// vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, Eigen::MatrixXd& matrWeights)
-// {
-//     queue<int> pq;
-//     vector<int> predecessor(numVert); // vector to save the predecessor of each vertex
-//     vector<double> distance(numVert);
-//     for(int i = 0; i < numVert; i++) // initialize predecessor and distance vectors
-//     {
-//         predecessor[i] = -1;
-//         distance[i] = -1.0;
-        
-//     }
-//     predecessor[v1] = v1;
-//     distance[v1] = 0.0;
+vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, Eigen::MatrixXd& matrWeights)
+{
+    vector<int> predecessor(numVert); // vector to save the predecessor of each vertex
+    vector<double> distance(numVert); // vector to store the current known shortest distance from v1 to each vertex
+    const double inf = 1e9; // use a large number to represent "infinity"
+    for(int i = 0; i < numVert; i++) 
+    {
+        predecessor[i] = -1; // Initialize all predecessors to -1
+        distance[i] = inf; // initialize all distances to "infinity"
+    }
+    // Set the source vertex v1
+    predecessor[v1] = v1;
+    distance[v1] = 0.0;
 
-//     while(!pq.empty())
-//     {
-//         int u = pq.front();
-//         pq.pop();
-//         for(int w : adjList[u])
-//         {
-//             if(distance[w] > distance[u] + matrWeights(u,w)) // check if the predecessor vertex hasn't been visited yet
-//             {
-//                 distance[w] = distance[u] + matrWeights(u,w); // mark as visited
-//                 predecessor[w] = u; // save the predecessor of w
-//                 pq.push(w); // add to the queue
-//             }    
-//             if(w == v2)
-//             {
-//                 vector<int> minPath;
-//                 int v = v2;
-//                 while(v != -1) // reconstruct the path from v2 back to v1
-//                 {
-//                     minPath.push_back(v);
-//                     v = predecessor[v];                  
-//                 }
-//                 reverse(minPath.begin(), minPath.end());
-//                 if (minPath[0] == v1) // check if the path starts at v1
-//                 { 
-//                     double lengthPath = 0.0;
-//                     cout << "The minimum path is: " << minPath[0];
-//                     for(int i = 1; i < minPath.size(); i++)
-//                     {
-//                         cout << " " << minPath[i];
-//                         lengthPath += matrWeigths(minPath[i-1], minPath[i]);
-//                     }                        
-//                     cout << endl;
-//                     cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
-//                     cout << "The minimum path length is " << lengthPath << endl;  
+    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>> pq; // std::greater<int> makes the max priority queue act as a min priority queue
+    for(int i = 0; i < numVert; i++) 
+    {
+        pq.push({distance[i], i}); // initialize the priority queue
+    }
 
-//                     return minPath;             
-//                 }
-//             }
-//         }
-//     }
-//     return {}; // if no path was found, return an empty vector  
-// }
+    while(!pq.empty())
+    {
+        // Dequeue the node with the smallest distance
+        auto [dist_u, u] = pq.top();
+        pq.pop();
+
+        // If we already found a better distance to u, skip it
+        if(dist_u > distance[u])
+            continue;
+            
+        for(int w : adjList[u])
+        {
+            if(distance[w] > distance[u] + matrWeights(u,w)) // check if going through u gives a shorter path to w
+            {
+                distance[w] = distance[u] + matrWeights(u,w); // update the distance to w with the one passing through u
+                predecessor[w] = u; // set u as predecessor of w
+                pq.push({distance[w], w}); // add the updated distance into the priority queue
+            }  
+        }
+    }
+
+    if (predecessor[v2] == -1) 
+    {
+        cout << "No path found from " << v1 << " to " << v2 << endl;
+        return {}; // if no path was found, return an empty vector
+    }
+
+    // Reconstruct the path from v2 back to v1 (using the predecessor of each vertex and finally reversing the created vector)
+    vector<int> minPath;
+    int v = v2;
+    while(v != v1) 
+    {
+        minPath.push_back(v);
+        v = predecessor[v];                  
+    }
+    minPath.push_back(v1);
+    reverse(minPath.begin(), minPath.end());
+    
+    // Output the path and calculate total length
+    double lengthPath = 0.0;
+    cout << "The minimum path (using Dijkstra algorithm) is: " << minPath[0];
+    for(int i = 1; i < minPath.size(); i++)
+    {
+        cout << " " << minPath[i];
+        lengthPath += matrWeights(minPath[i-1], minPath[i]);
+    }                        
+    cout << endl;
+    cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
+    cout << "The minimum path length is " << lengthPath << endl;  
+
+    return minPath; // return the list of vertices in the minimum path                  
+}
 
 void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVertices, const int& numVert, const int& numEdge, vector<int>& vertShortPath, vector<int>& edgeShortPath)
 {
