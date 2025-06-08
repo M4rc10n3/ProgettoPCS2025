@@ -8,7 +8,6 @@
 # include "Polyhedra.hpp"
 # include "BuildPolyhedra.hpp"
 # include "Utils.hpp"
-# include "UCDUtilities.hpp"
 
 using namespace std;
 
@@ -435,64 +434,6 @@ namespace PolyhedraLibrary{
         Cell2Ds();
 
         Cell3Ds();
-    }
-
-    void BuildPolyhedra::ExportPolyhedra()
-    {
-        Eigen::VectorXi VerticesMarkers(NumVertices);
-        for(int i = 0; i < NumVertices; i++)
-        {
-            VerticesMarkers[i] = 0;
-        }
-        
-        Eigen::VectorXi EdgesMarkers(NumEdges);
-        for(int i = 0; i < NumEdges; i++)
-        {
-            EdgesMarkers[i] = 5;
-        }
-
-        Gedim::UCDUtilities utilities;
-        utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
-                               CoordVertices,
-                               {},
-                               VerticesMarkers);
-
-        utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
-                                 CoordVertices,
-                                 ExtremaEdges,
-                                 {},
-                                 {},
-                                 EdgesMarkers);
-        
-        /* Creating a vector of vectors starting from ListVertFaces in order 
-        to use Mr. Vicini's code (UCDUtilities.hpp) */
-        
-        vector<vector<unsigned int>> FacesVertices;
-        FacesVertices.resize(NumFaces);
-
-        for(int i = 0; i < NumFaces; i++)
-        {
-            FacesVertices[i].resize(3);
-            
-            // Salvo i vertici di ciascuna faccia con indice "i" all'interno del vettore con indice "i"
-            FacesVertices[i][0] = ListVertFaces(0, i);
-            FacesVertices[i][1] = ListVertFaces(1, i);
-            FacesVertices[i][2] = ListVertFaces(2, i);
-        }
-
-        Eigen::VectorXi FacesMarkers(NumFaces);
-        for(int i = 0; i < NumFaces; i++)
-        {
-            FacesMarkers[i] = i;
-        }
-
-        utilities.ExportPolygons("../PolygonalData/Cell2Ds.inp",
-                                  CoordVertices,
-                                  FacesVertices,
-                                  {},
-                                  {},
-                                  FacesMarkers);
-    
     }
 
     GEOPolyhedron BuildPolyhedra::GetPolyhedron()

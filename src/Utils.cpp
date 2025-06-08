@@ -1,34 +1,34 @@
 /* File containing the body of the functions we'll use */
-# include <iomanip>
-# include "Utils.hpp"
-# include "Polyhedra.hpp"
-# include "BuildPolyhedra.hpp"
-# include "../ExportParaview/UCDUtilities.hpp"
 # include <vector>
 # include <queue>
+# include "Utils.hpp"
+# include "Polyhedra.hpp"
 
 using namespace PolyhedraLibrary;
 using namespace std;
 using namespace Eigen;
 
-Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertFace)
+Eigen::Vector3d findBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertFace)
 {
-    Eigen::Vector3d barycenter_coordinates = Eigen::Vector3d::Zero(3); // initialyze a vector for the final coordinates
-    double Coord_x = 0.0;
-    double Coord_y = 0.0;
-    double Coord_z = 0.0;
+    /* Let's initialise a vector where the coordinates of the barycenter will be stored and 
+    let's rename its components for code readability */
+    Eigen::Vector3d barycenterCoordinates = Eigen::Vector3d::Zero();
+    double& CoordX = barycenterCoordinates(0);
+    double& CoordY = barycenterCoordinates(1);
+    double& CoordZ = barycenterCoordinates(2);
 
-    // Finding the coordinates of each vertex 
-    for (int i = 0; i < VertFace.size(); i++)
+    /* Let's find the coordinates of the barycenter by computing the mean of the coordinates 
+    of the 3 vertices of the triangular face of the polyhedron */
+    for(int i = 0; i < 3; i++)
     {
-        Coord_x += polyhedron.CoordVertices(0, VertFace(i));
-        Coord_y += polyhedron.CoordVertices(1, VertFace(i));
-        Coord_z += polyhedron.CoordVertices(2, VertFace(i));
+        CoordX += polyhedron.CoordVertices(0, VertFace(i));
+        CoordY += polyhedron.CoordVertices(1, VertFace(i));
+        CoordZ += polyhedron.CoordVertices(2, VertFace(i));
     }
+    barycenterCoordinates = {CoordX/3.0, CoordY/3.0, CoordZ/3.0};
 
-    barycenter_coordinates = {Coord_x/3.0, Coord_y/3.0, Coord_z/3.0};
-
-    return barycenter_coordinates;
+    /* Now that everything's done, we can return "barycenterCoordinates" */
+    return barycenterCoordinates;
 }
 
 vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const double& lengthEdge)
@@ -159,7 +159,7 @@ void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVert
     }
     cout << endl;
 
-    for(int i = 1; i < minPath.size(); i++)
+    for(unsigned int i = 1; i < minPath.size(); i++)
     {
         const int& idEdge = MatrEdgeVertices(minPath[i-1], minPath[i]);
         if(idEdge > -1)
@@ -169,27 +169,128 @@ void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVert
     }
 }
 
-void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlafli_q)
+void ontoTheUnitSphere(GEOPolyhedron& polyhedron)
 {
-    /* Non ci serve una funzione che dualizzi un poliedro di base, poiché basta che partiamo proprio 
-    dal duale, ovvero, se dovessimo avere bisogno del duale del cubo, partiamo direttamente dall'ottaedro.
-    Ciò che ci serve è il duale del poliedro tassellato */
-    
-    Eigen::MatrixXd CoordVertices(3, polyhedron.NumFaces);
-    BuildPolyhedra constructor(Schlafli_q, Schlafli_p); // p, q are switched because it's the dual polyhedron
+    /* Let's rename the data structures we'll use in this function for code readability */
+    Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
+    int& NumVertices = polyhedron.NumVertices;
 
-    cout << "\n DualPolyhedron \n" << endl;
-
-    for (int i = 0; i < polyhedron.NumFaces; i++)
+    /* We need to normalize the vector of the coordinates of each vertex, so we need a 
+    "for" cycle on the indices of the vertices */
+    for(int vertexIndex = 0; vertexIndex < NumVertices; vertexIndex++)
     {
-        Eigen::Vector3i dual_vertex  = polyhedron.ListVertFaces.col(i);
-        Eigen::Vector3d barycenter_coordinates = FindBarycenter(polyhedron, dual_vertex);
-        CoordVertices.col(i) = barycenter_coordinates.normalized(); // project the point into the 3D sphere
+        /* Let's initialise a vector where the coordinates of the vector will be saved */
+        Eigen::Vector3d vertexCoord;
+        vertexCoord << CoordVertices(0, vertexIndex),
+                       CoordVertices(1, vertexIndex),
+                       CoordVertices(2, vertexIndex);
+
+        /* Let's normalise and update the vector of the coordinates using the ".normalized()" 
+        method already implemented in the Eigen library */
+        vertexCoord = vertexCoord.normalized();
+
+        /* Let's save the new coordinates of the vertex inside the "Coordvertices" matrix of the polyhedron,
+        updating it */
+        for(int coord = 0; coord < 3; coord++)
+        {
+            CoordVertices(coord, vertexIndex) = vertexCoord(coord);
+        }
+    }
+}
+
+GEOPolyhedron Dualise(GEOPolyhedron& polyhedron)
+{
+    /* Let's initialise the object of type "GEOPolyhedron" that will be returned by the function */
+    GEOPolyhedron dualPolyhedron;
+
+    // polyhedron.FindFacesWithVertex();
+    // Questo sarà il vettore di vettori che esporteremo come facce del poliedro
+    //vector<vector<unsigned int>>& oldListFacesWithVertex = polyhedron.ListFacesWithVertex;
+
+    /* Let's rename the data structures we'll use in this function for code readability */
+    Eigen::MatrixXi& oldListAdjacentFaces = polyhedron.ListAdjacentFaces;
+    Eigen::MatrixXi& oldListVertFaces = polyhedron.ListVertFaces;
+    int& oldNumVertices = polyhedron.NumVertices;
+    int& NumEdges = polyhedron.NumEdges;
+    int& oldNumFaces = polyhedron.NumFaces;
+    
+    /* Let's initialise the data structures of the dual polyhedron: the dual polyhedron will 
+    have the number of vertices and faces swapped in comparison to the original polyhedron */
+    dualPolyhedron.NumVertices = oldNumFaces;
+    dualPolyhedron.NumEdges = NumEdges;
+    dualPolyhedron.NumFaces = oldNumVertices;
+
+    Eigen::MatrixXd& newCoordVertices = dualPolyhedron.CoordVertices;
+    newCoordVertices.resize(3, dualPolyhedron.NumVertices);
+
+    Eigen::MatrixXi& newExtremaEdges = dualPolyhedron.ExtremaEdges;
+    newExtremaEdges.resize(2, NumEdges);
+
+    Eigen::MatrixXi& newListVertFaces = dualPolyhedron.ListVertFaces;
+    newListVertFaces.resize(3, dualPolyhedron.NumFaces);
+
+    /* Let's initialise a structure we'll use in order to find the edges and not repeat them */
+    vector<array<int, 2>> edgesFound;
+    /* The structure will need just enough memory space to save all of edges (that are represented
+    by their extrema) */
+    edgesFound.reserve(NumEdges);
+
+
+
+    // Questa variabile potrebbe essere rimpiazzata con la size() di edgesFound, che dite? 
+    // Risparmiamo memoria o potenza di calcolo?
+    int edgeFoundIndex = 0;
+
+
+
+    /* For each face we'll calculate the coordinates of its barycenter and the edges that 
+    have it as one of their extrema */
+    for(int faceIndex = 0; faceIndex < oldNumFaces; faceIndex++)
+    {
+        /* Let's initialise a vector that will store the indexes of the vertices of the face */
+        Eigen::Vector3i verticesOfFace = Eigen::Vector3i::Zero();
+        verticesOfFace << oldListVertFaces(0, faceIndex),
+                          oldListVertFaces(1, faceIndex),
+                          oldListVertFaces(2, faceIndex);
+
+        /* Let's use the function "findBarycenter" we implemented in order to compute 
+        the barycenter coordinates */
+        Eigen::Vector3d barycenterCoordinates = findBarycenter(polyhedron, verticesOfFace);
+        /* Let's save the coordinates of the barycenter of the face with index "faceIndex" as the 
+        coordinates of the vertex with index "faceIndex" of "dualPolyhedron" */
+        newCoordVertices.col(faceIndex) = barycenterCoordinates;
+        
+        /* In order to minimize the computational strain, let's find the edges that have the barycenter
+        with index "faceIndex" as one of their extrema. By using the structure "oldListAdjacentFaces" we 
+        can know which faces are adjacent, therefore connect their barycenters and create an edge. 
+        We just need to make sure that we didn't save the edge yet in order to avoid repeating edges. */
+        for(int adjacentFace = 0; adjacentFace < 3; adjacentFace++)
+        {
+            /* Let's access the right "adjacentFaceIndex" using the structure "oldListAdjacentFaces"*/
+            int& adjacentFaceIndex = oldListAdjacentFaces(adjacentFace, faceIndex);
+
+            /* An edge is formed by the two adjacent faces */
+            array<int, 2> sortedEdge = {faceIndex, adjacentFaceIndex};
+            /* We sort it in order to save it inside the structure "edgesFound" just once */
+            sort(sortedEdge.begin(), sortedEdge.end());
+
+            if(find(edgesFound.begin(), edgesFound.end(), sortedEdge) == edgesFound.end()){
+                /* If the edge isn't in the vector yet, we save it inside of it and in all of our 
+                data structures */
+                edgesFound.push_back(sortedEdge);
+
+                newExtremaEdges(0, edgeFoundIndex) = sortedEdge[0];
+                newExtremaEdges(1, edgeFoundIndex) = sortedEdge[1];
+                
+                /* Let's update the counter of how many edges we've found in order to access the right 
+                column of the matrix "newExtremaEdges" */
+                edgeFoundIndex++;
+            }
+        }
     }
 
-    constructor.PointsPolyhedra(CoordVertices);
-    constructor.CreateCells();
-    constructor.ExportPolyhedra();
+    /* Now that everything's done, we can return "dualPolyhedron" */
+    return dualPolyhedron;
 }
 
 GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
@@ -208,6 +309,11 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     numberNewFaces = 0; // F = 4 * T
 
     int& q = polyhedron.q;
+    
+    /* We need to copy these two variables into the new polyhedron in order to make other functions 
+    (needed to dualise the polyhedron) work */
+    tessellatedPolyhedron.q = polyhedron.q;
+    tessellatedPolyhedron.p = polyhedron.p;
     /* The formulas for the new values of the polyhedron depend on the value of the Schläfli number q,
     so let's divide the different cases: */
     switch (q)
@@ -666,11 +772,6 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         tutto l'algoritmo smette di funzionare, perché accediamo a strutture ormai modificate */
     }
 
-    // /* Now that we've found all of the vertices and the edges of the new polyhedron 
-    // we can update the data structures of the polyhedron itself */
-    // MatrEdgeVertices = newMatrEdgeVertices;
-    // ExtremaEdges = newExtremaEdges;
-
     // MatrEdgeVertices.makeCompressed(); // in tal caso creandola bisogna incrementare tutti gli indici per averla sparsa
 
 
@@ -798,8 +899,6 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     newListAdjacentFaces.resize(p, numberNewFaces);
     tessellatedPolyhedron.FindAdjacentFaces();
 
-    /* La lista delle facce adiacenti servirà? */
-
     return tessellatedPolyhedron;
 }
 
@@ -821,12 +920,12 @@ Eigen::VectorXi SortVertices(Eigen::Vector3d& Listvertices)
     return SortedVertices;
 }
 
-void TypeIITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
-{
-    vector<int> Vertices;
+// void TypeIITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
+// {
+//     vector<int> Vertices;
 
     
-}
+// }
 
 double distanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idPoint2)
 {

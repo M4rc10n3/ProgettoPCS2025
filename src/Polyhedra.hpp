@@ -32,18 +32,27 @@ namespace PolyhedraLibrary
         
         Eigen::MatrixXi ListAdjacentFaces; // All the adjacent faces for the face with index i, 
                                            // where i is the index of the column of the matrix, p x NumFaces matrix
-        vector<vector<int>> ListFacesWithVertex; // All the faces containing the vertex that has the index of 
-                                            // the column of the matrix
-        /* Creating the matrix containing the adjacent faces of each face. 
-        Each column contains the ids of the adjacent faces for the face that has as id the column index */
+        vector<vector<unsigned int>> ListFacesWithVertex; // All the faces containing the vertex that has the index of 
+                                                 // the inner vector
+
+        /* "FindAdjacentFaces" saves inside "ListAdjacentFaces" the adjacent faces to each face. 
+        Each column contains the ids of the adjacent faces for the face that has the column index as id */
         void FindAdjacentFaces(); // Create one matrix as explained above
         
-        // Finds the adjacency list of the vertices 
+        /* Finds the adjacency list of the vertices of the polyhedron */
         vector<vector<int>> AdjacencyList();
 
-        // Algorithm that saves inside "ListFacesWithVertex" at each column the faces containing the vertex 
-        // whose index is that of the column
+        /* "FindFacesWithVertex" saves inside "ListFacesWithVertex" at each column the faces containing 
+        the vertex whose index is that of the column */
         void FindFacesWithVertex();
+
+        /* "ExportPolyhedra" exports the structures of the polyhedron using the code of Mr. Vicini 
+        in order to create a file readable by ParaView */
+        void ExportPolyhedron();
+
+        /* "ExportPolyhedra" exports the structures of the polyhedron (except for the faces) using 
+        the code of Mr. Vicini in order to create a file readable by ParaView */
+        void ExportPolyhedronWithoutFaces();
     };
 
     struct Path 

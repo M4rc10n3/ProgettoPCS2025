@@ -76,7 +76,6 @@ int main(int argc, char* argv[])
 
     bool tessI = false;
     bool tessII = false;
-    GEOPolyhedron tessellatedPolyhedron;
 
     // check the validity for the values b and c and perform the requested tessellation
     if((b == 0 && c >= 1) || (b >= 1 && c == 0))
@@ -84,73 +83,25 @@ int main(int argc, char* argv[])
         tessI = true;
 		cout << "Tessellation type I" << endl;
 		int n = max(b,c);
-		tessellatedPolyhedron = TypeITessellation(polyhedron, n);
+		GEOPolyhedron tessellatedPolyhedron = TypeITessellation(polyhedron, n);
+        
+        // Nel caso in cui volessimo far visualizzare il poliedro tassellato da cui la dualizzazione 
+        // parte, lasciare la prossima riga, altrikmenti è inutile
+        tessellatedPolyhedron.ExportPolyhedron();
+
+        GEOPolyhedron dualPolyhedron = Dualise(tessellatedPolyhedron);
+        ontoTheUnitSphere(dualPolyhedron);
+        dualPolyhedron.ExportPolyhedronWithoutFaces();
 	} else if(b == c && b != 0)
     {
         tessII = true;
 		cout << "Tessellation type II'" << endl;
-		TypeIITessellation(polyhedron, b);
-	} else 
+		// TypeIITessellation(polyhedron, b);
+	} 
+    else 
+    {
 		cout << "Invalid values for b and c" << endl;
-
-    Gedim::UCDUtilities utilities;
-
-    Eigen::VectorXi VerticesMarkers(tessellatedPolyhedron.NumVertices);
-    for(int i = 0; i < tessellatedPolyhedron.NumVertices; i++)
-    {
-        VerticesMarkers[i] = 0;
     }
-    
-    Eigen::VectorXi EdgesMarkers(tessellatedPolyhedron.NumEdges);
-    for(int i = 0; i < tessellatedPolyhedron.NumEdges; i++)
-    {
-        EdgesMarkers[i] = tessellatedPolyhedron.NumEdges - i;
-    }
- 
-
-    utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
-                            tessellatedPolyhedron.CoordVertices,
-                            {},
-                            VerticesMarkers);
-
-    utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
-                                tessellatedPolyhedron.CoordVertices,
-                                tessellatedPolyhedron.ExtremaEdges,
-                                {},
-                                {},
-                                EdgesMarkers);
-    
-    vector<vector<unsigned int>> FacesVertices;
-    FacesVertices.resize(tessellatedPolyhedron.NumFaces);
-
-    for(int i = 0; i < tessellatedPolyhedron.NumFaces; i++)
-    {
-        FacesVertices[i].resize(3);
-        
-        // Salvo i vertici di ciascuna faccia con indice "i" all'interno del vettore con indice "i"
-        FacesVertices[i][0] = tessellatedPolyhedron.ListVertFaces(0, i);
-        FacesVertices[i][1] = tessellatedPolyhedron.ListVertFaces(1, i);
-        FacesVertices[i][2] = tessellatedPolyhedron.ListVertFaces(2, i);
-    }
-
-    Eigen::VectorXi FacesMarkers(tessellatedPolyhedron.NumFaces);
-    for(int i = 0; i < tessellatedPolyhedron.NumFaces; i++)
-    {
-        FacesMarkers[i] = i;
-    }
-
-    utilities.ExportPolygons("../PolygonalData/Cell2Ds.inp",
-                                tessellatedPolyhedron.CoordVertices,
-                                FacesVertices,
-                                {},
-                                {},
-                                FacesMarkers);
-
-                                 
-    // Constructor.CreateCells();
-    // Constructor.ExportPolyhedra();
-    // Dualise(polyhedron, p, q);
-    cout << "polyhedron.NumVertices: " << polyhedron.NumVertices << endl;
 
     Path minimumPath;
     
@@ -162,7 +113,8 @@ int main(int argc, char* argv[])
             if(tessI)
             {
                 minPath = BFS(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices, polyhedron.lengthEdge);
-            } else if(tessII)
+            } 
+            else if(tessII)
             {
                 //minPath = Dijkstra(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices);
             }

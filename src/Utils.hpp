@@ -11,7 +11,9 @@ using namespace std;
 of each triangular face
 Inputs list:
 ListVertFace: object of type "MatrixXi" containing the ids of each vertex of the face */
-Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertFace);
+Eigen::Vector3d findBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertFace);
+
+void ontoTheUnitSphere(GEOPolyhedron& polyhedron);
 
 /* BFS is a function that finds the minimum path between the two vertices marked by the ids given as inputs
 using the BFS algorithm (for unweighted graphs, therefore useful for type I tessellation)
@@ -47,7 +49,7 @@ void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVert
 /* Dualise is a function that outputs the dual, expressed as the type "Polyhedron", of a <polyhedron> given as input 
 Inputs list:
 polyhedron: object of type "Polyhedron" that the function uses to create its dual */
-void Dualise(GEOPolyhedron& polyhedron, const int& Schlafli_p, const int& Schlafli_q);
+GEOPolyhedron Dualise(GEOPolyhedron& polyhedron);
 // Che sia meglio dare come output il tipo void? Se facciamo return Polyhedron sarà una grossa e lenta operazione, vero? 
 // Forse è meglio definire un nuovo poliedro prima di chiamare questa funzione e mettiamo come altro input della funzione il poliedro stesso in cui dobbiamo fare output?
 
@@ -62,7 +64,7 @@ output its tassellations of type II regarding geodetic polyhedra
 Inputs list:
 polyhedron: object of type "Polyhedron" that the function modifies.
 numberDivisions */
-void TypeIITessellation(GEOPolyhedron& polyhedron, int& numberDivisions);
+// void TypeIITessellation(GEOPolyhedron& polyhedron, int& numberDivisions);
 
 /* distanceBetween id a method that calculates the squared distance between two vertices or points 
 just by using their ids 
