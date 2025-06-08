@@ -77,7 +77,6 @@ int main(int argc, char* argv[])
 
     bool tessI = false;
     bool tessII = false;
-    GEOPolyhedron tessellatedPolyhedron;
 
     // check the validity for the values b and c and perform the requested tessellation
     if((b == 0 && c >= 1) || (b >= 1 && c == 0))
@@ -85,14 +84,25 @@ int main(int argc, char* argv[])
         tessI = true;
 		cout << "Tessellation type I" << endl;
 		int n = max(b,c);
-		tessellatedPolyhedron = TypeITessellation(polyhedron, n);
+		GEOPolyhedron tessellatedPolyhedron = TypeITessellation(polyhedron, n);
+        
+        // Nel caso in cui volessimo far visualizzare il poliedro tassellato da cui la dualizzazione 
+        // parte, lasciare la prossima riga, altrikmenti è inutile
+        tessellatedPolyhedron.ExportPolyhedron();
+
+        GEOPolyhedron dualPolyhedron = Dualise(tessellatedPolyhedron);
+        ontoTheUnitSphere(dualPolyhedron);
+        dualPolyhedron.ExportPolyhedronWithoutFaces();
 	} else if(b == c && b != 0)
     {
         tessII = true;
 		cout << "Tessellation type II'" << endl;
-		TypeIITessellation(polyhedron, b);
-	} else 
+		// TypeIITessellation(polyhedron, b);
+	} 
+    else 
+    {
 		cout << "Invalid values for b and c" << endl;
+    }
 
     Gedim::UCDUtilities utilities;
 
@@ -171,6 +181,13 @@ int main(int argc, char* argv[])
             // }
             if(tessI)
             {
+                minPath = BFS(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices, polyhedron.lengthEdge);
+            } 
+            else if(tessII)
+            {
+                //minPath = Dijkstra(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices);
+            }
+            MinimumPath(minPath, polyhedron.MatrEdgeVertices, polyhedron.NumVertices, polyhedron.NumEdges, minimumPath.VerticesShortPath, minimumPath.EdgesShortPath);
                 minPath = BFS(tessellatedPolyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.lengthEdge);
 
                 // cout << "BFS" << endl;

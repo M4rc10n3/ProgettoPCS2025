@@ -63,9 +63,6 @@ namespace PolyhedraLibrary{
         void CreateCells(); // First fill the structure then calls all the CellXDs functions  
 
         GEOPolyhedron GetPolyhedron(); // Returns the final polyhedron requested 
-
-        void ExportPolyhedra(); // Export the structures using the code of Mr. Vicini in order 
-                                // to create a file readable by ParaView
     };
 
 }

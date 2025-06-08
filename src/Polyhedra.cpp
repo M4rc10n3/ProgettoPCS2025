@@ -1,4 +1,5 @@
 #include "Polyhedra.hpp"
+# include "UCDUtilities.hpp"
 
 using namespace std;
 
@@ -109,66 +110,142 @@ namespace PolyhedraLibrary
     {
         /* First, we need to understand how many vertices the polyhedron not tessellated has.
         We updated the value of NumVertices during the tessellation, so we need to understand 
-        it all over again with a "switch"*/
+        it all over again with a "switch" */
         int verticesWithLessFaces = 0;
         switch(q)
         {
-        case 3:
-            cout << "Your Polyhedron is a Tetrahedron. " << endl;
-            verticesWithLessFaces = 4;
-            break;
-        case 4:
-            cout << "Your Polyhedron is a Octahedron. " << endl;
-            verticesWithLessFaces = 6;
-            break;
-        case 5:
-            cout << "Your Polyhedron is a Icosahedron. " << endl;
-            verticesWithLessFaces = 20;
-            break;
+            case 3:
+                verticesWithLessFaces = 4;
+                break;
+            case 4:
+                verticesWithLessFaces = 6;
+                break;
+            case 5:
+                verticesWithLessFaces = 20;
+                break;
         }
 
-        ListFacesWithVertex.reserve(NumVertices);
-        /* We need to find for each vertex the faces that have it */
-        for(int vertexIndex = 0; vertexIndex < NumVertices; vertexIndex++){
+        /* We need to use a resize otherwise the program aborts with exception "bad_alloc" */
+        ListFacesWithVertex.resize(NumVertices);
+        /* We need to find for each vertex the faces to which the vertex belongs to */
+        for(int vertexIndex = 0; vertexIndex < NumVertices; vertexIndex++)
+        {
             /* The first "verticesWithLessFaces" vertices only belong to a number "q" of faces,
             so we reserve the exact number of memory space for them */
-            if(vertexIndex < verticesWithLessFaces){
+            if(vertexIndex < verticesWithLessFaces)
+            {
                 ListFacesWithVertex[vertexIndex].reserve(q);
             }
             /* The other vertices belong to 6 faces, so we reserve the exact number of 
             memory space for them */
-            else{
+            else
+            {
                 ListFacesWithVertex[vertexIndex].reserve(6);
             }
-            
-            /* At each iteration we save how many faces containing the vertex with index "vertexIndex" we've 
-            found inside the variable "faceWithVertex" */
-            // Non sevre con questo tipo di struttura dati
-            int faceWithVertex = 0;
-            /* Now we check whther the faces of the matrix "ListVertFaces" contain "vertexIndex" */
-            for(int faceIndex = 0; faceIndex < NumFaces; faceIndex++)
+
+            /* Now we check whether the faces of the matrix "ListVertFaces" contain "vertexIndex" */
+            for(unsigned int faceIndex = 0; faceIndex < unsigned(NumFaces); faceIndex++)
             {
                 const auto& face = ListVertFaces.col(faceIndex);
-                cout << "face: \n" << face << endl;
                 if(find(face.begin(), face.end(), vertexIndex) != face.end())
                 {
                     ListFacesWithVertex[vertexIndex].push_back(faceIndex);
-                    cout << "ListFacesWithVertex(" << faceWithVertex << ", " << vertexIndex << "): " << faceIndex << endl;
-                    faceWithVertex++;
-                    cout << "faceWithVertex: " << faceWithVertex << endl;
                 }
             }
         }
-        cout << "ListFacesWithVertex: \n";
-        for(int i = 0; i < NumVertices; i++){
-            for(unsigned int j = 0; j < ListFacesWithVertex[i].size(); j++){
-                cout << ListFacesWithVertex[i][j] << " ";
-            }
-            cout << endl;
-        }
-        cout << endl;
     }
 
+    void GEOPolyhedron::ExportPolyhedron()
+    {
+        /* In order to export the polyhedra, we need to create the markers for the vertices, 
+        the edges and the faces. We decided them arbitrarily in order to make them pop to the eye.
+        The vertices have all marker 0 because they are not difficult to separate from one another */
+        Eigen::VectorXi VerticesMarkers(NumVertices);
+        for(int i = 0; i < NumVertices; i++)
+        {
+            VerticesMarkers[i] = 0;
+        }
+        
+        Eigen::VectorXi EdgesMarkers(NumEdges);
+        for(int i = 0; i < NumEdges; i++)
+        {
+            EdgesMarkers[i] = NumEdges - i;
+        }
+
+        Eigen::VectorXi FacesMarkers(NumFaces);
+        for(int i = 0; i < NumFaces; i++)
+        {
+            FacesMarkers[i] = i;
+        }
+
+        /* Creating a vector of vectors starting from ListVertFaces in order 
+        to use Mr. Vicini's code (UCDUtilities.hpp) */
+        vector<vector<unsigned int>> FacesVertices;
+        FacesVertices.resize(NumFaces);
+
+        for(int i = 0; i < NumFaces; i++)
+        {
+            FacesVertices[i].resize(3);
+            
+            /* Saving the vertices of the face with index "i" inside the vector with index "i" */
+            FacesVertices[i][0] = ListVertFaces(0, i);
+            FacesVertices[i][1] = ListVertFaces(1, i);
+            FacesVertices[i][2] = ListVertFaces(2, i);
+        }
+
+        /* Lastly, we can export all of the structures passing the arguments needed to the functions */
+        Gedim::UCDUtilities utilities;
+        utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
+                               CoordVertices,
+                               {},
+                               VerticesMarkers);
+
+        utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
+                                 CoordVertices,
+                                 ExtremaEdges,
+                                 {},
+                                 {},
+                                 EdgesMarkers);
+
+        utilities.ExportPolygons("../PolygonalData/Cell2Ds.inp",
+                                  CoordVertices,
+                                  FacesVertices,
+                                  {},
+                                  {},
+                                  FacesMarkers);
+    }
+
+    void GEOPolyhedron::ExportPolyhedronWithoutFaces()
+    {
+        /* In order to export the polyhedra, we need to create the markers for the vertices, 
+        the edges and the faces. We decided them arbitrarily in order to make them pop to the eye.
+        The vertices have all marker 0 because they are not difficult to separate from one another */
+        Eigen::VectorXi VerticesMarkers(NumVertices);
+        for(int i = 0; i < NumVertices; i++)
+        {
+            VerticesMarkers[i] = 0;
+        }
+        
+        Eigen::VectorXi EdgesMarkers(NumEdges);
+        for(int i = 0; i < NumEdges; i++)
+        {
+            EdgesMarkers[i] = NumEdges - i;
+        }
+
+        /* Then, we can export all of the structures passing the arguments needed to the functions */
+        Gedim::UCDUtilities utilities;
+        utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
+                               CoordVertices,
+                               {},
+                               VerticesMarkers);
+
+        utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
+                                 CoordVertices,
+                                 ExtremaEdges,
+                                 {},
+                                 {},
+                                 EdgesMarkers);
+    }
 
 
 
