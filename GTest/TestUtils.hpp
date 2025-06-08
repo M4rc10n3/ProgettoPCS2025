@@ -9,7 +9,7 @@
 using namespace PolyhedraLibrary;
 using namespace std;
 using namespace Eigen;
-/*
+
 TEST(TestUtils, TestFindBarycenter)
 {
     
@@ -22,16 +22,36 @@ TEST(TestUtils, TestBFS)
                                     {0, 3, 4},  // Nodo 2 
                                     {4},        // Nodo 3
                                     {3, 5},     // Nodo 4
-                                    {4, 3} };   // Nodo 5    
-    BFS(adjList, 2, 5, );
-    vector<int> minPathEx = {2, 4, 5, 6, 7, 9, 9, 10, 12 ,13};
-    EXPECT_EQ(v, sortedV);
+                                    {4, 3} };   // Nodo 5  
+    int v1 = 2;
+    int v2 = 5;
+    int numVert = 6;
+    double lengthEdge = 1.0;
+    double lengthPath = 0.0;
+    vector<int> minPathBFS = BFS(adjList, v1, v2, numVert, lengthEdge, lengthPath);
+    vector<int> minPathEx = {2, 4, 5};
+    EXPECT_EQ(minPathBFS, minPathEx);
 }
 
 TEST(TestUtils, TestDijkstra)
 {
-    std::vector<int> v = {9, 13, 5, 10, 2, 7, 9, 4, 6, 12};
-    BubbleSort<int>(v);
-    std::vector<int> sortedV = {2, 4, 5, 6, 7, 9, 9, 10, 12 ,13};
-    EXPECT_EQ(v, sortedV);
-}*/
+    vector<vector<int>> adjList = { {1, 2, 3, 4},   // Nodo 0 
+                                    {0},            // Nodo 1 
+                                    {1, 3, 4},      // Nodo 2 
+                                    {2, 4},         // Nodo 3
+                                    {0, 1} };       // Nodo 4
+    MatrixXd matrWeights(5, 5); 
+    matrWeights << 0, 5, 2, 3, 4,
+                   5, 0, 0, 0, 0,
+                   0, 2, 0, 2, 1,
+                   0, 0, 1, 0, 2,
+                   4, 1, 0, 0, 0; 
+    int v1 = 3;
+    int v2 = 0;
+    int numVert = 5;
+    double lengthPath = 0.0;
+    vector<int> minPathDijkstra = Dijkstra(adjList, v1, v2, numVert, matrWeights, lengthPath);
+    vector<int> minPathEx = {3, 4, 0};
+    EXPECT_EQ(minPathDijkstra, minPathEx);
+    EXPECT_DOUBLE_EQ(lengthPath, 6.0);
+}

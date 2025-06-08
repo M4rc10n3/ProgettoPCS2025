@@ -175,14 +175,14 @@ int main(int argc, char* argv[])
         double time_elapsed_heap = 0.0;
         if(id_vertex_1 >= 0 && id_vertex_1 < tessellatedPolyhedron.NumVertices && id_vertex_2 >= 0 && id_vertex_2 < tessellatedPolyhedron.NumVertices)
         {
-            Eigen::MatrixXd matrWeights = Eigen::MatrixXd::Zero(tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.NumVertices);
-            for(int i = 0; i < tessellatedPolyhedron.NumVertices; i++){
-                for(int j = 0; j < tessellatedPolyhedron.NumVertices; j++){
-                    if(tessellatedPolyhedron.MatrEdgeVertices(i,j) > -1){
-                        matrWeights(i,j) = tessellatedPolyhedron.lengthEdge;
-                    }
-                }
-            }
+            // Eigen::MatrixXd matrWeights = Eigen::MatrixXd::Zero(tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.NumVertices);
+            // for(int i = 0; i < tessellatedPolyhedron.NumVertices; i++){
+            //     for(int j = 0; j < tessellatedPolyhedron.NumVertices; j++){
+            //         if(tessellatedPolyhedron.MatrEdgeVertices(i,j) > -1){
+            //             matrWeights(i,j) = tessellatedPolyhedron.lengthEdge;
+            //         }
+            //     }
+            // }
             if(tessI)
             {
                 cout << "BFS algorithm to find the minimum path" << endl;
