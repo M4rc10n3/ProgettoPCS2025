@@ -42,6 +42,12 @@ list(APPEND PlatonicSolids_SOURCES ${PlatonicSolids_sources})
 list(APPEND PlatonicSolids_HEADERS ${PlatonicSolids_headers})
 list(APPEND PlatonicSolids_INCLUDE ${PlatonicSolids_includes})
 
+add_subdirectory(GTest)
+
+list(APPEND PlatonicSolids_SOURCES ${GTest_sources})
+list(APPEND PlatonicSolids_HEADERS ${GTest_headers})
+list(APPEND PlatonicSolids_INCLUDE ${GTest_includes})
+
 add_subdirectory(ExportParaview)
 
 list(APPEND PlatonicSolids_SOURCES ${src_paraview_sources})

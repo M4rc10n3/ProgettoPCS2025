@@ -131,8 +131,8 @@ int main(int argc, char* argv[])
 
                                  
     Constructor.CreateCells();
-    Constructor.ExportPolyhedra();
-    Dualise(polyhedron, p, q);
+    // Constructor.ExportPolyhedra();
+    // Dualise(polyhedron, p, q);
 
     return 0;
 }

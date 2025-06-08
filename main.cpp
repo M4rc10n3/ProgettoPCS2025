@@ -78,6 +78,8 @@ int main(int argc, char* argv[])
     bool tessI = false;
     bool tessII = false;
 
+    GEOPolyhedron tessellatedPolyhedron;
+
     // check the validity for the values b and c and perform the requested tessellation
     if((b == 0 && c >= 1) || (b >= 1 && c == 0))
     {
@@ -167,9 +169,9 @@ int main(int argc, char* argv[])
     
     if(findMinPath)
     {
+        vector<int> minPath;
         if(id_vertex_1 >= 0 && id_vertex_1 < tessellatedPolyhedron.NumVertices && id_vertex_2 >= 0 && id_vertex_2 < tessellatedPolyhedron.NumVertices)
         {
-            vector<int> minPath;
             // vector<int> minPath1;
             // Eigen::MatrixXd matrWeights = Eigen::MatrixXd::Zero(tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.NumVertices);
             // for(int i = 0; i < tessellatedPolyhedron.NumVertices; i++){
@@ -188,7 +190,7 @@ int main(int argc, char* argv[])
                 //minPath = Dijkstra(polyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, polyhedron.NumVertices);
             }
             MinimumPath(minPath, polyhedron.MatrEdgeVertices, polyhedron.NumVertices, polyhedron.NumEdges, minimumPath.VerticesShortPath, minimumPath.EdgesShortPath);
-                minPath = BFS(tessellatedPolyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.lengthEdge);
+            minPath = BFS(tessellatedPolyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.lengthEdge);
 
                 // cout << "BFS" << endl;
                 // int num_experiment = 500;
@@ -222,10 +224,9 @@ int main(int argc, char* argv[])
             //     minPath = Dijkstra(tessellatedPolyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, tessellatedPolyhedron.NumVertices);
             // }
             MinimumPath(minPath, tessellatedPolyhedron.MatrEdgeVertices, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.NumEdges, minimumPath.VerticesShortPath, minimumPath.EdgesShortPath);
-        }
-        else
+        } else {
             cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
-    }
+        }
 
     return 0;
 }
