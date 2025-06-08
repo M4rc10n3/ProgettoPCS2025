@@ -31,7 +31,7 @@ Eigen::Vector3d findBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertF
     return barycenterCoordinates;
 }
 
-vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const double& lengthEdge)
+vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const double& lengthEdge, double& lengthPath)
 {
     queue<int> q;
     vector<bool> reached(numVert); // boolean vector to save visited vertices
@@ -66,15 +66,9 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
                     v = predecessor[v];                  
                 }
                 reverse(minPath.begin(), minPath.end());
-                
-                // Output the path and calculate total length
-                cout << "The minimum path (using BFS algorithm) is: ";
-                for(int i : minPath)
-                    cout << i << " ";
-                cout << endl;
-                cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
-                cout << "The minimum path length is " << (minPath.size() - 1) * lengthEdge << endl;  
 
+                lengthPath = (minPath.size() - 1) * lengthEdge; // calculate the minimum path's length
+                
                 return minPath; // return the list of vertices in the minimum path            
             }
         }
@@ -82,7 +76,7 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
     return {}; // if no path was found, return an empty vector  
 }
 
-vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, Eigen::MatrixXd& matrWeights)
+vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, Eigen::MatrixXd& matrWeights, double& lengthPath)
 {
     vector<int> predecessor(numVert); // vector to save the predecessor of each vertex
     vector<double> distance(numVert); // vector to store the current known shortest distance from v1 to each vertex
@@ -140,22 +134,16 @@ vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const in
     minPath.push_back(v1);
     reverse(minPath.begin(), minPath.end());
     
-    // Output the path and calculate total length
-    double lengthPath = 0.0;
-    cout << "The minimum path (using Dijkstra algorithm) is: " << minPath[0];
+    // Calculate the minimum path's length
     for(int i = 1; i < minPath.size(); i++)
     {
-        cout << " " << minPath[i];
         lengthPath += matrWeights(minPath[i-1], minPath[i]);
     }                        
-    cout << endl;
-    cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
-    cout << "The minimum path length is " << lengthPath << endl;  
 
     return minPath; // return the list of vertices in the minimum path                  
 }
 
-void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVertices, const int& numVert, const int& numEdge, vector<int>& vertShortPath, vector<int>& edgeShortPath)
+void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVertices, const int& numVert, const int& numEdge, const double& lengthPath, vector<int>& vertShortPath, vector<int>& edgeShortPath)
 {
     vertShortPath.resize(numVert);
     edgeShortPath.resize(numEdge);
@@ -183,6 +171,14 @@ void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVert
             edgeShortPath[idEdge] = 1;
         }
     }
+    
+    // Output the minimum path (through the ids of the vertices that compose it) and its length
+    cout << "The minimum path is: ";
+    for(int i : minPath)
+        cout << i << " ";
+    cout << endl;
+    cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
+    cout << "The minimum path length is " << lengthPath << endl;
 }
 
 void ontoTheUnitSphere(GEOPolyhedron& polyhedron)

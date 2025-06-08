@@ -23,7 +23,7 @@ v1: the id associated to the first vertex of the minimum path we're looking for
 v2: the id associated to the last vertex of the minimum path we're looking for 
 numVert: number of vertices of the polyhedron
 lengthEdge: length of the edges of the polyhedron (all equal to each other) */
-vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const double& lengthEdge);
+vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const double& lengthEdge, double& lengthPath);
 
 /* Dijkstra is a function that finds the minimum path between the two vertices marked by the ids given as inputs
 using the Dijkstra algorithm (for weighted graphs, therefore useful for type II tessellation)
@@ -33,7 +33,7 @@ v1: the id associated to the first vertex of the minimum path we're looking for
 v2: the id associated to the last vertex of the minimum path we're looking for 
 numVert: number of vertices of the polyhedron
 matrWeights: matrix with the lengths of each edge of the polyhedron */
-vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, Eigen::MatrixXd& matrWeights);
+vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, Eigen::MatrixXd& matrWeights, double& lengthPath);
 
 /* MinimumPath is a function that sets the property ShortPath = 1 to the vertices and the edges that compose 
 the minimum path and ShortPath = 0 to the other vertices and edges
@@ -44,7 +44,7 @@ numVert: number of vertices of the polyhedron
 numEdge: number of edges of the polyhedron
 vertShortPath: binary vector for the vertices used in the minimum path
 edgeShortPath: binary vector for the edges used in the minimum path */
-void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVertices, const int& numVert, const int& numEdge, vector<int>& vertShortPath, vector<int>& edgeShortPath);
+void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVertices, const int& numVert, const int& numEdge, const double& lengthPath, vector<int>& vertShortPath, vector<int>& edgeShortPath);
 
 /* Dualise is a function that outputs the dual, expressed as the type "Polyhedron", of a <polyhedron> given as input 
 Inputs list:
