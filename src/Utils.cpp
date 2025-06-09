@@ -90,7 +90,10 @@ vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const in
     predecessor[v1] = v1;
     distance[v1] = 0.0;
 
-    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>> pq; // std::greater<int> makes the max priority queue act as a min priority queue
+    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>> pq; // std::greater<int> makes the max priority queue act as a min priority queue;
+                                                                                                 // std::pair<T1, T2> is a class template that provides a way to store two heterogeneous objects as a single unit,
+                                                                                                 // in this case it stores the distance of each vertex from the source v1 (as the first element,
+                                                                                                 // since it represents the priority in the queue) and the vertex id as the second element
     for(int i = 0; i < numVert; i++) 
     {
         pq.push({distance[i], i}); // initialize the priority queue
