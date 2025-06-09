@@ -948,9 +948,29 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     }
 
     unsigned int FacesperFace = tessellatedPolyhedron.NumFaces/polyhedron.NumFaces; // Number of polygons per face derived by Tasselation I
+    unsigned int EdgeperFace = 3;
 
     GEOSolid.CoordVertices.resize(3, NumVertices);
+    GEOSolid.ExtremaEdges.resize(2, NumEdges);
+    GEOSolid.ListEdgeFaces.resize(polyhedron.p, NumFaces);
+    GEOSolid.ListVertFaces.resize(polyhedron.p, NumFaces);
     GEOSolid.lengthEdge = polyhedron.lengthEdge/(2 * numberDivisions);
+
+    VectorXi edgetracker = VectorXi::Zero(polyhedron.NumEdges); // prevents generating copies of edge points
+    // 0 if an edge in not been yet considered 
+
+
+    MatrixXi MatEdgeVertices = MatrixXi::Zero(polyhedron.NumEdges, (2 * numberDivisions) - 1); // Every row of the matrix
+    // is the id of each edge of the initial polyhedron; 
+
+    int vertexcounter = 0; // takes track of the number of vertices examined;
+    int edgecounter = 0; // takes track of the number of edges examined;
+
+    for (int i = 0; i < polyhedron.NumVertices; i++)
+    {
+        GEOSolid.CoordVertices.col(i) = polyhedron.CoordVertices.col(i);
+        vertexcounter++;
+    }
 
 
     for (int i = 0; i < polyhedron.NumFaces; i++)
@@ -958,6 +978,15 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
         // First we divide points between edgepoints and innerpoints
         vector<Vector3d> innerpoints;
         vector<Vector3d> edgepoints;
+
+        VectorXi IDbarycenters = VectorXi::Zero(FacesperFace);
+        VectorXi IDedgepoints = VectorXi::Zero(3 + ((2* numberDivisions) - 1) * EdgeperFace);
+
+        for (int z = 0; z < GEOSolid.p; z++)
+        {
+            edgepoints.push_back(polyhedron.CoordVertices.col(polyhedron.ListVertFaces(z,i))); // stores the initial vertices
+            IDedgepoints(z) = polyhedron.ListVertFaces(z,i);
+        }
 
         for(int j = 0; j < FacesperFace; j++) // generates the innerpoints of a Face
         {
@@ -970,48 +999,113 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
             barycenter = findBarycenter(tessellatedPolyhedron, VertFace);
 
-            GEOSolid.CoordVertices.col(j + i * FacesperFace) = barycenter;
+            GEOSolid.CoordVertices.col(vertexcounter) = barycenter;
             innerpoints.push_back(barycenter);
+            IDbarycenters(j) = vertexcounter;
+
+            vertexcounter++;
 
         }
 
         for (int k = 0; k < polyhedron.NumEdges/polyhedron.NumFaces; k++) // generates the edgepoints of a Face
         {
             int edge = polyhedron.ListEdgeFaces(k, i);
-            int IDVertex_1 = polyhedron.ExtremaEdges(edge, 0);
-            int IDVertex_2 = polyhedron.ExtremaEdges(edge, 1);
-
-            double x_1 = polyhedron.CoordVertices(0, IDVertex_1);
-            double y_1 = polyhedron.CoordVertices(1, IDVertex_1);
-            double z_1 = polyhedron.CoordVertices(2, IDVertex_1);
-
-            double x_2 = polyhedron.CoordVertices(0, IDVertex_2);
-            double y_2 = polyhedron.CoordVertices(1, IDVertex_2);
-            double z_2 = polyhedron.CoordVertices(2, IDVertex_2);
-
-            Vector3d angularcoefficient; // angular coeefficient of the line between the two vertices
-            angularcoefficient(0) = x_1 - x_2;
-            angularcoefficient(1) = y_1 - y_2;
-            angularcoefficient(2) = z_1 - z_2;
-
-            //TODO enumarate the initial Vertices
-            for (int w = 0; w < (2 * numberDivisions - 1); w++)
+            if (edgetracker(edge) == 0)
             {
-                double t = GEOSolid.lengthEdge / sqrt(angularcoefficient.squaredNorm());
-                double x = x_2 + t * angularcoefficient(0);
-                double y = y_2 + t * angularcoefficient(1);
-                double z = z_2 + t * angularcoefficient(2);
+                int IDVertex_1 = polyhedron.ExtremaEdges(edge, 0);
+                int IDVertex_2 = polyhedron.ExtremaEdges(edge, 1);
 
-                GEOSolid.CoordVertices.col((NumFaces * FacesperFace) + (k * (2 * numberDivisions - 1)) + w) = Vector3d(x, y, z);
-                edgepoints.push_back(Vector3d(x, y, z));
+                double x_1 = polyhedron.CoordVertices(0, IDVertex_1);
+                double y_1 = polyhedron.CoordVertices(1, IDVertex_1);
+                double z_1 = polyhedron.CoordVertices(2, IDVertex_1);
+
+                double x_2 = polyhedron.CoordVertices(0, IDVertex_2);
+                double y_2 = polyhedron.CoordVertices(1, IDVertex_2);
+                double z_2 = polyhedron.CoordVertices(2, IDVertex_2);
+
+                Vector3d angularcoefficient; // angular coeefficient of the line between the two vertices
+                angularcoefficient(0) = x_1 - x_2;
+                angularcoefficient(1) = y_1 - y_2;
+                angularcoefficient(2) = z_1 - z_2;
+
+                for (int w = 0; w < (2 * numberDivisions - 1); w++)
+                {
+                    double t = GEOSolid.lengthEdge / sqrt(angularcoefficient.squaredNorm());
+                    double x = x_2 + t * angularcoefficient(0);
+                    double y = y_2 + t * angularcoefficient(1);
+                    double z = z_2 + t * angularcoefficient(2);
+
+                    GEOSolid.CoordVertices.col(vertexcounter) = Vector3d(x, y, z);
+                    edgepoints.push_back(Vector3d(x, y, z));
+                    MatEdgeVertices(edge, w) = vertexcounter;
+                    
+                    GEOSolid.ExtremaEdges(0, edgecounter) = vertexcounter - 1;
+                    GEOSolid.ExtremaEdges(1, edgecounter) = vertexcounter;
+
+                    IDedgepoints(k * (2 * numberDivisions - 1) + w + 3) = vertexcounter;
+
+                    
+                    vertexcounter++;
+                    edgecounter++;
+
+                    x_2 = x;
+                    y_2 = y;
+                    z_2 = z;
+
+                }
+                // the for cycle stops before the last vertex so i manually add the last edge
+                GEOSolid.ExtremaEdges(0, edgecounter) = vertexcounter - 1; 
+                GEOSolid.ExtremaEdges(1, edgecounter) = IDVertex_1;
+
+                edgecounter++;
+                edgetracker(edge) = 1;
+
+            } else { // edge already considered before
                 
-                x_2 = x;
-                y_2 = y;
-                z_2 = z;
+                for (int w = 0; w < (2 * numberDivisions - 1); w++)
+                {
+                    edgepoints.push_back(GEOSolid.CoordVertices.col(MatEdgeVertices(edge,w)));
+                    IDedgepoints(k * (2 * numberDivisions - 1) + w + 3) = MatEdgeVertices(edge,w + 1);
+                }
             }
         }
 
-        
+        // Valence of each point on the edge, max = 3, considering a single face and just the barycenters
+        VectorXi valenceedgepoints = VectorXi::Zero(innerpoints.size()); 
+        int numbarycenters = innerpoints.size();
+
+        for (int j = 0; j < numbarycenters; j++)
+        {
+
+            for (int k = 0; k < edgepoints.size(); k++)
+            {
+                Vector3d distance = edgepoints[k] - innerpoints[0];
+
+                if (distance.norm() < GEOSolid.lengthEdge + 1e-5 && valenceedgepoints(k) < 3)
+                {
+                    GEOSolid.MatrEdgeVertices(0, edgecounter) = IDbarycenters(j);
+                    GEOSolid.MatrEdgeVertices(1, edgecounter) = IDedgepoints(k);
+
+                    valenceedgepoints(k)++;
+                    edgecounter++;
+                }
+            } 
+
+            for (int k = 1; k < innerpoints.size(); k++)
+            {
+                Vector3d distance = innerpoints[k] - innerpoints[0];
+
+                if (distance.norm() < GEOSolid.lengthEdge + 1e-5)
+                {
+                    GEOSolid.MatrEdgeVertices(0, edgecounter) = IDbarycenters(j);
+                    GEOSolid.MatrEdgeVertices(1, edgecounter) = IDbarycenters(k + j);
+
+                    edgecounter++;
+                }
+            }
+
+            innerpoints.erase(innerpoints.begin()); // pop the barycenter just considered to speed up the process
+        }
     }
 
     return GEOSolid;

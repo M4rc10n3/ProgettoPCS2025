@@ -65,6 +65,16 @@ target_link_libraries(${PROJECT_NAME} ${PlatonicSolids_LINKED_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${PlatonicSolids_INCLUDE})
 target_compile_options(${PROJECT_NAME} PUBLIC -fPIC)
 
+add_executable(${PROJECT_NAME}_TEST
+      main_test.cpp
+      ${PlatonicSolids_SOURCES}
+      ${PlatonicSolids_HEADERS}
+      ${PlatonicSolids_TEST_SOURCES}
+      ${PlatonicSolids_TEST_HEADERS})
+
+target_link_libraries(${PROJECT_NAME}_TEST ${PlatonicSolids_LINKED_LIBRARIES})
+target_include_directories(${PROJECT_NAME}_TEST PRIVATE ${PlatonicSolids_INCLUDE} ${PlatonicSolids_TEST_INCLUDE})
+target_compile_options(${PROJECT_NAME}_TEST PUBLIC -fPIC)
 
 # add_executable(ManuExe
 #       main_Manu.cpp
