@@ -27,18 +27,12 @@ namespace PolyhedraLibrary{
         We do it by checking the distance between a vertex and all of the others, by using a for cycle 
         that doesn't check for the last two vertices (that iteration would be useless) */
     void NumberEdges(); // Create two matrices: one with the vertex IDs of each edge and one with
-                                        // the edge IDs of each pair of vertices
+                        // the edge IDs of each pair of vertices
 
     /* Creating the matrix containing the vertices of each face as its column and the matrix containing the ids 
         of the edges of each face. */
     void NumberFaces(); // Create two matrices: one with the vertex IDs and one with the edge IDs, 
-                                        // which uniquely identify each face of the polyhedron
-    
-    /* Creating the matrix containing the adjacent faces of each face. 
-    Each column contains the ids of the adjacent faces for the face that has as id the column index */
-    // void FindAdjacentFaces(); // Create one matrix as explained above
-
-    
+                        // which uniquely identify each face of the polyhedron
 
     void Cell0Ds(); // Create Cell0Ds 
 
@@ -51,12 +45,11 @@ namespace PolyhedraLibrary{
     public:
         BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q); // Initialize the class
 
+        BuildPolyhedra(GEOPolyhedron& polyhedron); // Initialize the class with an already built polyhedron
+
         void DataPolyhedra(); // Gives all the important Data of the polyhedron
 
         void PointsPolyhedra(Eigen::MatrixXd& CoordVertices);  // Fills all the point of the polyhedron
-
-        // vector<vector<int>> AdjacencyList(); // Creates the adjacency list, where each vertex is associated
-                                             // with a vector containing all vertices adjacent to it
 
         void FillStructPolyhedra(); // Fills all the structures of GEOPolyhedron
 

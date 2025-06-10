@@ -247,6 +247,4 @@ namespace PolyhedraLibrary
                                  EdgesMarkers);
     }
 
-
-
 }
