@@ -71,12 +71,9 @@ int main(int argc, char* argv[])
         c << ")" << endl; 
     }
 
-    vector<GEOPolyhedron> allCreatedPolyhedra = {};
-
     BuildPolyhedra Constructor(p, q); // create the structure of the Polyhedron
     Constructor.DataPolyhedra();
     GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
-    allCreatedPolyhedra.push_back(polyhedron);
 
     bool tessI = false;
     bool tessII = false;
@@ -90,14 +87,12 @@ int main(int argc, char* argv[])
 		cout << "Tessellation type I" << endl;
 		int n = max(b,c);
 		tessellatedPolyhedron = TypeITessellation(polyhedron, n);
-        //allCreatedPolyhedra.push_back(tessellatedPolyhedron);
         
         // Nel caso in cui volessimo far visualizzare il poliedro tassellato da cui la dualizzazione 
         // parte, lasciare la prossima riga, altrikmenti è inutile
         tessellatedPolyhedron.ExportPolyhedron();
 
         GEOPolyhedron dualPolyhedron = Dualise(tessellatedPolyhedron);
-        // allCreatedPolyhedra.push_back(dualPolyhedron);
         ontoTheUnitSphere(dualPolyhedron);
         dualPolyhedron.ExportPolyhedronWithoutFaces();
 	} else if(b == c && b != 0)
@@ -105,7 +100,6 @@ int main(int argc, char* argv[])
         tessII = true;
 		cout << "Tessellation type II" << endl;
 		// tessellatedPolyhedron = TypeIITessellation(polyhedron, b);
-        //allCreatedPolyhedra.push_back(tessellatedPolyhedron);	
     } 
     else 
     {
@@ -166,7 +160,7 @@ int main(int argc, char* argv[])
                                 FacesMarkers);
 
                                  
-    Constructor.CreateCells(allCreatedPolyhedra);
+    // Constructor.CreateCells();
     // Constructor.ExportPolyhedra();
     // Dualise(polyhedron, p, q);
     cout << "tessellatedPolyhedron.NumVertices: " << tessellatedPolyhedron.NumVertices << endl;
