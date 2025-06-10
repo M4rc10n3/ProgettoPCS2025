@@ -10,7 +10,6 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    // unsigned int p, q, b, c, id_vertex_1, id_vertex_2; // initialize all the variables
     int p, q, b, c, id_vertex_1, id_vertex_2; // initialize all the variables
     string executable;
     vector<string> parameters;
@@ -130,7 +129,7 @@ int main(int argc, char* argv[])
     //                             FacesMarkers);
 
                                  
-    Constructor.CreateCells();
+    // Constructor.CreateCells();
     // Constructor.ExportPolyhedra();
     // Dualise(polyhedron, p, q);
 
