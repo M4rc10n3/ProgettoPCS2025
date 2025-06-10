@@ -46,7 +46,7 @@ namespace PolyhedraLibrary{
 
     void Cell2Ds(); // Create Cell2Ds
 
-    void Cell3Ds(); // Create Cell3Ds
+    void Cell3Ds(vector<GEOPolyhedron>& allPolyhedra); // Create Cell3Ds
 
     public:
         BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q); // Initialize the class
@@ -60,7 +60,7 @@ namespace PolyhedraLibrary{
 
         void FillStructPolyhedra(); // Fills all the structures of GEOPolyhedron
 
-        void CreateCells(); // First fill the structure then calls all the CellXDs functions  
+        void CreateCells(vector<GEOPolyhedron>& allPolyhedra); // First fill the structure then calls all the CellXDs functions  
 
         GEOPolyhedron GetPolyhedron(); // Returns the final polyhedron requested 
     };

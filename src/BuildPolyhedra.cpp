@@ -29,6 +29,10 @@ namespace PolyhedraLibrary{
         polyhedron.IdEdges.reserve(NumEdges);
         polyhedron.IdFaces.reserve(NumFaces);
 
+        polyhedron.ListVertPolyhedra.reserve(NumVertices);
+        polyhedron.ListEdgePolyhedra.reserve(NumEdges);
+        polyhedron.ListFacePolyhedra.reserve(NumFaces);
+
         // Initialize all the Matrices 
         
         CoordVertices = Eigen::MatrixXd(3, NumVertices);
@@ -348,6 +352,12 @@ namespace PolyhedraLibrary{
     {
         ofstream file("../PolygonalData/Cell0Ds.txt"); // the program should be launched inside Debug or Release folders
         
+        if (file.fail()) 
+        {
+            std::cerr << "Error opening file\n";
+            return;
+        }
+
         file << "Id,X,Y,Z\n";
         for (int i = 0; i < NumVertices; i++)
         {
@@ -364,6 +374,12 @@ namespace PolyhedraLibrary{
     {   
         ofstream file("../PolygonalData/Cell1Ds.txt"); // the program should be launched inside Debug or Release folders
         
+        if (file.fail()) 
+        {
+            std::cerr << "Error opening file\n";
+            return;
+        }
+
         file << "Id,Origin,End\n";
         for (int i = 0; i < NumEdges; i++)
         {
@@ -380,6 +396,12 @@ namespace PolyhedraLibrary{
     {   
         ofstream file("../PolygonalData/Cell2Ds.txt"); // the program needs to be launched inside Debug or Release folders
         
+        if (file.fail()) 
+        {
+            std::cerr << "Error opening file\n";
+            return;
+        }
+
         file << "Id,NumVertices,Vertices,NumEdges,Edges\n";
         for (int i = 0; i < NumFaces; i++)
         {
@@ -402,30 +424,76 @@ namespace PolyhedraLibrary{
         file.close();
     }
 
-    void BuildPolyhedra::Cell3Ds()
+    void BuildPolyhedra::Cell3Ds(vector<GEOPolyhedron>& allPolyhedra)
     {   
         ofstream file("../PolygonalData/Cell3Ds.txt"); // the program should be launched inside Debug or Release folders
         
-        file << "IdVertices:\n";
-        for (int i = 0; i < NumVertices; i++)
+        // file << "IdVertices:\n";
+        // for (int i = 0; i < NumVertices; i++)
+        // {
+        //     file << "V" << polyhedron.IdVertices[i] << "\n";
+        // }
+
+        // for (int j = 0; j < NumEdges; j++)
+        // {
+        //     file << "E" << polyhedron.IdEdges[j] << "\n";
+        // }
+
+        // for (int k = 0; k < NumFaces; k++)
+        // {
+        //     file << "F" << polyhedron.IdFaces[k] << "\n";
+        // }
+
+        if (file.fail()) 
         {
-            file << "V" << polyhedron.IdVertices[i] << "\n";
+            std::cerr << "Error opening file\n";
+            return;
         }
 
-        for (int j = 0; j < NumEdges; j++)
+        file << "Id,NumVertices,Vertices,NumEdges,Edges,NumFaces,Faces\n";
+        for (int i = 0; i < allPolyhedra.size(); i++)
         {
-            file << "E" << polyhedron.IdEdges[j] << "\n";
+            file << i << "," << allPolyhedra[i].NumVertices;
+            for (int j = 0; j < allPolyhedra[i].NumVertices; j++)
+            {
+                int v = allPolyhedra[i].IdVertices[j];
+                file << "," << "V" << v;
+                allPolyhedra[i].ListVertPolyhedra.push_back(v);
+                cout << v << endl;
+            }
+            
+            file << "," << allPolyhedra[i].NumEdges;
+            std::cout << "NumEdges: " << allPolyhedra[i].NumEdges << std::endl;
+            std::cout << "IdEdges.size() = " << allPolyhedra[i].IdEdges.size() << std::endl;
+            // for(int k :allPolyhedra[i].IdEdges)
+            //     cout << k << endl;
+            // for (int j = 0; j < allPolyhedra[i].NumEdges; j++)
+            // {
+            //     int e = allPolyhedra[i].IdEdges[j];
+            //     cout << e << endl;
+            //     file << "," << "E" << e;
+            //     allPolyhedra[i].ListEdgePolyhedra.push_back(e);
+            //     cout << j << endl;
+            // }
+            std::cout << "IdFaces.size() = " << allPolyhedra[i].IdFaces.size() << std::endl;
+            file << "," << allPolyhedra[i].NumFaces;
+            // for (int j = 0; j < allPolyhedra[i].NumFaces; j++)
+            // {
+            //     int f = allPolyhedra[i].IdFaces[j];
+            //     file << "," << "F" << f;
+            //     allPolyhedra[i].ListFacePolyhedra.push_back(f);
+            //     cout << j << endl;
+            // }
+            file << "\n";
+
+            allPolyhedra[i].IdPolyhedra = i;
         }
 
-        for (int k = 0; k < NumFaces; k++)
-        {
-            file << "F" << polyhedron.IdFaces[k] << "\n";
-        }
 
         file.close();
     }
 
-    void BuildPolyhedra::CreateCells() 
+    void BuildPolyhedra::CreateCells(vector<GEOPolyhedron>& allPolyhedra) 
     {
         Cell0Ds();
 
@@ -433,7 +501,7 @@ namespace PolyhedraLibrary{
 
         Cell2Ds();
 
-        Cell3Ds();
+        Cell3Ds(allPolyhedra);
     }
 
     GEOPolyhedron BuildPolyhedra::GetPolyhedron()
