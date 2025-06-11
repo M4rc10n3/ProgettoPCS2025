@@ -89,13 +89,14 @@ int main(int argc, char* argv[])
 		tessellatedPolyhedron = TypeITessellation(polyhedron, n);
         
         // Nel caso in cui volessimo far visualizzare il poliedro tassellato da cui la dualizzazione 
-        // parte, lasciare la prossima riga, altrikmenti è inutile
-        tessellatedPolyhedron.ExportPolyhedron();
+        // parte, lasciare la prossima riga, altrimenti è inutile
+        // tessellatedPolyhedron.ExportPolyhedron();
 
         GEOPolyhedron dualPolyhedron = Dualise(tessellatedPolyhedron);
-        ontoTheUnitSphere(dualPolyhedron);
+        OntoTheUnitSphere(dualPolyhedron);
         dualPolyhedron.ExportPolyhedronWithoutFaces();
-	} else if(b == c && b != 0)
+	} 
+    else if(b == c && b != 0)
     {
         tessII = true;
 		cout << "Tessellation type II" << endl;
@@ -105,68 +106,16 @@ int main(int argc, char* argv[])
     {
 		cout << "Invalid values for b and c" << endl;
     }
-
-    Gedim::UCDUtilities utilities;
-
-    Eigen::VectorXi VerticesMarkers(tessellatedPolyhedron.NumVertices);
-    for(int i = 0; i < tessellatedPolyhedron.NumVertices; i++)
-    {
-        VerticesMarkers[i] = 0;
-    }
-    
-    Eigen::VectorXi EdgesMarkers(tessellatedPolyhedron.NumEdges);
-    for(int i = 0; i < tessellatedPolyhedron.NumEdges; i++)
-    {
-        EdgesMarkers[i] = tessellatedPolyhedron.NumEdges - i;
-    }
- 
-
-    utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
-                            tessellatedPolyhedron.CoordVertices,
-                            {},
-                            VerticesMarkers);
-
-    utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
-                                tessellatedPolyhedron.CoordVertices,
-                                tessellatedPolyhedron.ExtremaEdges,
-                                {},
-                                {},
-                                EdgesMarkers);
-    
-    vector<vector<unsigned int>> FacesVertices;
-    FacesVertices.resize(tessellatedPolyhedron.NumFaces);
-
-    for(int i = 0; i < tessellatedPolyhedron.NumFaces; i++)
-    {
-        FacesVertices[i].resize(3);
-        
-        // Salvo i vertici di ciascuna faccia con indice "i" all'interno del vettore con indice "i"
-        FacesVertices[i][0] = tessellatedPolyhedron.ListVertFaces(0, i);
-        FacesVertices[i][1] = tessellatedPolyhedron.ListVertFaces(1, i);
-        FacesVertices[i][2] = tessellatedPolyhedron.ListVertFaces(2, i);
-    }
-
-    Eigen::VectorXi FacesMarkers(tessellatedPolyhedron.NumFaces);
-    for(int i = 0; i < tessellatedPolyhedron.NumFaces; i++)
-    {
-        FacesMarkers[i] = i;
-    }
-
-    utilities.ExportPolygons("../PolygonalData/Cell2Ds.inp",
-                                tessellatedPolyhedron.CoordVertices,
-                                FacesVertices,
-                                {},
-                                {},
-                                FacesMarkers);
-
-                                 
+                           
     // Constructor.CreateCells();
-    // Constructor.ExportPolyhedra();
     // Dualise(polyhedron, p, q);
     cout << "tessellatedPolyhedron.NumVertices: " << tessellatedPolyhedron.NumVertices << endl;
 
     
     
+    vector<int> nullVec = {};
+    int numAdjacentFaces = 6;
+
     if(findMinPath)
     {
         Path minimumPath;
@@ -187,12 +136,12 @@ int main(int argc, char* argv[])
             if(tessI)
             {
                 cout << "BFS algorithm to find the minimum path" << endl;
-                for(unsigned int t = 0; t < num_experiment; t++)
+                for(int t = 0; t < num_experiment; t++)
                 {
                     lengthPath = 0.0;
                     std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
 
-                    minPath = BFS(tessellatedPolyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.lengthEdge, lengthPath);
+                    minPath = BFS(tessellatedPolyhedron.AdjacencyList(nullVec, numAdjacentFaces), id_vertex_1, id_vertex_2, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.lengthEdge, lengthPath);
                     
                     std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
                     time_elapsed_heap += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();                    

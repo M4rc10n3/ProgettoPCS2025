@@ -58,3 +58,63 @@ Cose da fare:
 6. Creare algoritmo di stampa dei file di output;
 7. Crare algoritmo che trova il cammino minimo del grafo.
 8. Il codice del prof. Vicini esporta solo triangoli (pare), quindi possiamo esportare solo quelli su ParaView per provare a visualizzare i poliedri.
+
+
+Documentazione:
+
+Sequence diagram per il processo seguito del codice
+
+@startuml
+'skinparam plain true
+title Code sequence for a <color #76232E>geodetic polyhedron</color>
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+participant Main 
+collections BuildPolyhedra as BP
+collections Tessellations as Ts
+participant TypeITessellation as TI
+participant TypeIITessellation as TII
+participant Dualise
+participant OntoTheUnitSphere as OS
+
+'separator for each major part of code
+== Building the polyhedron ==
+
+Main -\ BP ** : (//p//, //q//)
+Main \-- BP : original **<color #470968>polyhedron</color>**
+'spacing
+||5||
+== Tessellating ==
+
+Main -\ Ts ** : **<color #470968>polyhedron</color> ** and (//b//, //c//)
+'rnote over Ts #FDDE03 : Choosing the \n right tessellation
+
+group#Gold Type I Tessellation [if  b > 0, c = 0 \n         or\n b = 0, c > 0]
+    Ts -\ TI ** : **<color #470968>polyhedron</color> **
+    Ts \-- TI : **<color #FD5201>tessellated</color>** polyhedron
+    end
+
+group#Gold Type I Tessellation [if  b > 0, c > 0 and b = c]
+    Ts -\ TII ** : **<color #470968>polyhedron</color> **
+    Ts \-- TII : **<color #FD5201>tessellated</color>** polyhedron
+    end
+
+Main \-- Ts : **<color #FD5201>tessellated</color>** polyhedron
+||20|| 
+== Dualising and normalising ==
+
+Main -\ Dualise ** : **<color #FD5201>tessellated</color>** polyhedron
+Main \-- Dualise : **<color #9EC3D4>dual</color>** of the tessellated polyhedron
+
+'spacing
+||5||
+Main -\ OS ** : **<color #9EC3D4>dual</color>** of the tessellated polyhedron
+Main \-- OS : **<color #76232E>geodetic polyhedron</color>**
+
+
+
+
+
+
+
+@enduml

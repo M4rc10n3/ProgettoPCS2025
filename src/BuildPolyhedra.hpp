@@ -31,8 +31,6 @@ namespace PolyhedraLibrary{
 
     /* Creating the matrix containing the vertices of each face as its column and the matrix containing the ids 
         of the edges of each face. */
-    void NumberFaces(); // Create two matrices: one with the vertex IDs and one with the edge IDs, 
-                        // which uniquely identify each face of the polyhedron
 
     void Cell0Ds(); // Create Cell0Ds 
 

@@ -69,7 +69,7 @@ target_compile_options(${PROJECT_NAME} PUBLIC -fPIC)
 #       main_test.cpp
 #       ${PlatonicSolids_SOURCES}
 #       ${PlatonicSolids_HEADERS}
-#       ${PlatonicSolids_TEST_SOURCES}
+#       ${PlatonicSolids_TEST_SOURCES}
 #       ${PlatonicSolids_TEST_HEADERS})
 
 # target_link_libraries(${PROJECT_NAME}_TEST ${PlatonicSolids_LINKED_LIBRARIES})
@@ -91,12 +91,23 @@ target_compile_options(${PROJECT_NAME} PUBLIC -fPIC)
 #       main_Marco.cpp
 #       ${PlatonicSolids_SOURCES}
 #       ${PlatonicSolids_HEADERS}
-#       ${MarcoExe_SOURCES}
-#       ${MarcoExe_HEADERS})
+#       ${ManuExe_SOURCES}
+#       ${ManuExe_HEADERS})
 
-# target_link_libraries(MarcoExe ${PlatonicSolids_LINKED_LIBRARIES})
-# target_include_directories(MarcoExe PRIVATE ${PlatonicSolids_INCLUDE} ${MarcoExe_INCLUDE})
-# target_compile_options(MarcoExe PUBLIC -fPIC)
+# target_link_libraries(ManuExe ${PlatonicSolids_LINKED_LIBRARIES})
+# target_include_directories(ManuExe PRIVATE ${PlatonicSolids_INCLUDE} ${ManuExe_INCLUDE})
+# target_compile_options(ManuExe PUBLIC -fPIC)
+
+add_executable(MarcoExe
+      main_Marco.cpp
+      ${PlatonicSolids_SOURCES}
+      ${PlatonicSolids_HEADERS}
+      ${MarcoExe_SOURCES}
+      ${MarcoExe_HEADERS})
+
+target_link_libraries(MarcoExe ${PlatonicSolids_LINKED_LIBRARIES})
+target_include_directories(MarcoExe PRIVATE ${PlatonicSolids_INCLUDE} ${MarcoExe_INCLUDE})
+target_compile_options(MarcoExe PUBLIC -fPIC)
 
 # add_executable(AnnaExe
 #       main_Anna.cpp

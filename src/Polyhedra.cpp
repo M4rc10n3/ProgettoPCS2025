@@ -85,27 +85,158 @@ namespace PolyhedraLibrary
 
     }
 
-    vector<vector<int>> GEOPolyhedron::AdjacencyList()
+    vector<vector<int>> GEOPolyhedron::AdjacencyList(vector<int>& verticesOnFace, int& numAdjacentVertices)
     {
+        /* Let's initialise the structure "adjacencyList" with "NumVertices" memory spaces
+        in order to avoid segmentation faults: we don't know which vertices ids are on each face, 
+        so we don't want to access the element with id 19 if the structure ha only 10 elements */
         vector<vector<int>> adjacencyList(NumVertices);
 
-        for(int vertex = 0; vertex < NumVertices; vertex++)
+        /* Let's initialise the numbers of vertices to check with the total number of vertices 
+        of the polyhedron. If we're interested on just one of its faces, then we can set the size of 
+        "verticesOnFace" as the numbers of vertices to check */
+        int verticesToCheck = NumVertices;
+        if(verticesOnFace.size() > 0)
         {
-            for(int adjVert = 0; adjVert < NumVertices; adjVert++)
+            verticesToCheck = int(verticesOnFace.size());
+        }
+
+        /* Let's start iterating on each vertex of the polyhedron. If we're interested on just one of its 
+        faces, then we'll use the "verticesOnFace" vector: at each iteration we'll access its next element */
+        for(int vertexId = 0; vertexId < verticesToCheck; vertexId++)
+        {
+            int vertex = vertexId;
+            if(verticesOnFace.size() > 0)
             {
-                if (vertex != adjVert) 
-                {                    
+                vertex = verticesOnFace[vertexId];
+            }
+
+            /* Now that we accessed the correct vertex id, we can reserve the maximum memory space its 
+            adjacency list will need, which is tha maximum number of adjacent vertices for a vertex in 
+            the polyhedron, number stored inside "numAdjacentVertices" */
+            adjacencyList[vertex].reserve(numAdjacentVertices);
+
+            /* Let's start iterating on each possible adjacent vertex of the polyhedron. If we're interested 
+            on just one of its faces, then we'll use the "verticesOnFace" vector: at each iteration 
+            we'll access its next element */
+            for(int adjVertId = 0; adjVertId < verticesToCheck; adjVertId++)
+            {
+                int adjVert = adjVertId;
+                if(verticesOnFace.size() > 0)
+                {
+                    adjVert = verticesOnFace[adjVertId];
+                }
+
+                /* We'll go on only if the two vertices are distinct, otherwise we would check 
+                a useless edge, wasting computational power */
+
+                // è anche vero che questa cosa succede solo una votla e le nostre strutture 
+                // non memorizzano lati sbagliati, quindi a una sola iterazione questo if è utile, 
+                // altrimenti è spreco di controllo a mio avviso
+                if(vertex != adjVert) 
+                {        
+                    /* Let's rename the edge we'll check for code readability */            
                     int& edgeIdToCheck = MatrEdgeVertices(vertex, adjVert);
-                    if (edgeIdToCheck >= 0)
+
+                    /* If the edge exists, then "adjVert" is an adjacent vertex of "vertex" 
+                    and we can save it inside its adjacency list */
+                    if(edgeIdToCheck >= 0)
                     {
                         adjacencyList[vertex].push_back(adjVert);
                     }
                 }
             }
         }
+        /* After we've created the adjacency list for each vertex, we can return the structure */
         return adjacencyList;
     }
 
+    void GEOPolyhedron::FindFaces(vector<int>& verticesOnFace, int& newFacesFound, vector<array<int, 3>>& vecVertFaces, int& numAdjacentVertices)
+    {
+        /* Let's find the adjacencyList for each vertex */
+        vector<vector<int>> adjacencyList = AdjacencyList(verticesOnFace, numAdjacentVertices);
+        
+        /* Let's initialise the numbers of vertices to check with the total number of vertices 
+        of the polyhedron. If we're interested on just one of its faces, then we can set the size of 
+        "verticesOnFace" as the numbers of vertices to check */
+        int verticesToCheck = NumVertices;
+        if(verticesOnFace.size() > 0){
+            verticesToCheck = int(verticesOnFace.size());
+        }
+
+        /* Let's start iterating on each vertex of the polyhedron. If we're interested on just one of its 
+        faces, then we'll use the "verticesOnFace" vector: at each iteration we'll access its next element */
+        for(int vertexId = 0; vertexId < verticesToCheck; vertexId++)
+        { 
+            int vertex = vertexId;
+            if(verticesOnFace.size() > 0)
+            {
+                vertex = verticesOnFace[vertexId];
+            }
+
+            /* Let's go on with the algorithm only if we didn't find alla of the faces of the polyhedron yet 
+            or if tthere aren't any adjacent vertices to "vertex". In those cases, we simply go on with 
+            the external "for" cycle until it ends */
+            if(newFacesFound < NumFaces && adjacencyList[vertex].size() > 0) // Proceed only if all the faces have not been numbered yet
+            {
+                /* Let's iterate on the other adjacent vertices of "vertex" */
+                for(int& vertexToCheck1 : adjacencyList[vertex])
+                {
+                    /* Let's again iterate on the other adjacent vertices of "vertex" */
+                    for(int& vertexToCheck2 : adjacencyList[vertex])
+                    {
+                        /* Let's go on with the algorithm only if the 3 vertices are distinct */
+                        if(vertex != vertexToCheck1 && vertex != vertexToCheck2 && vertexToCheck1 != vertexToCheck2)
+                        {                       
+                            /* Let's rename the edge ids between the 3 vertices for code readability */
+                            int& e1 = MatrEdgeVertices(vertex, vertexToCheck1);
+                            int& e2 = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);
+                            int& e3 = MatrEdgeVertices(vertexToCheck2, vertex);
+
+                            /* The first vertex is of course connected to its adjacent vertices, 
+                            so we need to check whether the other two are connected between them. 
+                            If that's the case, then w ego on with the algorithm */
+                            if(e2 >= 0)
+                            {
+                                /* Let's initialise and sort an array containing the vertices of the face 
+                                in order to avoid counting multiple times the same triangles with 
+                                different vertex ordering */
+                                array<int, 3> sortedVertFace = {vertex, vertexToCheck1, vertexToCheck2};
+                                sort(sortedVertFace.begin(), sortedVertFace.end()); 
+                                
+                                /* Let's go on with the algorithm only if the sorted triangle isn't in the vector yet */
+                                if(find(vecVertFaces.begin(), vecVertFaces.end(), sortedVertFace) == vecVertFaces.end())
+                                {
+                                    /* Let's add the face to our list of unique faces */
+                                    vecVertFaces.push_back(sortedVertFace);
+                                    
+                                    /* Just for aesthetic reasons, we decided to sort the edges of the face. */
+                                    // Ovviamente possiamo anche togliere questa riga per risparmiare 
+                                    // complessità computazionale
+                                    array<int, 3> sortedEdgeFace = {e1, e2, e3};
+                                    sort(sortedEdgeFace.begin(), sortedEdgeFace.end());
+                                          
+                                    /* Let's save the new face in our data structures */
+                                    ListVertFaces(0, newFacesFound) = sortedVertFace[0];
+                                    ListVertFaces(1, newFacesFound) = sortedVertFace[1];
+                                    ListVertFaces(2, newFacesFound) = sortedVertFace[2];
+
+                                    ListEdgeFaces(0, newFacesFound) = sortedEdgeFace[0];
+                                    ListEdgeFaces(1, newFacesFound) = sortedEdgeFace[1];
+                                    ListEdgeFaces(2, newFacesFound) = sortedEdgeFace[2];
+                                    
+                                    /* Let's increase the number of faces found now that we've found one */
+                                    newFacesFound++; 
+                                }  
+                            } 
+                        }                     
+                    }
+                }   
+            }
+        }
+    }
+
+    // Per il momento inutile
     void GEOPolyhedron::FindFacesWithVertex()
     {
         /* First, we need to understand how many vertices the polyhedron not tessellated has.

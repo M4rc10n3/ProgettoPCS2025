@@ -76,7 +76,7 @@ namespace PolyhedraLibrary{
                     break;
                 case 5:
                     cout << "Your Polyhedron is a Icosahedron with: \n";
-                    Length_edge = 4 / sqrt(10 + 2*sqrt(5));
+                    Length_edge = 4 / sqrt(10 + 2 * sqrt(5));
                     polyhedron.lengthEdge = Length_edge; 
                     polyhedron.CoordVertices << 0, 0.894427190999916, 0.276393202250021, 0.723606797749979, -0.276393202250021, 0, -0.894427190999916, -0.276393202250021, -0.723606797749979, 0.276393202250021, 0.723606797749979, -0.723606797749979,
                                                 0, 0, 0.85065080835204, 0.525731112119134, 0.85065080835204, 0, 0, -0.85065080835204, -0.525731112119134, -0.85065080835204, -0.525731112119133, 0.525731112119134,
@@ -146,7 +146,7 @@ namespace PolyhedraLibrary{
                 {
                     /* We'll use a function we have implemented in "Utils.cpp" in order to find the 
                     distance squared between the two vertices: */
-                    double distanceSquared = distanceSquaredBetween(polyhedron, firstVertexIndex, secondVertexIndex);
+                    double distanceSquared = DistanceSquaredBetween(polyhedron, firstVertexIndex, secondVertexIndex);
 
                     // cout << "distance edge:" << abs(distanceSquared - lengthEdgeSquared) << endl;
                     /* When the two vertices have the correct distance squared between them we save them as an 
@@ -173,87 +173,38 @@ namespace PolyhedraLibrary{
         // cout << "MatrEdgeVertices: " << endl << MatrEdgeVertices << endl;
     }
 
-    void BuildPolyhedra::NumberFaces()
-    {
-        int faceIndex = 0;
-
-        vector<array<int, 3>> vecVertFaces; // This vector stores unique triangles (faces) as sorted arrays of 3 vertices
-        vecVertFaces.reserve(NumFaces);
-
-        vector<vector<int>> adjacencyList = polyhedron.AdjacencyList();
-        
-        for(int vertex = 0; vertex < NumVertices; vertex++)
-        { 
-            if (faceIndex < NumFaces) // Proceed only if all the faces have not been numbered yet
-            {
-                for(auto& vertexToCheck1 : adjacencyList[vertex])
-                {
-                    // cout << "vertexToCheck1: " << vertexToCheck1 << endl;
-                    for(int& vertexToCheck2 : adjacencyList[vertex])
-                    {
-                        // cout << "vertexToCheck2: " << vertexToCheck2 << endl;
-                        
-                        // Check all three vertices are distinct
-                        if(vertex != vertexToCheck1 && vertex != vertexToCheck2 && vertexToCheck1 != vertexToCheck2)
-                        {                    
-                            int& edgeIdToAdd = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);     
-                            if (edgeIdToAdd >= 0) // Proceed only if there is an edge that connects the two vertices
-                            {
-                                array<int, 3> sortedVertFace = {vertex, vertexToCheck1, vertexToCheck2};
-                                sort(sortedVertFace.begin(), sortedVertFace.end()); // Sorting avoids counting multiple times the same triangles with different vertex ordering
-
-                                // Check if the sorted triangle is already in the vector
-
-                                if(find(vecVertFaces.begin(), vecVertFaces.end(), sortedVertFace) == vecVertFaces.end())
-                                {
-                                    vecVertFaces.push_back(sortedVertFace);
-
-                                    // Find the edge IDs between the three vertices
-                                    int& e1 = MatrEdgeVertices(vertex, vertexToCheck1);
-                                    int& e2 = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);
-                                    int& e3 = MatrEdgeVertices(vertexToCheck2, vertex);
-
-                                    array<int, 3> edgesInFace = {e1, e2, e3}; 
-                                    array<int, 3> verticesInFace = {vertex, vertexToCheck1, vertexToCheck2};
-
-                                    // cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
-
-                                    // Check face orientation consistency
-                                    if (ExtremaEdges(1, e1) == ExtremaEdges(0, e2)) // e1.end == e2.origin
-                                    {                                            
-                                        ListVertFaces(0, faceIndex) = verticesInFace[0];
-                                        ListVertFaces(1, faceIndex) = verticesInFace[1];
-                                        ListVertFaces(2, faceIndex) = verticesInFace[2];
-
-                                        ListEdgeFaces(0, faceIndex) = edgesInFace[0];
-                                        ListEdgeFaces(1, faceIndex) = edgesInFace[1];
-                                        ListEdgeFaces(2, faceIndex) = edgesInFace[2];
-                                        
-                                        faceIndex++; // Passing to the next face only if we saved a face during this iteration
-                                    }
-                                }  
-                            } 
-                        }  
-                        else
-                            continue;                         
-                    }
-                }   
-            }
-            else
-                break; 
-        } 
-        // Stampa finale per controllo
-        // cout << "ListVertFaces: " << endl << ListVertFaces << endl;
-        // cout << "ListEdgeFaces: " << endl << ListEdgeFaces << endl;
-    }
+    // void BuildPolyhedra::NumberFaces(vector<int>& verticesOnFace)
+    // Diventato il metodo FindFaces dell'oggetto polyhedron
+    // }
 
     void BuildPolyhedra::FillStructPolyhedra()
     {        
         NumberEdges();
 
-        NumberFaces();
 
-        polyhedron.FindAdjacentFaces();
+        /* We need to initialise the arguments we'll pass to the function that will find the faces 
+        of the polyhedron */
+        
+        /* There aren't any vertices on the face except for the of the original polyhedron, 
+        so the function works with a null vector as first argument */
+        vector<int> verticesOnFace = {};
+        
+        /* The function needs to know if we've already found any faces before, but we didn't, 
+        so we pass a variable equal to 0 to the function */
+        int newFacesFound = 0;
+
+        /* The function needs a structure where the unique faces of the polyhedron are stored, 
+        so we initialise it as empty*/
+        vector<array<int, 3>> vecVertFaces;
+        vecVertFaces.reserve(NumFaces);
+
+        /* The function needs to know how many adjacent vertices there are maximum for each vertex 
+        of the polyhedron, so we pass this value to it */
+        int numAdjacentVertices = 3;
+
+        /* Now we can call the function with all the arguments needed */
+        polyhedron.FindFaces(verticesOnFace, newFacesFound, vecVertFaces, numAdjacentVertices);
+
     }
 
     void BuildPolyhedra::Cell0Ds()

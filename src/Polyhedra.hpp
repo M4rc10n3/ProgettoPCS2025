@@ -43,19 +43,38 @@ namespace PolyhedraLibrary
         /* "FindAdjacentFaces" saves inside "ListAdjacentFaces" the adjacent faces to each face. 
         Each column contains the ids of the adjacent faces for the face that has the column index as id */
         void FindAdjacentFaces(); // Create one matrix as explained above
+
+        /* Creating the matrix containing the vertices of each face as its column, which is "ListVertFaces"
+        and the matrix containing the ids of the edges of each face, which is "ListEdgeFaces" 
+        Inputs list:
+        - verticesOnFace: vector containing the ids of the vertices for the face considered;
+        - newFacesFound: integer representing how many faces of the polyhedron were already found;
+        - vecVertFaces: structure containing the unique faces already found as an array made up by their 3 ids;
+        - numAdjacentVertices: integer representing how many vertices are adjacent to each 
+        vertex in the polyhedron */
+        void FindFaces(vector<int>& verticesOnFace, 
+                       int& newFacesFound, 
+                       vector<array<int, 3>>& vecVertFaces, 
+                       int& numAdjacentVertices);
         
-        /* Finds the adjacency list of the vertices of the polyhedron */
-        vector<vector<int>> AdjacencyList();
+        /* "AdjacencyList" finds for each vertex the adjacency list composed by the vertices of the same 
+        face of the polyhedron
+        Inputs list:  
+        - verticesOnFace: vector containing the ids of the vertices for the face considered;
+        - numAdjacentVertices: integer representing how many vertices are adjacent to each 
+        vertex in the polyhedron */
+        std::vector<vector<int>> AdjacencyList(vector<int>& verticesOnFace, 
+                                               int& numAdjacentVertices);
 
         /* "FindFacesWithVertex" saves inside "ListFacesWithVertex" at each column the faces containing 
         the vertex whose index is that of the column */
         void FindFacesWithVertex();
 
-        /* "ExportPolyhedra" exports the structures of the polyhedron using the code of Mr. Vicini 
+        /* "ExportPolyhedron" exports the structures of the polyhedron using the code of Mr. Vicini 
         in order to create a file readable by ParaView */
         void ExportPolyhedron();
 
-        /* "ExportPolyhedra" exports the structures of the polyhedron (except for the faces) using 
+        /* "ExportPolyhedronWithoutFaces" exports the structures of the polyhedron (except for the faces) using 
         the code of Mr. Vicini in order to create a file readable by ParaView */
         void ExportPolyhedronWithoutFaces();
     };
