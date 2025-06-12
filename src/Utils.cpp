@@ -146,36 +146,26 @@ vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const in
     return minPath; // return the list of vertices in the minimum path                  
 }
 
-void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVertices, const int& numVert, const int& numEdge, const double& lengthPath, vector<int>& vertShortPath, vector<int>& edgeShortPath)
+void MinimumPath(const vector<int>& minPath, 
+                 const Eigen::MatrixXi& MatrEdgeVertices, 
+                 const int& numVert, 
+                 const int& numEdge, 
+                 const double& lengthPath, 
+                 vector<double>& verticesShortPath, 
+                 vector<double>& edgesShortPath)
 {
-    vertShortPath.resize(numVert);
-    edgeShortPath.resize(numEdge);
-    for(int i = 0; i < numVert; i++) // initialize vertShortPath vectors
-    {
-        vertShortPath[i] = 0;
-    }
-    for(int i = 0; i < numEdge; i++) // initialize edgeShortPath vector
-    {
-        edgeShortPath[i] = 0;
+    verticesShortPath.resize(numVert, 0.0);
+    edgesShortPath.resize(numEdge, 0.0);
+
+    for(auto vertexId : minPath){
+        verticesShortPath[vertexId] = 1.0;
     }
 
-    // set the property ShortPath = 1 to the vertices and the edges that compose the minimum path
-    for(int i : minPath)
-    {
-        vertShortPath[i] = 1; 
-    }
-    cout << endl;
-
-    for(unsigned int i = 1; i < minPath.size(); i++)
-    {
-        const int& idEdge = MatrEdgeVertices(minPath[i-1], minPath[i]);
-        
-        // Credo che questo if non serve dato che l'algoritmo deve aver per forza 
-        // trovato un cammino i cui lati esistono, o sbaglio?
-        if(idEdge > -1)
-        {
-            edgeShortPath[idEdge] = 1;
-        }
+    for(unsigned int vertexId = 0; vertexId < minPath.size() - 1; vertexId++){
+        const int& vertex1 = minPath[vertexId];
+        const int& vertex2 = minPath[vertexId + 1];
+        const int& edgeId = MatrEdgeVertices(vertex1, vertex2);
+        edgesShortPath[edgeId] = 1.0;
     }
     
     // Output the minimum path (through the ids of the vertices that compose it) and its length
@@ -402,7 +392,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     const double newLengthEdge = oldLengthEdge / numberDivisions;
     tessellatedPolyhedron.lengthEdge = newLengthEdge;
 
-    const int numberVerticesOnFace = TriangularNumber(numberDivisions);
+    const int numberVerticesOnFace = ((numberDivisions + 1) * (numberDivisions + 2) / 2);
 
     /* Let's initialize a vector that will save all of the edges that we have already divided.
     It will v1 with just "-1" as its elements. Then, we'll also need to keep track of its 
@@ -1028,11 +1018,6 @@ double DistanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idP
                       differenceZCoord * differenceZCoord;
 
     return distanceSquared;
-}
-
-int TriangularNumber(int& b) // Funzione inutile al momento, ma magari in futuro potrebbe servire
-{
-    return ((b + 1) * (b + 2) / 2);
 }
 
 Eigen::VectorXi SortVertices(Eigen::Vector3d& Listvertices)

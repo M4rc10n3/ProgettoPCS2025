@@ -71,8 +71,33 @@ int main(int argc, char* argv[])
         c << ")" << endl; 
     }
 
-    BuildPolyhedra Constructor(p, q); // create the structure of the Polyhedron
-    Constructor.DataPolyhedra();
+    // Il nostro codice dovrebbe diventare così: 
+
+    // GEOPolyhedron polyhedron;
+    // if(p == 3)
+    // {
+    //     /* Following the directions of the project, we need to export the geodetic polyhedron 
+    //     for the polyhedra with p = 3, so we start by creating the polyhedron that we'll tessellate 
+    //     and then project on the unit sphere. The tetrahedron will follow this case: we'll 
+    //     export its geodetic polyhedron, which is the same as its generalized Goldberg polyhedron */
+
+    //     BuildPolyhedra Constructor(p, q); 
+    //     Constructor.DataPolyhedra(); // create the structure of the Polyhedron
+    //     polyhedron = Constructor.GetPolyhedron();
+    // }
+    // else if(q == 3)
+    // {
+    //     /* Following the directions of the project, we need to export the generalized Goldberg polyhedron 
+    //     for the polyhedra with q = 3, so we decide to create the geodetic polyhedron 
+    //     starting from the dual polyhedron of the polyhedron with q = 3 */
+        
+    //     BuildPolyhedra Constructor(q, p);
+    //     Constructor.DataPolyhedra(); // create the structure of the Polyhedron
+    //     polyhedron = Constructor.GetPolyhedron();
+    // }
+
+    BuildPolyhedra Constructor(p, q); 
+    Constructor.DataPolyhedra(); // create the structure of the Polyhedron
     GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
 
     bool tessI = false;
@@ -87,38 +112,30 @@ int main(int argc, char* argv[])
 		cout << "Tessellation type I" << endl;
 		int n = max(b,c);
 		tessellatedPolyhedron = TypeITessellation(polyhedron, n);
-        
-        // Nel caso in cui volessimo far visualizzare il poliedro tassellato da cui la dualizzazione 
-        // parte, lasciare la prossima riga, altrimenti è inutile
-        // tessellatedPolyhedron.ExportPolyhedron();
-
-        GEOPolyhedron dualPolyhedron = Dualise(tessellatedPolyhedron);
-        OntoTheUnitSphere(dualPolyhedron);
-        dualPolyhedron.ExportPolyhedronWithoutFaces();
+        OntoTheUnitSphere(tessellatedPolyhedron);
 	} 
     else if(b == c && b != 0)
     {
         tessII = true;
 		cout << "Tessellation type II" << endl;
 		// tessellatedPolyhedron = TypeIITessellation(polyhedron, b);
+        // OntoTheUnitSphere(tessellatedPolyhedron);
     } 
     else 
     {
 		cout << "Invalid values for b and c" << endl;
     }
-                           
-    // Constructor.CreateCells();
-    // Dualise(polyhedron, p, q);
+
     cout << "tessellatedPolyhedron.NumVertices: " << tessellatedPolyhedron.NumVertices << endl;
 
     
     
     vector<int> nullVec = {};
     int numAdjacentFaces = 6;
+    Path minimumPath;
 
     if(findMinPath)
     {
-        Path minimumPath;
         vector<int> minPath;
         double lengthPath;
         int num_experiment = 100;
@@ -142,7 +159,7 @@ int main(int argc, char* argv[])
                     std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
 
                     minPath = BFS(tessellatedPolyhedron.AdjacencyList(nullVec, numAdjacentFaces), id_vertex_1, id_vertex_2, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.lengthEdge, lengthPath);
-                    
+
                     std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
                     time_elapsed_heap += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();                    
                 }
@@ -171,6 +188,10 @@ int main(int argc, char* argv[])
             cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
         }
     }
+
+    tessellatedPolyhedron.ExportPolyhedron(minimumPath);
+
+    // Constructor.CreateCells();
 
     return 0;
 }

@@ -11,6 +11,12 @@ using namespace std;
 
 namespace PolyhedraLibrary
 {
+    struct Path 
+    {
+        std::vector<double> VerticesShortPath = {}; // Binary vector for the vertices used in the minimum path
+        std::vector<double> EdgesShortPath = {}; // Binary vector for the edges used in the minimum path
+    };
+
     struct GEOPolyhedron
     {
         int p, q;
@@ -72,17 +78,16 @@ namespace PolyhedraLibrary
 
         /* "ExportPolyhedron" exports the structures of the polyhedron using the code of Mr. Vicini 
         in order to create a file readable by ParaView */
-        void ExportPolyhedron();
+        // void ExportPolyhedron();
 
         /* "ExportPolyhedronWithoutFaces" exports the structures of the polyhedron (except for the faces) using 
         the code of Mr. Vicini in order to create a file readable by ParaView */
         void ExportPolyhedronWithoutFaces();
-    };
 
-    struct Path 
-    {
-        std::vector<int> VerticesShortPath; // Binary vector for the vertices used in the minimum path
-        std::vector<int> EdgesShortPath; // Binary vector for the edges used in the minimum path
+        /* "ExportPolyhedronWithoutFaces" exports the structures of the polyhedron colouring them if they belong 
+        to the minimum path whose extrema were given as input to the code using the code of Mr. Vicini 
+        sin order to create a file readable by ParaView */
+        void ExportPolyhedron(Path& minimumPath);
     };
 
 }

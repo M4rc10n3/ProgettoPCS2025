@@ -1,4 +1,5 @@
 # include <iostream>
+# include <iomanip>
 # include <fstream>
 # include <vector>
 # include <set>
@@ -59,7 +60,7 @@ namespace PolyhedraLibrary{
                 switch (q)
                 {
                 case 3:
-                    cout << "Your Polyhedron is a Tetrahedron with:\n";
+                    // cout << "Your Polyhedron is a Tetrahedron with:\n";
                     Length_edge = 2 * sqrt(6) / 3;
                     polyhedron.lengthEdge = Length_edge;
                     polyhedron.CoordVertices << 0, -0.942809041582063, 0.471404520791031, 0.471404520791031,
@@ -67,7 +68,7 @@ namespace PolyhedraLibrary{
                                                 1, -0.333333333333333, -0.333333333333333, -0.333333333333333;
                     break;
                 case 4:
-                    cout << "Your Polyhedron is a Octahedron with:\n";
+                    // cout << "Your Polyhedron is a Octahedron with:\n";
                     Length_edge = sqrt(2);
                     polyhedron.lengthEdge = Length_edge;
                     polyhedron.CoordVertices << 0, 0, 0, 0, 1, -1,
@@ -75,7 +76,7 @@ namespace PolyhedraLibrary{
                                                 1, -1, 0, 0, 0, 0;
                     break;
                 case 5:
-                    cout << "Your Polyhedron is a Icosahedron with: \n";
+                    // cout << "Your Polyhedron is a Icosahedron with: \n";
                     Length_edge = 4 / sqrt(10 + 2 * sqrt(5));
                     polyhedron.lengthEdge = Length_edge; 
                     polyhedron.CoordVertices << 0, 0.894427190999916, 0.276393202250021, 0.723606797749979, -0.276393202250021, 0, -0.894427190999916, -0.276393202250021, -0.723606797749979, 0.276393202250021, 0.723606797749979, -0.723606797749979,
@@ -87,7 +88,7 @@ namespace PolyhedraLibrary{
             case 4:
                 if (q == 3)
                 {
-                    cout << "Your Polyhedron is a Cube with: \n";
+                    // cout << "Your Polyhedron is a Cube with: \n";
                     Length_edge = 2 / sqrt(3);
                     polyhedron.lengthEdge = Length_edge;
                 }
@@ -95,15 +96,15 @@ namespace PolyhedraLibrary{
             case 5:
                 if (q == 3)
                 {
-                    cout << "Your Polyhedron is a Dodecahedron with: \n";
+                    // cout << "Your Polyhedron is a Dodecahedron with: \n";
                     Length_edge = 4 / (sqrt(3) * (1 + sqrt(5)));
                     polyhedron.lengthEdge = Length_edge;
                 }
                 break;
             }
-            cout << NumVertices << " Vertices\n" <<
-                    NumEdges << " Edges\n" <<
-                    NumFaces << " Faces\n" << endl;
+            // cout << NumVertices << " Vertices\n" <<
+            //         NumEdges << " Edges\n" <<
+            //         NumFaces << " Faces\n" << endl;
             FillStructPolyhedra();
         }
         else
@@ -221,6 +222,7 @@ namespace PolyhedraLibrary{
         for (int i = 0; i < NumVertices; i++)
         {
             file << i << "," << 
+            scientific << setprecision(16) <<
             CoordVertices(0, i) << "," << 
             CoordVertices(1, i) << "," << 
             CoordVertices(2, i) << "\n";
