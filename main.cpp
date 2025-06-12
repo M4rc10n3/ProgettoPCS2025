@@ -182,7 +182,9 @@ int main(int argc, char* argv[])
                 // time_elapsed_heap /= num_experiment;
                 // cout << "Average time to run the algorithm: " << time_elapsed_heap << " µs" << endl;            
             }
-            MinimumPath(minPath, tessellatedPolyhedron.MatrEdgeVertices, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.NumEdges, lengthPath, minimumPath.VerticesShortPath, minimumPath.EdgesShortPath);
+            MinimumPath(minPath, tessellatedPolyhedron.MatrEdgeVertices, tessellatedPolyhedron.NumVertices, 
+                        tessellatedPolyhedron.NumEdges, lengthPath, minimumPath.VerticesShortPath, 
+                        minimumPath.EdgesShortPath);
     
         } else {
             cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
