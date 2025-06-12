@@ -287,66 +287,6 @@ namespace PolyhedraLibrary
         }
     }
 
-    // void GEOPolyhedron::ExportPolyhedron()
-    // {
-    //     /* In order to export the polyhedra, we need to create the markers for the vertices, 
-    //     the edges and the faces. We decided them arbitrarily in order to make them pop to the eye.
-    //     The vertices have all marker 0 because they are not difficult to separate from one another */
-    //     Eigen::VectorXi VerticesMarkers(NumVertices);
-    //     for(int i = 0; i < NumVertices; i++)
-    //     {
-    //         VerticesMarkers[i] = 0;
-    //     }
-        
-    //     Eigen::VectorXi EdgesMarkers(NumEdges);
-    //     for(int i = 0; i < NumEdges; i++)
-    //     {
-    //         EdgesMarkers[i] = NumEdges - i;
-    //     }
-
-    //     Eigen::VectorXi FacesMarkers(NumFaces);
-    //     for(int i = 0; i < NumFaces; i++)
-    //     {
-    //         FacesMarkers[i] = i;
-    //     }
-
-    //     /* Creating a vector of vectors starting from ListVertFaces in order 
-    //     to use Mr. Vicini's code (UCDUtilities.hpp) */
-    //     vector<vector<unsigned int>> FacesVertices;
-    //     FacesVertices.resize(NumFaces);
-
-    //     for(int i = 0; i < NumFaces; i++)
-    //     {
-    //         FacesVertices[i].resize(3);
-            
-    //         /* Saving the vertices of the face with index "i" inside the vector with index "i" */
-    //         FacesVertices[i][0] = ListVertFaces(0, i);
-    //         FacesVertices[i][1] = ListVertFaces(1, i);
-    //         FacesVertices[i][2] = ListVertFaces(2, i);
-    //     }
-
-    //     /* Lastly, we can export all of the structures passing the arguments needed to the functions */
-    //     Gedim::UCDUtilities utilities;
-    //     utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
-    //                            CoordVertices,
-    //                            {},
-    //                            VerticesMarkers);
-
-    //     utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
-    //                              CoordVertices,
-    //                              ExtremaEdges,
-    //                              {},
-    //                              {},
-    //                              EdgesMarkers);
-
-    //     utilities.ExportPolygons("../PolygonalData/Cell2Ds.inp",
-    //                               CoordVertices,
-    //                               FacesVertices,
-    //                               {},
-    //                               {},
-    //                               FacesMarkers);
-    // }
-
     void GEOPolyhedron::ExportPolyhedronWithoutFaces()
     {
         /* In order to export the polyhedra, we need to create the markers for the vertices, 
