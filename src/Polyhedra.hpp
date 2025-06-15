@@ -28,7 +28,7 @@ namespace PolyhedraLibrary
 
         int NumEdges = 0; // Number of Edges
         std::vector<int> IdEdges = {}; // Id of all vertices
-        Eigen::MatrixXi ExtremaEdges = {}; // Extrema of each edge, NumEdges x 2 matrix
+        Eigen::MatrixXi ExtremaEdges = {}; // Extrema of each edge, 2 x NumEdges matrix
         Eigen::MatrixXi MatrEdgeVertices = {}; // Edge connecting each pair of extrema, NumVertices x NumVertices matrix
         
         int NumFaces = 0; // Number of faces 

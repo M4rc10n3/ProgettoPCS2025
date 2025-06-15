@@ -118,7 +118,8 @@ int main(int argc, char* argv[])
     {
         tessII = true;
 		cout << "Tessellation type II" << endl;
-		// tessellatedPolyhedron = TypeIITessellation(polyhedron, b);
+        GEOPolyhedron type_I_tesseletion = TypeITessellation(polyhedron, b);
+		tessellatedPolyhedron = TypeIITessellation(polyhedron, type_I_tesseletion, b);
         // OntoTheUnitSphere(tessellatedPolyhedron);
     } 
     else 
