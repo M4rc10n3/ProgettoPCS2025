@@ -975,7 +975,6 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
         vertexcounter++;
     }
 
-
     for (int i = 0; i < polyhedron.NumFaces; i++)
     {
         // First we divide points between edgepoints and innerpoints

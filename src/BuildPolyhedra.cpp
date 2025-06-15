@@ -12,7 +12,7 @@
 using namespace std;
 
 namespace PolyhedraLibrary{
-    
+
     BuildPolyhedra::BuildPolyhedra(const int& Schlafli_p, const int& Schlafli_q)
     {
         p = Schlafli_p;
