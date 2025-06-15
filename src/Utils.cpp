@@ -138,7 +138,7 @@ vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const in
     reverse(minPath.begin(), minPath.end());
     
     // Calculate the minimum path's length
-    for(int i = 1; i < minPath.size(); i++)
+    for(unsigned int i = 1; i < minPath.size(); i++)
     {
         lengthPath += matrWeights(minPath[i-1], minPath[i]);
     }                        
@@ -146,33 +146,26 @@ vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const in
     return minPath; // return the list of vertices in the minimum path                  
 }
 
-void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVertices, const int& numVert, const int& numEdge, const double& lengthPath, vector<int>& vertShortPath, vector<int>& edgeShortPath)
+void MinimumPath(const vector<int>& minPath, 
+                 const Eigen::MatrixXi& MatrEdgeVertices, 
+                 const int& numVert, 
+                 const int& numEdge, 
+                 const double& lengthPath, 
+                 vector<double>& verticesShortPath, 
+                 vector<double>& edgesShortPath)
 {
-    vertShortPath.resize(numVert);
-    edgeShortPath.resize(numEdge);
-    for(int i = 0; i < numVert; i++) // initialize vertShortPath vectors
-    {
-        vertShortPath[i] = 0;
-    }
-    for(int i = 0; i < numEdge; i++) // initialize edgeShortPath vector
-    {
-        edgeShortPath[i] = 0;
+    verticesShortPath.resize(numVert, 0.0);
+    edgesShortPath.resize(numEdge, 0.0);
+
+    for(auto vertexId : minPath){
+        verticesShortPath[vertexId] = 1.0;
     }
 
-    // set the property ShortPath = 1 to the vertices and the edges that compose the minimum path
-    for(int i : minPath)
-    {
-        vertShortPath[i] = 1; 
-    }
-    cout << endl;
-
-    for(unsigned int i = 1; i < minPath.size(); i++)
-    {
-        const int& idEdge = MatrEdgeVertices(minPath[i-1], minPath[i]);
-        if(idEdge > -1)
-        {
-            edgeShortPath[idEdge] = 1;
-        }
+    for(unsigned int vertexId = 0; vertexId < minPath.size() - 1; vertexId++){
+        const int& vertex1 = minPath[vertexId];
+        const int& vertex2 = minPath[vertexId + 1];
+        const int& edgeId = MatrEdgeVertices(vertex1, vertex2);
+        edgesShortPath[edgeId] = 1.0;
     }
     
     // Output the minimum path (through the ids of the vertices that compose it) and its length
@@ -184,7 +177,7 @@ void MinimumPath(const vector<int>& minPath, const Eigen::MatrixXi& MatrEdgeVert
     cout << "The minimum path length is " << lengthPath << endl;
 }
 
-void ontoTheUnitSphere(GEOPolyhedron& polyhedron)
+void OntoTheUnitSphere(GEOPolyhedron& polyhedron)
 {
     /* Let's rename the data structures we'll use in this function for code readability */
     Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
@@ -399,7 +392,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     const double newLengthEdge = oldLengthEdge / numberDivisions;
     tessellatedPolyhedron.lengthEdge = newLengthEdge;
 
-    const int numberVerticesOnFace = triangularNumber(numberDivisions);
+    const int numberVerticesOnFace = ((numberDivisions + 1) * (numberDivisions + 2) / 2);
 
     /* Let's initialize a vector that will save all of the edges that we have already divided.
     It will v1 with just "-1" as its elements. Then, we'll also need to keep track of its 
@@ -416,14 +409,19 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     This variable will be used to access the right column of the matrix "newExtremaEdges" and as an 
     element saved into the matrix "newMatrEdgeVertices". */
     int edgeIndexFound = 0;
-
+    
     int newFacesFound = 0;
 
-    vector<vector<int>> verticesOnAllFaces;
-    verticesOnAllFaces.reserve(oldNumFaces);
-    for(int i = 0; i < oldNumFaces; i++){
-        verticesOnAllFaces[i].reserve(numberVerticesOnFace);
-    }
+    /* Let's initialise the vector which stores unique triangles (the faces of the polyhedron) 
+    as sorted arrays of 3 vertices. It will store the unique new faces found on the old polyhedron 
+    face with index "faceIndex" */
+    vector<array<int, 3>> vecVertFaces;
+    vecVertFaces.reserve(numberNewFaces / oldNumFaces);
+
+    /* Creating the adjacency list for the vertices. We don't care which vertex has the maximum 
+    index on the face, so we need to initialise it using more memory than what I need in order to avoid
+    segmentation faults */
+    // vector<vector<int>> adjacencyList(numberNewVertices);
 
     /* We need to tesselate each face of the polyhedron given as input, so we need a "for" 
     cycle on the old polyhedron faces: */
@@ -613,7 +611,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     
                         /* "distance" is the variable contanining the difference between the distance squared 
                         between the vertices and the length of the segment we're looking for */
-                        double distance = abs(distanceSquaredBetween(tessellatedPolyhedron, idVertexWeStartFrom, idOpposingVertex) - 
+                        double distance = abs(DistanceSquaredBetween(tessellatedPolyhedron, idVertexWeStartFrom, idOpposingVertex) - 
                             newLengthEdge * (numberDivisions - 1 - time) * newLengthEdge * (numberDivisions - 1 - time));
     
                         /* When we found a vertex with a "distance" that's less than that we've already saved, 
@@ -661,7 +659,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                     
                     /* "distance" is the variable contanining the difference between the distance squared 
                     between the vertices and the length of the segment we're looking for */
-                    double distance = abs(distanceSquaredBetween(tessellatedPolyhedron, idVertexWeStartFrom, idOpposingVertex) - 
+                    double distance = abs(DistanceSquaredBetween(tessellatedPolyhedron, idVertexWeStartFrom, idOpposingVertex) - 
                         newLengthEdge * (numberDivisions - 1 - time) * newLengthEdge * (numberDivisions - 1 - time));
 
                     /* When we found a vertex with a "distance" that's less than that we've already saved, 
@@ -750,7 +748,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
 
                     /* We'll use a function we have implemented in order to find the 
                     distance squared between the two vertices: */
-                    double distanceSquared = distanceSquaredBetween(tessellatedPolyhedron, firstVertexIndex, secondVertexIndex);
+                    double distanceSquared = DistanceSquaredBetween(tessellatedPolyhedron, firstVertexIndex, secondVertexIndex);
 
                     /* When the two vertices have the correct distance squared between them we could save them 
                     as an edge of the polyhedron if they have not been saved yet (the tolerance was set arbitrarily 
@@ -779,137 +777,21 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                 }
             }
         }
-        verticesOnAllFaces.push_back(verticesOnFace);
-
-        /* Mettere qui dentro il prossimo algoritmo è complesso e fa creare strutture in più su 
-        ListVertFaces, ListeEdgeFaces e ExtremaEdges, magari poi ci proverò. Infatti, l'algoritmo 
-        ha bisogno della matrice MatrEdgeVertices aggiornata, eppure aggiornando le altre 3 strutture 
-        tutto l'algoritmo smette di funzionare, perché accediamo a strutture ormai modificate */
-    }
-
-    // MatrEdgeVertices.makeCompressed(); // in tal caso creandola bisogna incrementare tutti gli indici per averla sparsa
-
-
-    /* Now we'll search for the faces of the polyhedron using the same algorithm used
-    for the original polyhedron but using it on each face in order not to find inner 
-    faces of the polyhedron */
-    for(int faceIndex = 0; faceIndex < oldNumFaces; faceIndex++)
-    {   
-        /* Let's initialise the vector which stores unique triangles (the faces of the polyhedron) 
-        as sorted arrays of 3 vertices. It will store the unique new faces found on the old polyhedron 
-        face with index "faceIndex" */
-        vector<array<int, 3>> vecVertFaces;
-        vecVertFaces.reserve(numberNewFaces / oldNumFaces);
-
-        /* Creating the adjacency list for the vertices. We don't care which vertex has the maximum 
-        index on the face, so we need to initialise it using more memory than what I need in order to avoid
-        segmentation faults */
-        vector<vector<int>> adjacencyList(numberNewVertices);
-        /* We need to find the adjacent vertices for each vertex on the face of the old polyhedron */
-        for(int vertexId = 0; vertexId < numberVerticesOnFace; vertexId++)
-        {
-            /* Let's access the right "adjVert" for our data structures index using the 
-            structure "verticesOnAllFaces" */
-            int& vertex = verticesOnAllFaces[faceIndex][vertexId];
-            adjacencyList[vertex].reserve(6);
-    
-            for(int adjVertId = 0; adjVertId < numberVerticesOnFace; adjVertId++)
-            {
-                /* Let's access the right "adjVert" for our data structures index using the 
-                structure "verticesOnAllFaces" */
-                int& adjVert = verticesOnAllFaces[faceIndex][adjVertId];
-                /* We don't care about the iteration during which "vertex" and "adjVert" are equal, 
-                so we skip it */
-                if(vertex != adjVert) 
-                {                    
-                    /* Let's access the right "edgeIdToCheck" in our data structures */
-                    int& edgeIdToCheck = newMatrEdgeVertices(vertex, adjVert);
-                    if(edgeIdToCheck >= 0)
-                    {
-                        /* If the edge exists, then the vertex with index "adjVert" is one of the 
-                        adjacent vertices for the vertex with index "vertex" and we can add it to its 
-                        vector inside "adjacencyList" */
-                        adjacencyList[vertex].push_back(adjVert);
-                        
-                    }
-                }
-            }
-        }
         
         /* Now we can look for the new faces of the polyhedron v1ing from each of the vertices 
         on the face of the old polyhedron */
-        for(int vertexId = 0; vertexId < numberVerticesOnFace; vertexId++)
-        {
-            /* Let's access the right "vertex" for our data structures index using the 
-            structure "verticesOnAllFaces" */
-            int& vertex = verticesOnAllFaces[faceIndex][vertexId];
-            /* We'll proceed only if all the faces have not been numbered yet and 
-            there are adjacent vertices to "vertex" */
-            if(newFacesFound < numberNewFaces && adjacencyList[vertex].size() > 0) 
-            {
-                /* We'll look for the extrema of the face inside the adjacent vertices of vertex */
-                for(int& vertexToCheck1 : adjacencyList[vertex])
-                {
-                    for(int& vertexToCheck2 : adjacencyList[vertex])
-                    {
-                        /* We'll proceed only if all of the three vertices are distinct */
-                        if(vertex != vertexToCheck1 && vertex != vertexToCheck2 && vertexToCheck1 != vertexToCheck2)
-                        {
-                            /*Let's rename the "edges" of the face for code readability */
-                            int& e1 = newMatrEdgeVertices(vertex, vertexToCheck1);
-                            int& e2 = newMatrEdgeVertices(vertexToCheck1, vertexToCheck2);
-                            int& e3 = newMatrEdgeVertices(vertexToCheck2, vertex);
+        int numAdjacentVertices = 6;
+        tessellatedPolyhedron.FindFaces(verticesOnFace, newFacesFound, vecVertFaces, numAdjacentVertices);
+        
+      
 
-                            /* We'll proceed only if the edges that connect the vertices exist */
-                            if(e1 >= 0 && e2 >= 0 && e3 >= 0) 
-                            {
-                                array<int, 3> sortedVertFace = {vertex, vertexToCheck1, vertexToCheck2};
-                                /* We'll sort the face (based on the indexes of its vertices) 
-                                in order to avoid counting multiple times the same faces 
-                                with different vertex ordering */
-                                sort(sortedVertFace.begin(), sortedVertFace.end()); 
-    
-                                /* We'll proceed only if the sorted triangle is not already in the vector */
-                                if(find(vecVertFaces.begin(), vecVertFaces.end(), sortedVertFace) == vecVertFaces.end())
-                                {
-                                    /* We add the face the the structure storing unique faces (in order 
-                                    to find its copies after this iteration) */
-                                    vecVertFaces.push_back(sortedVertFace);
-                                    
-                                    // Just to have the edges with the smaller indexes on the top 
-                                    // (we can also erase this next two lines and add to ListEdgeFaces e1, e2 and e3)
-                                    array<int, 3> edgesInFace = {e1, e2, e3}; 
-                                    sort(edgesInFace.begin(), edgesInFace.end()); 
+    // // cout << "newCoordVertices: \n" << newCoordVertices << endl;
+    // // cout << "newExtremaEdges: \n" << newExtremaEdges << endl;
+    // // cout << "MatrEdgeVertices: \n" << newMatrEdgeVertices << endl;
+    // // cout << "newListVertFaces: \n" << newListVertFaces << endl;
+    // // cout << "newListEdgeFaces: \n" << newListEdgeFaces << endl;
 
-                                    // array<int, 3> verticesInFace = {vertex, vertexToCheck1, vertexToCheck2};
-
-                                    /* We add the vertices and edges to the old polyhedron data structures, 
-                                    modifying them */
-                                    newListVertFaces(0, newFacesFound) = vertex;
-                                    newListVertFaces(1, newFacesFound) = vertexToCheck1;
-                                    newListVertFaces(2, newFacesFound) = vertexToCheck2;
-
-                                    newListEdgeFaces(0, newFacesFound) = edgesInFace[0];
-                                    newListEdgeFaces(1, newFacesFound) = edgesInFace[1];
-                                    newListEdgeFaces(2, newFacesFound) = edgesInFace[2];
-                                    
-                                    /* Passing to the next face only if we saved a face during this iteration */
-                                    newFacesFound++;
-                                }  
-                            } 
-                        }                    
-                    }
-                }   
-            }
-        }
     }
-
-    // cout << "newCoordVertices: \n" << newCoordVertices << endl;
-    // cout << "newExtremaEdges: \n" << newExtremaEdges << endl;
-    // cout << "MatrEdgeVertices: \n" << newMatrEdgeVertices << endl;
-    // cout << "newListVertFaces: \n" << newListVertFaces << endl;
-    // cout << "newListEdgeFaces: \n" << newListEdgeFaces << endl;
-
     Eigen::MatrixXi& newListAdjacentFaces = tessellatedPolyhedron.ListAdjacentFaces;
     newListAdjacentFaces.resize(p, numberNewFaces);
     tessellatedPolyhedron.FindAdjacentFaces();
@@ -990,7 +872,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
             IDedgepoints(z) = polyhedron.ListVertFaces(z,i);
         }
 
-        for(int j = 0; j < FacesperFace; j++) // generates the innerpoints of a Face
+        for(unsigned int j = 0; j < FacesperFace; j++) // generates the innerpoints of a Face
         {
             Vector3i VertFace = Vector3i::Zero();
             Vector3d barycenter;
@@ -1076,14 +958,14 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
         VectorXi valenceedgepoints = VectorXi::Zero(innerpoints.size()); 
         int numbarycenters = innerpoints.size();
 
-        for (int j = 0; j < numbarycenters; j++)
+        for(int j = 0; j < numbarycenters; j++)
         {
 
-            for (int k = 0; k < edgepoints.size(); k++)
+            for(unsigned int k = 0; k < edgepoints.size(); k++)
             {
                 Vector3d distance = edgepoints[k] - innerpoints[0];
 
-                if (distance.norm() < GEOSolid.lengthEdge + 1e-5 && valenceedgepoints(k) < 3)
+                if(distance.norm() < GEOSolid.lengthEdge + 1e-5 && valenceedgepoints(k) < 3)
                 {
                     GEOSolid.MatrEdgeVertices(0, edgecounter) = IDbarycenters(j);
                     GEOSolid.MatrEdgeVertices(1, edgecounter) = IDedgepoints(k);
@@ -1093,11 +975,11 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                 }
             } 
 
-            for (int k = 1; k < innerpoints.size(); k++)
+            for(unsigned int k = 1; k < innerpoints.size(); k++)
             {
                 Vector3d distance = innerpoints[k] - innerpoints[0];
 
-                if (distance.norm() < GEOSolid.lengthEdge + 1e-5)
+                if(distance.norm() < GEOSolid.lengthEdge + 1e-5)
                 {
                     GEOSolid.MatrEdgeVertices(0, edgecounter) = IDbarycenters(j);
                     GEOSolid.MatrEdgeVertices(1, edgecounter) = IDbarycenters(k + j);
@@ -1113,7 +995,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     return GEOSolid;
 }
 
-double distanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idPoint2)
+double DistanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idPoint2)
 {
 
     Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
@@ -1135,11 +1017,6 @@ double distanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idP
                       differenceZCoord * differenceZCoord;
 
     return distanceSquared;
-}
-
-int triangularNumber(int& b) // Funzione inutile al momento, ma magari in futuro potrebbe servire
-{
-    return ((b + 1) * (b + 2) / 2);
 }
 
 Eigen::VectorXi SortVertices(Eigen::Vector3d& Listvertices)

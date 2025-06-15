@@ -1,4 +1,5 @@
 # include <iostream>
+# include <iomanip>
 # include <fstream>
 # include <vector>
 # include <set>
@@ -30,6 +31,10 @@ namespace PolyhedraLibrary{
         polyhedron.IdEdges.reserve(NumEdges);
         polyhedron.IdFaces.reserve(NumFaces);
 
+        polyhedron.ListVertPolyhedra.reserve(NumVertices);
+        polyhedron.ListEdgePolyhedra.reserve(NumEdges);
+        polyhedron.ListFacePolyhedra.reserve(NumFaces);
+
         // Initialize all the Matrices 
         
         CoordVertices = Eigen::MatrixXd(3, NumVertices);
@@ -55,7 +60,7 @@ namespace PolyhedraLibrary{
                 switch (q)
                 {
                 case 3:
-                    cout << "Your Polyhedron is a Tetrahedron with:\n";
+                    // cout << "Your Polyhedron is a Tetrahedron with:\n";
                     Length_edge = 2 * sqrt(6) / 3;
                     polyhedron.lengthEdge = Length_edge;
                     polyhedron.CoordVertices << 0, -0.942809041582063, 0.471404520791031, 0.471404520791031,
@@ -63,7 +68,7 @@ namespace PolyhedraLibrary{
                                                 1, -0.333333333333333, -0.333333333333333, -0.333333333333333;
                     break;
                 case 4:
-                    cout << "Your Polyhedron is a Octahedron with:\n";
+                    // cout << "Your Polyhedron is a Octahedron with:\n";
                     Length_edge = sqrt(2);
                     polyhedron.lengthEdge = Length_edge;
                     polyhedron.CoordVertices << 0, 0, 0, 0, 1, -1,
@@ -71,8 +76,8 @@ namespace PolyhedraLibrary{
                                                 1, -1, 0, 0, 0, 0;
                     break;
                 case 5:
-                    cout << "Your Polyhedron is a Icosahedron with: \n";
-                    Length_edge = 4 / sqrt(10 + 2*sqrt(5));
+                    // cout << "Your Polyhedron is a Icosahedron with: \n";
+                    Length_edge = 4 / sqrt(10 + 2 * sqrt(5));
                     polyhedron.lengthEdge = Length_edge; 
                     polyhedron.CoordVertices << 0, 0.894427190999916, 0.276393202250021, 0.723606797749979, -0.276393202250021, 0, -0.894427190999916, -0.276393202250021, -0.723606797749979, 0.276393202250021, 0.723606797749979, -0.723606797749979,
                                                 0, 0, 0.85065080835204, 0.525731112119134, 0.85065080835204, 0, 0, -0.85065080835204, -0.525731112119134, -0.85065080835204, -0.525731112119133, 0.525731112119134,
@@ -83,7 +88,7 @@ namespace PolyhedraLibrary{
             case 4:
                 if (q == 3)
                 {
-                    cout << "Your Polyhedron is a Cube with: \n";
+                    // cout << "Your Polyhedron is a Cube with: \n";
                     Length_edge = 2 / sqrt(3);
                     polyhedron.lengthEdge = Length_edge;
                 }
@@ -91,15 +96,15 @@ namespace PolyhedraLibrary{
             case 5:
                 if (q == 3)
                 {
-                    cout << "Your Polyhedron is a Dodecahedron with: \n";
+                    // cout << "Your Polyhedron is a Dodecahedron with: \n";
                     Length_edge = 4 / (sqrt(3) * (1 + sqrt(5)));
                     polyhedron.lengthEdge = Length_edge;
                 }
                 break;
             }
-            cout << NumVertices << " Vertices\n" <<
-                    NumEdges << " Edges\n" <<
-                    NumFaces << " Faces\n" << endl;
+            // cout << NumVertices << " Vertices\n" <<
+            //         NumEdges << " Edges\n" <<
+            //         NumFaces << " Faces\n" << endl;
             FillStructPolyhedra();
         }
         else
@@ -142,7 +147,7 @@ namespace PolyhedraLibrary{
                 {
                     /* We'll use a function we have implemented in "Utils.cpp" in order to find the 
                     distance squared between the two vertices: */
-                    double distanceSquared = distanceSquaredBetween(polyhedron, firstVertexIndex, secondVertexIndex);
+                    double distanceSquared = DistanceSquaredBetween(polyhedron, firstVertexIndex, secondVertexIndex);
 
                     // cout << "distance edge:" << abs(distanceSquared - lengthEdgeSquared) << endl;
                     /* When the two vertices have the correct distance squared between them we save them as an 
@@ -169,97 +174,55 @@ namespace PolyhedraLibrary{
         // cout << "MatrEdgeVertices: " << endl << MatrEdgeVertices << endl;
     }
 
-    void BuildPolyhedra::NumberFaces()
-    {
-        int faceIndex = 0;
-
-        vector<array<int, 3>> vecVertFaces; // This vector stores unique triangles (faces) as sorted arrays of 3 vertices
-        vecVertFaces.reserve(NumFaces);
-
-        vector<vector<int>> adjacencyList = polyhedron.AdjacencyList();
-        
-        for(int vertex = 0; vertex < NumVertices; vertex++)
-        { 
-            if (faceIndex < NumFaces) // Proceed only if all the faces have not been numbered yet
-            {
-                for(auto& vertexToCheck1 : adjacencyList[vertex])
-                {
-                    // cout << "vertexToCheck1: " << vertexToCheck1 << endl;
-                    for(int& vertexToCheck2 : adjacencyList[vertex])
-                    {
-                        // cout << "vertexToCheck2: " << vertexToCheck2 << endl;
-                        
-                        // Check all three vertices are distinct
-                        if(vertex != vertexToCheck1 && vertex != vertexToCheck2 && vertexToCheck1 != vertexToCheck2)
-                        {                    
-                            int& edgeIdToAdd = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);     
-                            if (edgeIdToAdd >= 0) // Proceed only if there is an edge that connects the two vertices
-                            {
-                                array<int, 3> sortedVertFace = {vertex, vertexToCheck1, vertexToCheck2};
-                                sort(sortedVertFace.begin(), sortedVertFace.end()); // Sorting avoids counting multiple times the same triangles with different vertex ordering
-
-                                // Check if the sorted triangle is already in the vector
-
-                                if(find(vecVertFaces.begin(), vecVertFaces.end(), sortedVertFace) == vecVertFaces.end())
-                                {
-                                    vecVertFaces.push_back(sortedVertFace);
-
-                                    // Find the edge IDs between the three vertices
-                                    int& e1 = MatrEdgeVertices(vertex, vertexToCheck1);
-                                    int& e2 = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);
-                                    int& e3 = MatrEdgeVertices(vertexToCheck2, vertex);
-
-                                    array<int, 3> edgesInFace = {e1, e2, e3}; 
-                                    array<int, 3> verticesInFace = {vertex, vertexToCheck1, vertexToCheck2};
-
-                                    // cout << "Triangolo trovato: (" << vertex << ", " << vertexToCheck1 << ", " << vertexToCheck2 << ")" << endl;
-
-                                    // Check face orientation consistency
-                                    if (ExtremaEdges(1, e1) == ExtremaEdges(0, e2)) // e1.end == e2.origin
-                                    {                                            
-                                        ListVertFaces(0, faceIndex) = verticesInFace[0];
-                                        ListVertFaces(1, faceIndex) = verticesInFace[1];
-                                        ListVertFaces(2, faceIndex) = verticesInFace[2];
-
-                                        ListEdgeFaces(0, faceIndex) = edgesInFace[0];
-                                        ListEdgeFaces(1, faceIndex) = edgesInFace[1];
-                                        ListEdgeFaces(2, faceIndex) = edgesInFace[2];
-                                        
-                                        faceIndex++; // Passing to the next face only if we saved a face during this iteration
-                                    }
-                                }  
-                            } 
-                        }  
-                        else
-                            continue;                         
-                    }
-                }   
-            }
-            else
-                break; 
-        } 
-        // Stampa finale per controllo
-        // cout << "ListVertFaces: " << endl << ListVertFaces << endl;
-        // cout << "ListEdgeFaces: " << endl << ListEdgeFaces << endl;
-    }
+    // void BuildPolyhedra::NumberFaces(vector<int>& verticesOnFace)
+    // Diventato il metodo FindFaces dell'oggetto polyhedron
+    // }
 
     void BuildPolyhedra::FillStructPolyhedra()
     {        
         NumberEdges();
 
-        NumberFaces();
 
-        polyhedron.FindAdjacentFaces();
+        /* We need to initialise the arguments we'll pass to the function that will find the faces 
+        of the polyhedron */
+        
+        /* There aren't any vertices on the face except for the of the original polyhedron, 
+        so the function works with a null vector as first argument */
+        vector<int> verticesOnFace = {};
+        
+        /* The function needs to know if we've already found any faces before, but we didn't, 
+        so we pass a variable equal to 0 to the function */
+        int newFacesFound = 0;
+
+        /* The function needs a structure where the unique faces of the polyhedron are stored, 
+        so we initialise it as empty*/
+        vector<array<int, 3>> vecVertFaces;
+        vecVertFaces.reserve(NumFaces);
+
+        /* The function needs to know how many adjacent vertices there are maximum for each vertex 
+        of the polyhedron, so we pass this value to it */
+        int numAdjacentVertices = 3;
+
+        /* Now we can call the function with all the arguments needed */
+        polyhedron.FindFaces(verticesOnFace, newFacesFound, vecVertFaces, numAdjacentVertices);
+
     }
 
     void BuildPolyhedra::Cell0Ds()
     {
         ofstream file("../PolygonalData/Cell0Ds.txt"); // the program should be launched inside Debug or Release folders
         
+        if (file.fail()) 
+        {
+            std::cerr << "Error opening file\n";
+            return;
+        }
+
         file << "Id,X,Y,Z\n";
         for (int i = 0; i < NumVertices; i++)
         {
             file << i << "," << 
+            scientific << setprecision(16) <<
             CoordVertices(0, i) << "," << 
             CoordVertices(1, i) << "," << 
             CoordVertices(2, i) << "\n";
@@ -272,6 +235,12 @@ namespace PolyhedraLibrary{
     {   
         ofstream file("../PolygonalData/Cell1Ds.txt"); // the program should be launched inside Debug or Release folders
         
+        if (file.fail()) 
+        {
+            std::cerr << "Error opening file\n";
+            return;
+        }
+
         file << "Id,Origin,End\n";
         for (int i = 0; i < NumEdges; i++)
         {
@@ -288,6 +257,12 @@ namespace PolyhedraLibrary{
     {   
         ofstream file("../PolygonalData/Cell2Ds.txt"); // the program needs to be launched inside Debug or Release folders
         
+        if (file.fail()) 
+        {
+            std::cerr << "Error opening file\n";
+            return;
+        }
+
         file << "Id,NumVertices,Vertices,NumEdges,Edges\n";
         for (int i = 0; i < NumFaces; i++)
         {
@@ -313,22 +288,68 @@ namespace PolyhedraLibrary{
     void BuildPolyhedra::Cell3Ds()
     {   
         ofstream file("../PolygonalData/Cell3Ds.txt"); // the program should be launched inside Debug or Release folders
+
+        if (file.fail()) 
+        {
+            std::cerr << "Error opening file\n";
+            return;
+        }
         
-        file << "IdVertices:\n";
+        file << "IdVertices:";
         for (int i = 0; i < NumVertices; i++)
         {
-            file << "V" << polyhedron.IdVertices[i] << "\n";
+            file << "V" << polyhedron.IdVertices[i] << ",";
         }
 
+        file  << "\n" << "IdEdges:";
         for (int j = 0; j < NumEdges; j++)
         {
-            file << "E" << polyhedron.IdEdges[j] << "\n";
+            file << "E" << polyhedron.IdEdges[j] << ",";
         }
 
+        file  << "\n" << "IdEdges:";
         for (int k = 0; k < NumFaces; k++)
         {
-            file << "F" << polyhedron.IdFaces[k] << "\n";
+            file << "F" << polyhedron.IdFaces[k] << ",";
         }
+
+        // file << "Id,NumVertices,Vertices,NumEdges,Edges,NumFaces,Faces\n";
+        // for (int i = 0; i < allPolyhedra.size(); i++)
+        // {
+        //     file << i << "," << allPolyhedra[i].NumVertices;
+        //     for (int j = 0; j < allPolyhedra[i].NumVertices; j++)
+        //     {
+        //         int v = allPolyhedra[i].IdVertices[j];
+        //         file << "," << "V" << v;
+        //         allPolyhedra[i].ListVertPolyhedra.push_back(v);
+        //         cout << v << endl;
+        //     }
+            
+            // file << "," << allPolyhedra[i].NumEdges;
+            // std::cout << "NumEdges: " << allPolyhedra[i].NumEdges << std::endl;
+            // std::cout << "IdEdges.size() = " << allPolyhedra[i].IdEdges.size() << std::endl;
+            // for(int k :allPolyhedra[i].IdEdges)
+            //     cout << k << endl;
+            // for (int j = 0; j < allPolyhedra[i].NumEdges; j++)
+            // {
+            //     int e = allPolyhedra[i].IdEdges[j];
+            //     cout << e << endl;
+            //     file << "," << "E" << e;
+            //     allPolyhedra[i].ListEdgePolyhedra.push_back(e);
+            //     cout << j << endl;
+            // }
+            // std::cout << "IdFaces.size() = " << allPolyhedra[i].IdFaces.size() << std::endl;
+            // file << "," << allPolyhedra[i].NumFaces;
+            // for (int j = 0; j < allPolyhedra[i].NumFaces; j++)
+            // {
+            //     int f = allPolyhedra[i].IdFaces[j];
+            //     file << "," << "F" << f;
+            //     allPolyhedra[i].ListFacePolyhedra.push_back(f);
+            //     cout << j << endl;
+            // }
+            file << "\n";
+
+
 
         file.close();
     }
