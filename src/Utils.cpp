@@ -810,7 +810,6 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     NumEdges = 0; 
     NumFaces = 0; 
 
-    // int& q = polyhedron.q;
     int& p = polyhedron.p;
 
     NumVertices = polyhedron.NumVertices + (polyhedron.NumEdges * ((2 * numberDivisions)-1)) + (polyhedron.NumFaces * (((3 * numberDivisions * numberDivisions)/ 2) - ((3 * numberDivisions)/ 2) + 1)); // numV + numE*(2b-1)+numF((3b^2)/2-3b/2+1)
@@ -822,7 +821,6 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
     GEOSolid.CoordVertices = MatrixXd::Zero(3, NumVertices);
     GEOSolid.ExtremaEdges = MatrixXi::Zero(2, NumEdges);
-    // GEOSolid.MatrEdgeVertices.resize(2, NumEdges);
     GEOSolid.ListEdgeFaces = MatrixXi::Zero(polyhedron.p, NumFaces);
     GEOSolid.ListVertFaces = MatrixXi::Zero(polyhedron.p, NumFaces);
     GEOSolid.lengthEdge = polyhedron.lengthEdge/(2 * numberDivisions);
@@ -830,7 +828,6 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     cout << "Geosolid length edge = " << GEOSolid.lengthEdge << endl;
 
     cout << "NumEdges = " << NumEdges << endl;
-    cout << "NumVertices = " << NumVertices << endl;
 
     VectorXi edgetracker = VectorXi::Zero(polyhedron.NumEdges); // prevents generating copies of edge points
     // 0 if an edge in not been yet considered 
@@ -850,7 +847,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
     for (int i = 0; i < polyhedron.NumFaces; i++)
     {
-        cout << "start i = " << i << endl;
+        // cout << "start i = " << i << endl;
         // First we divide points between edgepoints and innerpoints
         vector<Vector3d> innerpoints;
         vector<Vector3d> edgepoints;
@@ -865,7 +862,6 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
         }
         for(unsigned int j = 0; j < FacesperFace; j++) // generates the innerpoints of a Face
         {
-            // cout << "innerpoints" << endl;
             Vector3i VertFace = Vector3i::Zero();
 
             VertFace(0) = tessellatedPolyhedron.ListVertFaces(0, j + (i * FacesperFace));
@@ -884,11 +880,9 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
         }
         for (int k = 0; k < p; k++) // generates the edgepoints of a Face
         {
-            // cout << "edgepoint" << endl;
             int edge = polyhedron.ListEdgeFaces(k, i);
             if (edgetracker(edge) == 0)
             {
-                // cout << "edgetracker = 0" << endl;
                 int IDVertex_1 = polyhedron.ExtremaEdges(0, edge);
                 int IDVertex_2 = polyhedron.ExtremaEdges(1, edge);
 
