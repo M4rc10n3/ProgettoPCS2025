@@ -129,6 +129,7 @@ int main(int argc, char* argv[])
 
     cout << "tessellatedPolyhedron.NumVertices: " << tessellatedPolyhedron.NumVertices << endl;
 
+    tessellatedPolyhedron.ExportPolyhedronWithoutFaces();
     
     
     vector<int> nullVec = {};
