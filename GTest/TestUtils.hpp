@@ -16,7 +16,84 @@ using namespace Eigen;
 
 TEST(TestUtils, TestFindBarycenter)
 {
-    
+    // Let's create the tetrahedron
+    BuildPolyhedra tetraConstructor(3, 3);
+    tetraConstructor.DataPolyhedra();
+    GEOPolyhedron tetrahedron = tetraConstructor.GetPolyhedron();
+
+    // Choose a face of the tetrahedron (given by the indices of its 3 vertices)
+    Eigen::Vector3i vertFace = {5, 0, 3};
+
+    // Get the coordinates of each vertex of the face
+    Eigen::Vector3d v1 = tetrahedron.CoordVertices.col(vertFace(0));
+    Eigen::Vector3d v2 = tetrahedron.CoordVertices.col(vertFace(1));
+    Eigen::Vector3d v3 = tetrahedron.CoordVertices.col(vertFace(2));
+
+    // Compute the expected barycenter through the average of the three vertices
+    Eigen::Vector3d barycenterTetraEx = Eigen::Vector3d::Zero();
+    barycenterTetraEx(0) = (v1(0) + v2(0) + v3(0))/3.0;
+    barycenterTetraEx(1) = (v1(1) + v2(1) + v3(1))/3.0;
+    barycenterTetraEx(2) = (v1(2) + v2(2) + v3(2))/3.0;
+
+    // Compute the barycenter using the function to be tested
+    Eigen::Vector3d barycenterTetraToCheck = findBarycenter(tetrahedron, vertFace);
+
+    // Let's create the octahedron
+    BuildPolyhedra octaConstructor(3, 4);
+    octaConstructor.DataPolyhedra();
+    GEOPolyhedron octahedron = octaConstructor.GetPolyhedron();
+
+    // Choose a face of the octahedron (given by the indices of its 3 vertices)
+    vertFace = {8, 2, 11};
+
+    // Get the coordinates of each vertex of the face
+    v1 = octahedron.CoordVertices.col(vertFace(0));
+    v2 = octahedron.CoordVertices.col(vertFace(1));
+    v3 = octahedron.CoordVertices.col(vertFace(2));
+
+    // Compute the expected barycenter through the average of the three vertices
+    Eigen::Vector3d barycenterOctaEx = Eigen::Vector3d::Zero();
+    barycenterOctaEx(0) = (v1(0) + v2(0) + v3(0))/3.0;
+    barycenterOctaEx(1) = (v1(1) + v2(1) + v3(1))/3.0;
+    barycenterOctaEx(2) = (v1(2) + v2(2) + v3(2))/3.0;
+
+    // Compute the barycenter using the function to be tested
+    Eigen::Vector3d barycenterOctaToCheck = findBarycenter(octahedron, vertFace);
+
+    // Let's create the icosahedron
+    BuildPolyhedra icosaConstructor(3, 5);
+    icosaConstructor.DataPolyhedra();
+    GEOPolyhedron icosahedron = icosaConstructor.GetPolyhedron();
+
+    // Choose a face of the icosahedron (given by the indices of its 3 vertices)
+    vertFace = {6, 11, 9};
+
+    // Get the coordinates of each vertex of the face
+    v1 = icosahedron.CoordVertices.col(vertFace(0));
+    v2 = icosahedron.CoordVertices.col(vertFace(1));
+    v3 = icosahedron.CoordVertices.col(vertFace(2));
+
+    // Compute the expected barycenter through the average of the three vertices
+    Eigen::Vector3d barycenterIcosaEx = Eigen::Vector3d::Zero();
+    barycenterIcosaEx(0) = (v1(0) + v2(0) + v3(0))/3.0;
+    barycenterIcosaEx(1) = (v1(1) + v2(1) + v3(1))/3.0;
+    barycenterIcosaEx(2) = (v1(2) + v2(2) + v3(2))/3.0;
+
+    // Compute the barycenter using the function to be tested
+    Eigen::Vector3d barycenterIcosaToCheck = findBarycenter(icosahedron, vertFace);
+
+    // Compare the computed barycenters' coordinates with the expected values
+    EXPECT_DOUBLE_EQ(barycenterTetraToCheck(0), barycenterTetraEx(0));
+    EXPECT_DOUBLE_EQ(barycenterTetraToCheck(1), barycenterTetraEx(1));
+    EXPECT_DOUBLE_EQ(barycenterTetraToCheck(2), barycenterTetraEx(2));
+
+    EXPECT_DOUBLE_EQ(barycenterOctaToCheck(0), barycenterOctaEx(0));
+    EXPECT_DOUBLE_EQ(barycenterOctaToCheck(1), barycenterOctaEx(1));
+    EXPECT_DOUBLE_EQ(barycenterOctaToCheck(2), barycenterOctaEx(2));
+
+    EXPECT_DOUBLE_EQ(barycenterIcosaToCheck(0), barycenterIcosaEx(0));
+    EXPECT_DOUBLE_EQ(barycenterIcosaToCheck(1), barycenterIcosaEx(1));
+    EXPECT_DOUBLE_EQ(barycenterIcosaToCheck(2), barycenterIcosaEx(2));
 }
 
 TEST(TestUtils, TestOntoTheUnitSphereTetrahedron)
@@ -124,12 +201,12 @@ TEST(TestUtils, TestOntoTheUnitSphereMoreGeneral)
 
 TEST(TestUtils, TestBFS)
 {
-    vector<vector<int>> adjList = { {1, 2},     // Nodo 0 
-                                    {2},        // Nodo 1 
-                                    {0, 3, 4},  // Nodo 2 
-                                    {4},        // Nodo 3
-                                    {3, 5},     // Nodo 4
-                                    {4, 3} };   // Nodo 5  
+    vector<vector<int>> adjList = { {1, 2},     // vertex 0 
+                                    {2},        // vertex 1 
+                                    {0, 3, 4},  // vertex 2 
+                                    {4},        // vertex 3
+                                    {3, 5},     // vertex 4
+                                    {4, 3} };   // vertex 5  
     int v1 = 2;
     int v2 = 5;
     int numVert = 6;
@@ -142,11 +219,11 @@ TEST(TestUtils, TestBFS)
 
 TEST(TestUtils, TestDijkstra)
 {
-    vector<vector<int>> adjList = { {1, 2, 3, 4},   // Nodo 0 
-                                    {0},            // Nodo 1 
-                                    {1, 3, 4},      // Nodo 2 
-                                    {2, 4},         // Nodo 3
-                                    {0, 1} };       // Nodo 4
+    vector<vector<int>> adjList = { {1, 2, 3, 4},   // vertex 0 
+                                    {0},            // vertex 1 
+                                    {1, 3, 4},      // vertex 2 
+                                    {2, 4},         // vertex 3
+                                    {0, 1} };       // vertex 4
     MatrixXd matrWeights(5, 5); 
     matrWeights << 0, 5, 2, 3, 4,
                    5, 0, 0, 0, 0,
@@ -162,11 +239,11 @@ TEST(TestUtils, TestDijkstra)
     EXPECT_EQ(minPathDijkstra, minPathEx);
     EXPECT_DOUBLE_EQ(lengthPath, 6.0);
 
-    vector<vector<int>> adjList1 = { {1, 2},        // Nodo 0 
-                                    {0, 2, 3, 4},   // Nodo 1 
-                                    {0, 1, 4},      // Nodo 2 
-                                    {1, 4},         // Nodo 3
-                                    {1, 2, 3} };    // Nodo 4
+    vector<vector<int>> adjList1 = { {1, 2},        // vertex 0 
+                                    {0, 2, 3, 4},   // vertex 1 
+                                    {0, 1, 4},      // vertex 2 
+                                    {1, 4},         // vertex 3
+                                    {1, 2, 3} };    // vertex 4
     MatrixXd matrWeights1(5, 5); 
     matrWeights1 << 0, 10, 1, 0, 0,
                    10, 0, 2, 9, 5,

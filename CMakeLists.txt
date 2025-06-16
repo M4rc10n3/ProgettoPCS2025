@@ -69,7 +69,7 @@ target_compile_options(${PROJECT_NAME} PUBLIC -fPIC)
 #       main_test.cpp
 #       ${PlatonicSolids_SOURCES}
 #       ${PlatonicSolids_HEADERS}
-#       ${PlatonicSolids_TEST_SOURCES}
+#       ${PlatonicSolids_TEST_SOURCES}
 #       ${PlatonicSolids_TEST_HEADERS})
 
 # target_link_libraries(${PROJECT_NAME}_TEST ${PlatonicSolids_LINKED_LIBRARIES})
