@@ -821,11 +821,16 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
     GEOSolid.CoordVertices = MatrixXd::Zero(3, NumVertices);
     GEOSolid.ExtremaEdges = MatrixXi::Zero(2, NumEdges);
+    GEOSolid.MatrEdgeVertices = MatrixXi::Zero(NumVertices, NumVertices);
     GEOSolid.ListEdgeFaces = MatrixXi::Zero(polyhedron.p, NumFaces);
     GEOSolid.ListVertFaces = MatrixXi::Zero(polyhedron.p, NumFaces);
     GEOSolid.lengthEdge = polyhedron.lengthEdge/(sqrt(3) * numberDivisions); // maximum distance between two point (diagonaly)
 
     double second_length_edge = polyhedron.lengthEdge/(2 * numberDivisions); // lenght between two edge vertices
+
+    double height = sqrt((GEOSolid.lengthEdge * GEOSolid.lengthEdge) - (second_length_edge * second_length_edge));
+
+    GEOSolid.MatrEdgeVertices.setConstant(-1);
 
     cout << "Geosolid length edge = " << GEOSolid.lengthEdge << endl;
 
@@ -844,8 +849,6 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
     int vertexcounter = 0; // takes track of the number of vertices examined;
     int edgecounter = 0; // takes track of the number of edges examined;
-
-    int count = 0;
 
     for (int i = 0; i < polyhedron.NumVertices; i++)
     {
@@ -993,58 +996,69 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
             vertexcounter++;
         }
 
-        // Valence of each point on the edge, max = 3, considering a single face and just the barycenters
         int numbarycenters = innerpoints.size();
         int numedgepoints = edgepoints.size();
         double distance;
 
+        // Valence of each point on the edge, max = 3, considering a single face and just the barycenters
         VectorXi valenceedgepoints = VectorXi::Zero(numedgepoints); 
         VectorXi valenceinnerpoints = VectorXi::Zero(numbarycenters); 
 
         for (int j = 0; j < numbarycenters; j++)
         {
-            int initial_edge = edgecounter;
-
             for (int k = 0; k < numedgepoints; k++)
             {
-                distance = (edgepoints[k] - innerpoints[0]).norm();
+                distance = (edgepoints[k] - innerpoints[j]).norm();
                 if (distance < GEOSolid.lengthEdge + 1e-6)
                 {
-                    cout << "edgecounter = " << edgecounter << endl;
+                    // cout << "distance = " << distance << endl;
+                    // cout << "j = " << j << endl;
+
                     GEOSolid.ExtremaEdges(0, edgecounter) = IDbarycenters(j);
                     GEOSolid.ExtremaEdges(1, edgecounter) = IDedgepoints(k);
+                    GEOSolid.MatrEdgeVertices(IDbarycenters(j), IDedgepoints(k)) = edgecounter;
+                    GEOSolid.MatrEdgeVertices(IDedgepoints(k), IDbarycenters(j)) = edgecounter;
+
+                    valenceinnerpoints(j)++;
                     edgecounter++;
                 }
             }
 
-            // cout << edgecounter - initial_edge << endl;
-
-            count += edgecounter - initial_edge;
-
-            cout << "edge points edges = " << count << endl;
-
-            // int resized_innerpoints = innerpoints.size(); // is needed to avoid warnings and because the size changes 
+            int resized_innerpoints = innerpoints.size(); // is needed to avoid warnings and because the size changes 
             // every iteration and avoids copies of edges
 
-            // for (int k = 1; k < resized_innerpoints; k++) // generates the edges of the polyhedron
-            // {   
-            //     distance = (innerpoints[k] - innerpoints[0]).norm();
+            for (int k = 0; k < resized_innerpoints; k++) // generates the edges of the polyhedron
+            {   
+                distance = (innerpoints[k] - innerpoints[j]).norm();
 
-            //     if (distance < GEOSolid.lengthEdge + 1e-6)
-            //     {
-            //         GEOSolid.ExtremaEdges(0, edgecounter) = IDbarycenters(j);
-            //         GEOSolid.ExtremaEdges(1, edgecounter) = IDbarycenters(k);
+                // cout << "distance = " << distance << endl;
 
-            //         valenceinnerpoints(k)++;
+                int flag_edge = GEOSolid.MatrEdgeVertices(IDbarycenters[k], IDbarycenters[j]);
 
-            //         edgecounter++;
-            //     }
-            // }
-            
-            innerpoints.erase(innerpoints.begin()); // pop the barycenter just considered to speed up the process
+                if (distance < GEOSolid.lengthEdge + 1e-6 && flag_edge == -1 && k != j)
+                {
+                    GEOSolid.ExtremaEdges(0, edgecounter) = IDbarycenters(j);
+                    GEOSolid.ExtremaEdges(1, edgecounter) = IDbarycenters(k);
+                    GEOSolid.MatrEdgeVertices(IDbarycenters[k], IDbarycenters[j]) = edgecounter;
+                    GEOSolid.MatrEdgeVertices(IDbarycenters[j], IDbarycenters[k]) = edgecounter;
+
+                    valenceinnerpoints(j)++;
+                    valenceinnerpoints(k)++;
+
+                    edgecounter++;
+                }
+            }
+            if (valenceinnerpoints(j) < 6)
+            {
+                cout << "\n The barycenter ID" << IDbarycenters(j) << " didn't find all the 6 near vertices, he made just " <<
+                valenceinnerpoints(j) << " edges \n" << endl;
+
+                cout << "The iteration is: " << j << "\n" << endl;
+            }
+            // innerpoints.erase(innerpoints.begin()); // pop the barycenter just considered to speed up the process
         }
     } 
-    cout << "vertexcounter = " << vertexcounter << endl;
+    cout << "\nvertexcounter = " << vertexcounter << endl;
     cout << "edgecounter = " << edgecounter << endl;
     return GEOSolid;
 }
