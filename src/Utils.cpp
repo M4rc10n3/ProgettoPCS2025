@@ -410,7 +410,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     element saved into the matrix "newMatrEdgeVertices". */
     int edgeIndexFound = 0;
     
-    int newFacesFound = 0;
+    int facecounter = 0;
 
     /* Let's initialise the vector which stores unique triangles (the faces of the polyhedron) 
     as sorted arrays of 3 vertices. It will store the unique new faces found on the old polyhedron 
@@ -781,7 +781,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         /* Now we can look for the new faces of the polyhedron v1ing from each of the vertices 
         on the face of the old polyhedron */
         int numAdjacentVertices = 6;
-        tessellatedPolyhedron.FindFaces(verticesOnFace, newFacesFound, vecVertFaces, numAdjacentVertices);
+        tessellatedPolyhedron.FindFaces(verticesOnFace, facecounter, vecVertFaces, numAdjacentVertices);
         
       
 
@@ -817,7 +817,9 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     NumFaces = polyhedron.NumFaces * ((3 * numberDivisions * numberDivisions) + 3 * numberDivisions); // numF((3b^2)+3b)
 
     unsigned int FacesperFace = tessellatedPolyhedron.NumFaces/polyhedron.NumFaces; // Number of polygons per face derived by Tasselation I
-    unsigned int EdgeperFace = 3;
+
+    vector<array<int, 3>> vecVertFaces;
+    vecVertFaces.reserve(NumFaces / polyhedron.NumFaces); // this array is needed to store the faces
 
     GEOSolid.CoordVertices = MatrixXd::Zero(3, NumVertices);
     GEOSolid.ExtremaEdges = MatrixXi::Zero(2, NumEdges);
@@ -828,15 +830,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
     double second_length_edge = polyhedron.lengthEdge/(2 * numberDivisions); // lenght between two edge vertices
 
-    double height = sqrt((GEOSolid.lengthEdge * GEOSolid.lengthEdge) - (second_length_edge * second_length_edge));
-
     GEOSolid.MatrEdgeVertices.setConstant(-1);
-
-    cout << "Geosolid length edge = " << GEOSolid.lengthEdge << endl;
-
-    cout << "NumEdges = " << NumEdges << endl;
-
-    cout << "NumVertices = " << NumVertices << endl;
 
     VectorXi edgetracker = VectorXi::Zero(polyhedron.NumEdges); // prevents generating copies of edge points
     // 0 if an edge in not been yet considered 
@@ -847,8 +841,9 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     MatrixXi MatEdgeVertices = MatrixXi::Zero(polyhedron.NumEdges, (2 * numberDivisions) - 1); // Every row of the matrix
     // is the id of each edge of the initial polyhedron; 
 
-    int vertexcounter = 0; // takes track of the number of vertices examined;
-    int edgecounter = 0; // takes track of the number of edges examined;
+    int vertexcounter = 0; // takes track of the number of vertices examined
+    int edgecounter = 0; // takes track of the number of edges examined
+    int facecounter = 0; // takes track og the number of faces examined
 
     for (int i = 0; i < polyhedron.NumVertices; i++)
     {
@@ -858,10 +853,12 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
     for (int i = 0; i < polyhedron.NumFaces; i++)
     {
-        cout << "\n start i = " << i << endl;
         // First we divide points between edgepoints and innerpoints
         vector<Vector3d> innerpoints;
         vector<Vector3d> edgepoints;
+        vector<int> total_vertices;
+        vector<int> IDbarycenters;
+        vector<int> IDedgepoints;
 
         int additional_barycenters = 0; // if b >= 3 some vertices of the face are not on the edges so the must be counted
 
@@ -870,13 +867,11 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
             additional_barycenters = ((numberDivisions - 1) * (numberDivisions - 2))/2;
         }
 
-        VectorXi IDbarycenters = VectorXi::Zero(FacesperFace + additional_barycenters);
-        VectorXi IDedgepoints = VectorXi::Zero(3 + ((2* numberDivisions) - 1) * EdgeperFace);
-
         for (int z = 0; z < p; z++)
         {
             edgepoints.push_back(polyhedron.CoordVertices.col(polyhedron.ListVertFaces(z,i))); // stores the initial vertices
-            IDedgepoints(z) = polyhedron.ListVertFaces(z,i);
+            IDedgepoints.push_back(polyhedron.ListVertFaces(z,i));
+            total_vertices.push_back(polyhedron.ListVertFaces(z,i));
         }
 
         for (int k = 0; k < p; k++) // generates the edgepoints of a Face
@@ -923,8 +918,8 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                         GEOSolid.ExtremaEdges(1, edgecounter) = vertexcounter;
 
                     }
-                
-                    IDedgepoints((k * (2 * numberDivisions - 1)) + w + 3) = vertexcounter;
+                    IDedgepoints.push_back(vertexcounter);
+                    total_vertices.push_back(vertexcounter);
 
                     vertexcounter++;
                     edgecounter++;
@@ -932,7 +927,6 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                     x_2 = x;
                     y_2 = y;
                     z_2 = z;
-
                 }
                 // the for cycle stops before the last vertex so i manually add the last edge
                 GEOSolid.ExtremaEdges(0, edgecounter) = vertexcounter - 1; 
@@ -946,7 +940,8 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                 for (int w = 0; w < (2 * numberDivisions - 1); w++)
                 {
                     edgepoints.push_back(GEOSolid.CoordVertices.col(MatEdgeVertices(edge,w)));
-                    IDedgepoints(k * (2 * numberDivisions - 1) + w + 3) = MatEdgeVertices(edge, w);
+                    IDedgepoints.push_back(MatEdgeVertices(edge, w));
+                    total_vertices.push_back(vertexcounter);
                 }
             }
         }
@@ -964,9 +959,10 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                 if (vertexbool[VertFace(y)] == false)
                 {
                     bool flag = false; // becomes true if a point is on the edge;
-                    for (int h = 0; h < IDedgepoints.size(); h++)
+                    int numedgepoints = IDedgepoints.size();
+                    for (int h = 0; h < numedgepoints; h++)
                     {
-                        Vector3d norm = tessellatedPolyhedron.CoordVertices.col(VertFace(y)) - GEOSolid.CoordVertices.col(IDedgepoints(h));
+                        Vector3d norm = tessellatedPolyhedron.CoordVertices.col(VertFace(y)) - GEOSolid.CoordVertices.col(IDedgepoints[h]);
                         if (norm.norm() < 1e-8)
                         {
                             flag = true; // the vertex is on the edge
@@ -980,7 +976,8 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                         innerpoints.push_back(tessellatedPolyhedron.CoordVertices.col(VertFace(y)));
 
                         additional_barycenters--;
-                        IDbarycenters(FacesperFace + additional_barycenters) = vertexcounter;
+                        IDbarycenters.push_back(vertexcounter);
+                        total_vertices.push_back(vertexcounter);
                         vertexcounter++;
                     }
                     vertexbool[VertFace(y)] = true;
@@ -991,7 +988,8 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
             GEOSolid.CoordVertices.col(vertexcounter) = barycenter;
             innerpoints.push_back(barycenter);
-            IDbarycenters(j) = vertexcounter;
+            IDbarycenters.push_back(vertexcounter);
+            total_vertices.push_back(vertexcounter);
 
             vertexcounter++;
         }
@@ -1011,34 +1009,26 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                 distance = (edgepoints[k] - innerpoints[j]).norm();
                 if (distance < GEOSolid.lengthEdge + 1e-6)
                 {
-                    // cout << "distance = " << distance << endl;
-                    // cout << "j = " << j << endl;
-
-                    GEOSolid.ExtremaEdges(0, edgecounter) = IDbarycenters(j);
-                    GEOSolid.ExtremaEdges(1, edgecounter) = IDedgepoints(k);
-                    GEOSolid.MatrEdgeVertices(IDbarycenters(j), IDedgepoints(k)) = edgecounter;
-                    GEOSolid.MatrEdgeVertices(IDedgepoints(k), IDbarycenters(j)) = edgecounter;
+                    GEOSolid.ExtremaEdges(0, edgecounter) = IDbarycenters[j];
+                    GEOSolid.ExtremaEdges(1, edgecounter) = IDedgepoints[k];
+                    GEOSolid.MatrEdgeVertices(IDbarycenters[j], IDedgepoints[k]) = edgecounter;
+                    GEOSolid.MatrEdgeVertices(IDedgepoints[k], IDbarycenters[j]) = edgecounter;
 
                     valenceinnerpoints(j)++;
                     edgecounter++;
                 }
             }
 
-            int resized_innerpoints = innerpoints.size(); // is needed to avoid warnings and because the size changes 
-            // every iteration and avoids copies of edges
-
-            for (int k = 0; k < resized_innerpoints; k++) // generates the edges of the polyhedron
+            for (int k = 0; k < numbarycenters; k++) // generates the edges of the polyhedron
             {   
                 distance = (innerpoints[k] - innerpoints[j]).norm();
-
-                // cout << "distance = " << distance << endl;
 
                 int flag_edge = GEOSolid.MatrEdgeVertices(IDbarycenters[k], IDbarycenters[j]);
 
                 if (distance < GEOSolid.lengthEdge + 1e-6 && flag_edge == -1 && k != j)
                 {
-                    GEOSolid.ExtremaEdges(0, edgecounter) = IDbarycenters(j);
-                    GEOSolid.ExtremaEdges(1, edgecounter) = IDbarycenters(k);
+                    GEOSolid.ExtremaEdges(0, edgecounter) = IDbarycenters[j];
+                    GEOSolid.ExtremaEdges(1, edgecounter) = IDbarycenters[k];
                     GEOSolid.MatrEdgeVertices(IDbarycenters[k], IDbarycenters[j]) = edgecounter;
                     GEOSolid.MatrEdgeVertices(IDbarycenters[j], IDbarycenters[k]) = edgecounter;
 
@@ -1050,16 +1040,15 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
             }
             if (valenceinnerpoints(j) < 6)
             {
-                cout << "\n The barycenter ID" << IDbarycenters(j) << " didn't find all the 6 near vertices, he made just " <<
+                cout << "\n The barycenter ID" << IDbarycenters[j] << " didn't find all the 6 near vertices, he made just " <<
                 valenceinnerpoints(j) << " edges \n" << endl;
 
                 cout << "The iteration is: " << j << "\n" << endl;
             }
             // innerpoints.erase(innerpoints.begin()); // pop the barycenter just considered to speed up the process
         }
+        GEOSolid.FindFaces(total_vertices, facecounter, vecVertFaces , GEOSolid.q);
     } 
-    cout << "\nvertexcounter = " << vertexcounter << endl;
-    cout << "edgecounter = " << edgecounter << endl;
     return GEOSolid;
 }
 

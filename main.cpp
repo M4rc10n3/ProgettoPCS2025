@@ -129,11 +129,7 @@ int main(int argc, char* argv[])
 		cout << "Invalid values for b and c" << endl;
     }
 
-    cout << "tessellatedPolyhedron.NumVertices: " << tessellatedPolyhedron.NumVertices << endl;
 
-    tessellatedPolyhedron.ExportPolyhedronWithoutFaces();
-    
-    
     vector<int> nullVec = {};
     int numAdjacentFaces = 6;
     Path minimumPath;
