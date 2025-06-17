@@ -941,7 +941,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                 {
                     edgepoints.push_back(GEOSolid.CoordVertices.col(MatEdgeVertices(edge,w)));
                     IDedgepoints.push_back(MatEdgeVertices(edge, w));
-                    total_vertices.push_back(vertexcounter);
+                    total_vertices.push_back(MatEdgeVertices(edge, w));
                 }
             }
         }
