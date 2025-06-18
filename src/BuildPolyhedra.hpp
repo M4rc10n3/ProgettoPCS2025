@@ -47,7 +47,7 @@ namespace PolyhedraLibrary{
 
         void DataPolyhedra(); // Gives all the important Data of the polyhedron
 
-        void PointsPolyhedra(Eigen::MatrixXd& CoordVertices);  // Fills all the point of the polyhedron
+        void PointsPolyhedra(Eigen::MatrixXd& CoordVertices);  // Fills all the points of the polyhedron
 
         void FillStructPolyhedra(); // Fills all the structures of GEOPolyhedron
 

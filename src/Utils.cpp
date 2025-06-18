@@ -410,19 +410,14 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     element saved into the matrix "newMatrEdgeVertices". */
     int edgeIndexFound = 0;
     
-    int facecounter = 0;
-
+    int faceCounter = 0;
+    
     /* Let's initialise the vector which stores unique triangles (the faces of the polyhedron) 
     as sorted arrays of 3 vertices. It will store the unique new faces found on the old polyhedron 
     face with index "faceIndex" */
     vector<array<int, 3>> vecVertFaces;
     vecVertFaces.reserve(numberNewFaces / oldNumFaces);
-
-    /* Creating the adjacency list for the vertices. We don't care which vertex has the maximum 
-    index on the face, so we need to initialise it using more memory than what I need in order to avoid
-    segmentation faults */
-    // vector<vector<int>> adjacencyList(numberNewVertices);
-
+    
     /* We need to tesselate each face of the polyhedron given as input, so we need a "for" 
     cycle on the old polyhedron faces: */
     for(int faceIndex = 0; faceIndex < oldNumFaces; faceIndex++)
@@ -781,16 +776,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         /* Now we can look for the new faces of the polyhedron v1ing from each of the vertices 
         on the face of the old polyhedron */
         int numAdjacentVertices = 6;
-        tessellatedPolyhedron.FindFaces(verticesOnFace, facecounter, vecVertFaces, numAdjacentVertices);
-        
-      
-
-    // // cout << "newCoordVertices: \n" << newCoordVertices << endl;
-    // // cout << "newExtremaEdges: \n" << newExtremaEdges << endl;
-    // // cout << "MatrEdgeVertices: \n" << newMatrEdgeVertices << endl;
-    // // cout << "newListVertFaces: \n" << newListVertFaces << endl;
-    // // cout << "newListEdgeFaces: \n" << newListEdgeFaces << endl;
-
+        tessellatedPolyhedron.FindFaces(verticesOnFace, faceCounter, vecVertFaces, numAdjacentVertices);
     }
     Eigen::MatrixXi& newListAdjacentFaces = tessellatedPolyhedron.ListAdjacentFaces;
     newListAdjacentFaces.resize(p, numberNewFaces);
@@ -812,25 +798,41 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
     int& p = polyhedron.p;
 
-    NumVertices = polyhedron.NumVertices + (polyhedron.NumEdges * ((2 * numberDivisions)-1)) + (polyhedron.NumFaces * (((3 * numberDivisions * numberDivisions)/ 2.0) - ((3 * numberDivisions)/ 2.0) + 1)); // numV + numE*(2b-1)+numF((3b^2)/2-3b/2+1)
-    NumEdges = (polyhedron.NumEdges * 2 * numberDivisions) + (polyhedron.NumFaces * (((9 * numberDivisions * numberDivisions)/ 2.0) + (3 * numberDivisions)/2.0)); // numE(2b)+numF((9b^2)/2+3b/2) 
-    NumFaces = polyhedron.NumFaces * ((3 * numberDivisions * numberDivisions) + 3 * numberDivisions); // numF((3b^2)+3b)
+    // NumVertices = numV + numE(2b-1)+numF((3b^2)/2-3b/2+1)
+    NumVertices = polyhedron.NumVertices + 
+                  (polyhedron.NumEdges * ((2 * numberDivisions)-1)) + 
+                  (polyhedron.NumFaces * (((3 * numberDivisions * numberDivisions)/ 2.0) 
+                                            - ((3 * numberDivisions)/ 2.0) + 1)); 
 
-    unsigned int FacesperFace = tessellatedPolyhedron.NumFaces/polyhedron.NumFaces; // Number of polygons per face derived by Tasselation I
+    // NumEdges = numE(2b)+numF((9b^2)/2+3b/2) 
+    NumEdges = (polyhedron.NumEdges * 2 * numberDivisions) + 
+               (polyhedron.NumFaces * (((9 * numberDivisions * numberDivisions)/ 2.0) 
+                                         + (3 * numberDivisions)/2.0)); 
+
+    // Numfaces = numF((3b^2)+3b)
+    NumFaces = polyhedron.NumFaces * ((3 * numberDivisions * numberDivisions) + 3 * numberDivisions); 
+
+    cout << "NumVertices: " << NumVertices << endl;
+    cout << "NumEdges: " << NumFaces << endl;
+    cout << "NumEdges: " << NumFaces << endl;
+
+
+    unsigned int FacesperFace = tessellatedPolyhedron.NumFaces/polyhedron.NumFaces; // Number of polygons per face derived by Tesselation I
 
     vector<array<int, 3>> vecVertFaces;
-    vecVertFaces.reserve(NumFaces / polyhedron.NumFaces); // this array is needed to store the faces
+    vecVertFaces.reserve(NumFaces / polyhedron.NumFaces); // this array is needed to store the new faces 
+                                                          // on each face of the old polyhedron
 
     GEOSolid.CoordVertices = MatrixXd::Zero(3, NumVertices);
     GEOSolid.ExtremaEdges = MatrixXi::Zero(2, NumEdges);
-    GEOSolid.MatrEdgeVertices = MatrixXi::Zero(NumVertices, NumVertices);
+    GEOSolid.MatrEdgeVertices = MatrixXi::Constant(NumVertices, NumVertices, -1);
+    // GEOSolid.MatrEdgeVertices.setConstant(-1);
     GEOSolid.ListEdgeFaces = MatrixXi::Zero(polyhedron.p, NumFaces);
     GEOSolid.ListVertFaces = MatrixXi::Zero(polyhedron.p, NumFaces);
     GEOSolid.lengthEdge = polyhedron.lengthEdge/(sqrt(3) * numberDivisions); // maximum distance between two point (diagonaly)
 
-    double second_length_edge = polyhedron.lengthEdge/(2 * numberDivisions); // lenght between two edge vertices
+    double second_length_edge = polyhedron.lengthEdge/(2 * numberDivisions); // length between two edge vertices
 
-    GEOSolid.MatrEdgeVertices.setConstant(-1);
 
     VectorXi edgetracker = VectorXi::Zero(polyhedron.NumEdges); // prevents generating copies of edge points
     // 0 if an edge in not been yet considered 
@@ -843,8 +845,11 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
     int vertexcounter = 0; // takes track of the number of vertices examined
     int edgecounter = 0; // takes track of the number of edges examined
-    int facecounter = 0; // takes track og the number of faces examined
 
+    int faceCounter = 0; // takes track of the number of faces found
+
+
+    // Facendo un'uguaglianza non funziona, vero? Usando un "block" o un "leftCols"?
     for (int i = 0; i < polyhedron.NumVertices; i++)
     {
         GEOSolid.CoordVertices.col(i) = polyhedron.CoordVertices.col(i);
@@ -860,10 +865,13 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
         vector<int> IDbarycenters;
         vector<int> IDedgepoints;
 
-        int additional_barycenters = 0; // if b >= 3 some vertices of the face are not on the edges so the must be counted
+        int additional_barycenters = 0; // if b >= 3 some vertices of the face are not on the edges so they must be counted
 
         if (numberDivisions >= 3)
         {
+            // Volendo, possiamo creare una funzione che restituisca il numero triangolare che 
+            // rappresenta il numero di "additional_barycenters"; io sicuramente ho usato
+            // un'altra volta i numeri triangolari nella tassellazione I
             additional_barycenters = ((numberDivisions - 1) * (numberDivisions - 2))/2;
         }
 
@@ -876,19 +884,19 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
         for (int k = 0; k < p; k++) // generates the edgepoints of a Face
         {
-            int edge = polyhedron.ListEdgeFaces(k, i);
+            int& edge = polyhedron.ListEdgeFaces(k, i);
             if (edgetracker(edge) == 0)
             {
-                int IDVertex_1 = polyhedron.ExtremaEdges(0, edge);
-                int IDVertex_2 = polyhedron.ExtremaEdges(1, edge);
+                int& IDVertex_1 = polyhedron.ExtremaEdges(0, edge);
+                int& IDVertex_2 = polyhedron.ExtremaEdges(1, edge);
 
-                double x_1 = polyhedron.CoordVertices(0, IDVertex_1);
-                double y_1 = polyhedron.CoordVertices(1, IDVertex_1);
-                double z_1 = polyhedron.CoordVertices(2, IDVertex_1);
+                double& x_1 = polyhedron.CoordVertices(0, IDVertex_1);
+                double& y_1 = polyhedron.CoordVertices(1, IDVertex_1);
+                double& z_1 = polyhedron.CoordVertices(2, IDVertex_1);
 
-                double x_2 = polyhedron.CoordVertices(0, IDVertex_2);
-                double y_2 = polyhedron.CoordVertices(1, IDVertex_2);
-                double z_2 = polyhedron.CoordVertices(2, IDVertex_2);
+                double& x_2 = polyhedron.CoordVertices(0, IDVertex_2);
+                double& y_2 = polyhedron.CoordVertices(1, IDVertex_2);
+                double& z_2 = polyhedron.CoordVertices(2, IDVertex_2);
 
                 Vector3d angularcoefficient = Vector3d::Zero(); // angular coefficient of the line between the two vertices
                 angularcoefficient(0) = x_1 - x_2;
@@ -921,14 +929,18 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                     IDedgepoints.push_back(vertexcounter);
                     total_vertices.push_back(vertexcounter);
 
-                    vertexcounter++;
-                    edgecounter++;
-
                     x_2 = x;
                     y_2 = y;
                     z_2 = z;
+
+                    vertexcounter++;
+                    edgecounter++;
                 }
-                // the for cycle stops before the last vertex so i manually add the last edge
+                // Non ho capito questo prossimo commento: il "for" non si ferma dopo che ha generato 
+                // l'ultimo punto sul lato del vecchio poliedro e quindi ci serve solo aggiungere 
+                // il lato sul nuovo poliedro tra quest'ultimo vertice e IDVertex_1?
+
+                // the for cycle stops before the last vertex so  manually add the last edge
                 GEOSolid.ExtremaEdges(0, edgecounter) = vertexcounter - 1; 
                 GEOSolid.ExtremaEdges(1, edgecounter) = IDVertex_1;
 
@@ -939,6 +951,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
                 for (int w = 0; w < (2 * numberDivisions - 1); w++)
                 {
+                    // Perché ci serve risalvare dati già prodotti? Per fare meno casino con indici dopo?
                     edgepoints.push_back(GEOSolid.CoordVertices.col(MatEdgeVertices(edge,w)));
                     IDedgepoints.push_back(MatEdgeVertices(edge, w));
                     total_vertices.push_back(MatEdgeVertices(edge, w));
@@ -954,6 +967,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
             VertFace(1) = tessellatedPolyhedron.ListVertFaces(1, j + (i * FacesperFace));
             VertFace(2) = tessellatedPolyhedron.ListVertFaces(2, j + (i * FacesperFace));
 
+            // Possiamo sostituire "VertFace.size()" con 3?
             for (int y = 0; y < VertFace.size(); y++) // checks if a vertex of Vertface is on the edge of the face or inside
             {
                 if (vertexbool[VertFace(y)] == false)
@@ -970,7 +984,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                         }
                     }
 
-                    if (flag == false) // if the vertex is not on the edge is going to be added at the list of barycenters
+                    if (flag == false) // if the vertex is not on the edge is going to be added to the list of barycenters
                     {
                         GEOSolid.CoordVertices.col(vertexcounter) = tessellatedPolyhedron.CoordVertices.col(VertFace(y));
                         innerpoints.push_back(tessellatedPolyhedron.CoordVertices.col(VertFace(y)));
@@ -1040,14 +1054,21 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
             }
             if (valenceinnerpoints(j) < 6)
             {
-                cout << "\n The barycenter ID" << IDbarycenters[j] << " didn't find all the 6 near vertices, he made just " <<
+                cout << "\n The barycenter ID " << IDbarycenters[j] << " didn't find all the 6 near vertices, he made just " <<
                 valenceinnerpoints(j) << " edges \n" << endl;
 
                 cout << "The iteration is: " << j << "\n" << endl;
             }
             // innerpoints.erase(innerpoints.begin()); // pop the barycenter just considered to speed up the process
         }
-        GEOSolid.FindFaces(total_vertices, facecounter, vecVertFaces , GEOSolid.q);
+
+        cout << "CoordVertices: " << endl << GEOSolid.CoordVertices << endl;
+        cout << "ExtremaEdges: " << endl << GEOSolid.ExtremaEdges << endl;
+        cout << "MatrEdgeVertices: " << endl << GEOSolid.MatrEdgeVertices << endl;
+        
+
+        int numAdjacentFaces = 6;
+        GEOSolid.FindFaces(total_vertices, faceCounter, vecVertFaces, numAdjacentFaces);
     } 
     return GEOSolid;
 }

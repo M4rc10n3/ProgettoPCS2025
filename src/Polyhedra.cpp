@@ -156,7 +156,15 @@ namespace PolyhedraLibrary
     {
         /* Let's find the adjacencyList for each vertex */
         vector<vector<int>> adjacencyList = AdjacencyList(verticesOnFace, numAdjacentVertices);
-        
+
+        cout << "adjacencyList: " << endl;
+        for(unsigned int i = 0; i < adjacencyList.size(); i++){
+            for(auto elem : adjacencyList[i]){
+                cout << elem << " ";
+            }
+            cout << endl;
+        }
+
         /* Let's initialise the numbers of vertices to check with the total number of vertices 
         of the polyhedron. If we're interested on just one of its faces, then we can set the size of 
         "verticesOnFace" as the numbers of vertices to check */

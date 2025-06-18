@@ -57,7 +57,7 @@ namespace PolyhedraLibrary
         - newFacesFound: integer representing how many faces of the polyhedron were already found;
         - vecVertFaces: structure containing the unique faces already found as an array made up by their 3 ids;
         - numAdjacentVertices: integer representing how many vertices are adjacent to each 
-        vertex in the polyhedron */
+                               vertex in the polyhedron */
         void FindFaces(vector<int>& verticesOnFace, 
                        int& newFacesFound, 
                        vector<array<int, 3>>& vecVertFaces, 
