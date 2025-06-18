@@ -154,6 +154,7 @@ namespace PolyhedraLibrary
 
     void GEOPolyhedron::FindFaces(vector<int>& verticesOnFace, int& newFacesFound, vector<array<int, 3>>& vecVertFaces, int& numAdjacentVertices)
     {
+
         /* Let's find the adjacencyList for each vertex */
         vector<vector<int>> adjacencyList = AdjacencyList(verticesOnFace, numAdjacentVertices);
 
@@ -237,95 +238,26 @@ namespace PolyhedraLibrary
         }
     }
 
-    // Per il momento inutile
-    void GEOPolyhedron::FindFacesWithVertex()
-    {
-        /* First, we need to understand how many vertices the polyhedron not tessellated has.
-        We updated the value of NumVertices during the tessellation, so we need to understand 
-        it all over again with a "switch" */
-        int verticesWithLessFaces = 0;
-        switch(q)
-        {
-            case 3:
-                verticesWithLessFaces = 4;
-                break;
-            case 4:
-                verticesWithLessFaces = 6;
-                break;
-            case 5:
-                verticesWithLessFaces = 20;
-                break;
-        }
-
-        /* We need to use a resize otherwise the program aborts with exception "bad_alloc" */
-        ListFacesWithVertex.resize(NumVertices);
-        /* We need to find for each vertex the faces to which the vertex belongs to */
-        for(int vertexIndex = 0; vertexIndex < NumVertices; vertexIndex++)
-        {
-            /* The first "verticesWithLessFaces" vertices only belong to a number "q" of faces,
-            so we reserve the exact number of memory space for them */
-            if(vertexIndex < verticesWithLessFaces)
-            {
-                ListFacesWithVertex[vertexIndex].reserve(q);
-            }
-            /* The other vertices belong to 6 faces, so we reserve the exact number of 
-            memory space for them */
-            else
-            {
-                ListFacesWithVertex[vertexIndex].reserve(6);
-            }
-
-            /* Now we check whether the faces of the matrix "ListVertFaces" contain "vertexIndex" */
-            for(unsigned int faceIndex = 0; faceIndex < unsigned(NumFaces); faceIndex++)
-            {
-                const auto& face = ListVertFaces.col(faceIndex);
-                if(find(face.begin(), face.end(), vertexIndex) != face.end())
-                {
-                    ListFacesWithVertex[vertexIndex].push_back(faceIndex);
-                }
-            }
-        }
-    }
-
-    void GEOPolyhedron::ExportPolyhedronWithoutFaces()
-    {
-        /* In order to export the polyhedra, we need to create the markers for the vertices, 
-        the edges and the faces. We decided them arbitrarily in order to make them pop to the eye.
-        The vertices have all marker 0 because they are not difficult to separate from one another */
-        Eigen::VectorXi VerticesMarkers(NumVertices);
-        for(int i = 0; i < NumVertices; i++)
-        {
-            VerticesMarkers[i] = 0;
-        }
-        
-        Eigen::VectorXi EdgesMarkers(NumEdges);
-        for(int i = 0; i < NumEdges; i++)
-        {
-            EdgesMarkers[i] = NumEdges - i;
-        }
-
-        /* Then, we can export all of the structures passing the arguments needed to the functions */
-        Gedim::UCDUtilities utilities;
-        utilities.ExportPoints("../PolygonalData/Cell0Ds.inp",
-                               CoordVertices,
-                               {},
-                               VerticesMarkers);
-
-        utilities.ExportSegments("../PolygonalData/Cell1Ds.inp",
-                                 CoordVertices,
-                                 ExtremaEdges,
-                                 {},
-                                 {},
-                                 EdgesMarkers);
-    }
-
     void GEOPolyhedron::ExportPolyhedron(Path& minimumPath)
     {
-        std::vector<Gedim::UCDProperty<double>> VerticesProperties = {};
-        std::vector<Gedim::UCDProperty<double>> EdgesProperties = {};
+        /* Let's initialise two vectors with elements of type "Gedim::UCDProperty<double>" as empty vectors */
+        vector<Gedim::UCDProperty<double>> VerticesProperties = {};
+        vector<Gedim::UCDProperty<double>> EdgesProperties = {};
+
+        /* If "minimumPath" is a proper "Path" object, which means it has a "VerticesShortPath" 
+        and an "EdgesShortPath" that are not empty, we save their data inside the "VerticesProperties" and
+        "EdgesProperties" vectors */
         if(minimumPath.VerticesShortPath.size() > 0 && minimumPath.EdgesShortPath.size() > 0)
         {
+            /* First, we need to resize the vector in order to store the property as an element */
             VerticesProperties.resize(1);
+
+            /* Then, we define the element of "VerticesProperties" giving it: 
+                - a property "label" (used only inside ParaView to access the property); 
+                - an "unit label" (used only inside ParaView to access the property);
+                - the "size" of the property, which is the number of elements described by the property;
+                - the "number of components" of the property, which is 1 in our case;
+                - the "data" of the property, stored inside "VerticesShortPath". */
             VerticesProperties[0] = {
                 "ShortPath",
                 "colour",
@@ -334,6 +266,8 @@ namespace PolyhedraLibrary
                 minimumPath.VerticesShortPath.data()
             };
 
+            /* We also do the same thing as above for "EdgesProperties" using the data 
+            inside "EdgesShortPath" */
             EdgesProperties.resize(1);
             EdgesProperties[0] = {
                 "ShortPath",
@@ -344,6 +278,8 @@ namespace PolyhedraLibrary
             };
         }
 
+        /* Let's create some markers for the data structures of the polyhedron in order 
+        to see them colourful inside ParaView */
         Eigen::VectorXi VerticesMarkers(NumVertices);
         for(int i = 0; i < NumVertices; i++)
         {
@@ -362,6 +298,7 @@ namespace PolyhedraLibrary
             FacesMarkers[i] = i;
         }
 
+        /* Let's export the vertices and edges of the polyhedron */
         Gedim::UCDUtilities exporter;
         exporter.ExportPoints("../PolygonalData/Cell0Ds.inp",
                                CoordVertices,
@@ -390,6 +327,8 @@ namespace PolyhedraLibrary
             FacesVertices[i][1] = ListVertFaces(1, i);
             FacesVertices[i][2] = ListVertFaces(2, i);
         }
+        
+        /* Lastly, let's export the faces of the polyhedron */
         exporter.ExportPolygons("../PolygonalData/Cell2Ds.inp",
                                   CoordVertices,
                                   FacesVertices,

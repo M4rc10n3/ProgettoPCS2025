@@ -211,10 +211,6 @@ GEOPolyhedron Dualise(GEOPolyhedron& polyhedron)
     /* Let's initialise the object of type "GEOPolyhedron" that will be returned by the function */
     GEOPolyhedron dualPolyhedron;
 
-    // polyhedron.FindFacesWithVertex();
-    // Questo sarà il vettore di vettori che esporteremo come facce del poliedro
-    //vector<vector<unsigned int>>& oldListFacesWithVertex = polyhedron.ListFacesWithVertex;
-
     /* Let's rename the data structures we'll use in this function for code readability */
     Eigen::MatrixXi& oldListAdjacentFaces = polyhedron.ListAdjacentFaces;
     Eigen::MatrixXi& oldListVertFaces = polyhedron.ListVertFaces;
@@ -779,9 +775,6 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         tessellatedPolyhedron.FindFaces(verticesOnFace, faceCounter, vecVertFaces, numAdjacentVertices);
     }
 
-    Eigen::MatrixXi& newListAdjacentFaces = tessellatedPolyhedron.ListAdjacentFaces;
-    newListAdjacentFaces.resize(p, numberNewFaces);
-    tessellatedPolyhedron.FindAdjacentFaces();
 
     return tessellatedPolyhedron;
 }
@@ -811,12 +804,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                                          + (3 * numberDivisions)/2.0)); 
 
     // Numfaces = numF((3b^2)+3b)
-    NumFaces = polyhedron.NumFaces * ((3 * numberDivisions * numberDivisions) + 3 * numberDivisions); 
-
-    cout << "NumVertices: " << NumVertices << endl;
-    cout << "NumEdges: " << NumFaces << endl;
-    cout << "NumEdges: " << NumFaces << endl;
-
+    NumFaces = polyhedron.NumFaces * ((3 * numberDivisions * numberDivisions) + 3 * numberDivisions);
 
     unsigned int FacesperFace = tessellatedPolyhedron.NumFaces/polyhedron.NumFaces; // Number of polygons per face derived by Tesselation I
 
@@ -844,7 +832,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
 
     int vertexcounter = 0; // takes track of the number of vertices examined
     int edgecounter = 0; // takes track of the number of edges examined
-    int facecounter = 0; // takes track og the number of faces examined
+    int facecounter = 0; // takes track of the number of faces examined
 
     for (int i = 0; i < polyhedron.NumVertices; i++)
     {

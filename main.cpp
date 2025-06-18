@@ -85,10 +85,6 @@ int main(int argc, char* argv[])
         polyhedron = Constructor.GetPolyhedron();
     }
 
-    // BuildPolyhedra Constructor(p, q); 
-    // Constructor.DataPolyhedra(); // create the structure of the Polyhedron
-    // GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
-
     bool tessI = false;
     bool tessII = false;
 

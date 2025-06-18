@@ -43,8 +43,6 @@ namespace PolyhedraLibrary
         
         Eigen::MatrixXi ListAdjacentFaces = {}; // All the adjacent faces for the face with index i, 
                                                 // where i is the index of the column of the matrix, p x NumFaces matrix
-        vector<vector<unsigned int>> ListFacesWithVertex = {}; // All the faces containing the vertex that has the index of 
-                                                               // the inner vector
 
         /* "FindAdjacentFaces" saves inside "ListAdjacentFaces" the adjacent faces to each face. 
         Each column contains the ids of the adjacent faces for the face that has the column index as id */
@@ -72,19 +70,7 @@ namespace PolyhedraLibrary
         std::vector<vector<int>> AdjacencyList(vector<int>& verticesOnFace, 
                                                int& numAdjacentVertices);
 
-        /* "FindFacesWithVertex" saves inside "ListFacesWithVertex" at each column the faces containing 
-        the vertex whose index is that of the column */
-        void FindFacesWithVertex();
-
-        /* "ExportPolyhedron" exports the structures of the polyhedron using the code of Mr. Vicini 
-        in order to create a file readable by ParaView */
-        // void ExportPolyhedron();
-
-        /* "ExportPolyhedronWithoutFaces" exports the structures of the polyhedron (except for the faces) using 
-        the code of Mr. Vicini in order to create a file readable by ParaView */
-        void ExportPolyhedronWithoutFaces();
-
-        /* "ExportPolyhedronWithoutFaces" exports the structures of the polyhedron colouring them if they belong 
+        /* "ExportPolyhedron" exports the structures of the polyhedron colouring them if they belong 
         to the minimum path whose extrema were given as input to the code using the code of Mr. Vicini 
         sin order to create a file readable by ParaView */
         void ExportPolyhedron(Path& minimumPath);

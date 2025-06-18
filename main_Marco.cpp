@@ -29,7 +29,6 @@ int main()
     tessellatedPolyhedron.ExportPolyhedron(minimumPath);
 
     // GEOPolyhedron dualPolyhedron = Dualise(tessellatedPolyhedron);
-    // dualPolyhedron.ExportPolyhedronWithoutFaces();
 
     return 0;
 }
