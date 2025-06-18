@@ -1066,7 +1066,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
         cout << "ExtremaEdges: " << endl << GEOSolid.ExtremaEdges << endl;
         cout << "MatrEdgeVertices: " << endl << GEOSolid.MatrEdgeVertices << endl;
         
-
+        cout << "Calling FindFaces for II Tessellation " << i << endl;
         int numAdjacentFaces = 6;
         GEOSolid.FindFaces(total_vertices, faceCounter, vecVertFaces, numAdjacentFaces);
     } 
