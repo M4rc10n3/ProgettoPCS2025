@@ -90,7 +90,7 @@ namespace PolyhedraLibrary
     {
         /* Let's initialise the structure "adjacencyList" with "NumVertices" memory spaces
         in order to avoid segmentation faults: we don't know which vertices ids are on each face, 
-        so we don't want to access the element with id 19 if the structure ha only 10 elements */
+        so we don't want to access the element with id 19 if the structure has only 10 elements */
         vector<vector<int>> adjacencyList(NumVertices);
 
         /* Let's initialise the numbers of vertices to check with the total number of vertices 
@@ -114,7 +114,7 @@ namespace PolyhedraLibrary
 
             /* Now that we accessed the correct vertex id, we can reserve the maximum memory space its 
             adjacency list will need, which is tha maximum number of adjacent vertices for a vertex in 
-            the polyhedron, number stored inside "numAdjacentVertices" */
+            the polyhedron, which is an integer stored inside "numAdjacentVertices" */
             adjacencyList[vertex].reserve(numAdjacentVertices);
 
             /* Let's start iterating on each possible adjacent vertex of the polyhedron. If we're interested 
@@ -131,9 +131,9 @@ namespace PolyhedraLibrary
                 /* We'll go on only if the two vertices are distinct, otherwise we would check 
                 a useless edge, wasting computational power */
 
-                // è anche vero che questa cosa succede solo una votla e le nostre strutture 
+                // è anche vero che questa cosa succede solo una volta e le nostre strutture 
                 // non memorizzano lati sbagliati, quindi a una sola iterazione questo if è utile, 
-                // altrimenti è spreco di controllo a mio avviso
+                // altrimenti è spreco di controllo (e di potenza computazionale) a mio avviso
                 if(vertex != adjVert) 
                 {        
                     /* Let's rename the edge we'll check for code readability */            
@@ -154,6 +154,28 @@ namespace PolyhedraLibrary
 
     void GEOPolyhedron::FindFaces(vector<int>& verticesOnFace, int& newFacesFound, vector<array<int, 3>>& vecVertFaces, int& numAdjacentVertices)
     {
+        
+        // Stampiamo gli argomenti come controllo
+        cout << "newFacesFound: " << newFacesFound << endl;
+        cout << "numAdjacentVertices: " << numAdjacentVertices << endl;
+        
+        cout << "verticesOnFace: { ";
+        for(auto elem : verticesOnFace){
+            cout << elem << " ";
+        }
+        cout << "}" << endl;
+        
+
+        cout << "vecVertFaces: " << endl;
+        for(unsigned int i = 0; i < vecVertFaces.size(); i++){
+            for(auto elem : vecVertFaces[i]){
+                cout << elem << " ";
+            }
+            cout << endl;
+        }
+
+        
+
         /* Let's find the adjacencyList for each vertex */
         vector<vector<int>> adjacencyList = AdjacencyList(verticesOnFace, numAdjacentVertices);
 
@@ -183,10 +205,10 @@ namespace PolyhedraLibrary
                 vertex = verticesOnFace[vertexId];
             }
 
-            /* Let's go on with the algorithm only if we didn't find alla of the faces of the polyhedron yet 
-            or if tthere aren't any adjacent vertices to "vertex". In those cases, we simply go on with 
+            /* Let's go on with the algorithm only if we didn't find all of the faces of the polyhedron yet 
+            and there are some adjacent vertices to "vertex". If that's not the case, we simply go on with 
             the external "for" cycle until it ends */
-            if(newFacesFound < NumFaces && adjacencyList[vertex].size() > 0) // Proceed only if all the faces have not been numbered yet
+            if(newFacesFound < NumFaces && adjacencyList[vertex].size() > 0)
             {
                 /* Let's iterate on the other adjacent vertices of "vertex" */
                 for(int& vertexToCheck1 : adjacencyList[vertex])
@@ -202,9 +224,9 @@ namespace PolyhedraLibrary
                             int& e2 = MatrEdgeVertices(vertexToCheck1, vertexToCheck2);
                             int& e3 = MatrEdgeVertices(vertexToCheck2, vertex);
 
-                            /* The first vertex is of course connected to its adjacent vertices, 
-                            so we need to check whether the other two are connected between them. 
-                            If that's the case, then w ego on with the algorithm */
+                            /* The first vertex is of course connected to its adjacent vertices with edge "e1" 
+                            and "e3", so we need to check whether the other two vertices are connected 
+                            between them. If that's the case, we go on with the algorithm */
                             if(e2 >= 0)
                             {
                                 /* Let's initialise and sort an array containing the vertices of the face 
@@ -234,7 +256,7 @@ namespace PolyhedraLibrary
                                     ListEdgeFaces(1, newFacesFound) = sortedEdgeFace[1];
                                     ListEdgeFaces(2, newFacesFound) = sortedEdgeFace[2];
                                     
-                                    /* Let's increase the number of faces found now that we've found one */
+                                    /* Now that we've found one, let's increase the number of faces found */
                                     newFacesFound++; 
                                 }  
                             } 
