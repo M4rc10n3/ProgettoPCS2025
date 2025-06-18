@@ -71,34 +71,23 @@ int main(int argc, char* argv[])
         c << ")" << endl; 
     }
 
-    // Il nostro codice dovrebbe diventare così: 
+    GEOPolyhedron polyhedron;
+    if(p == 3)
+    {
+        BuildPolyhedra Constructor(p, q); 
+        Constructor.DataPolyhedra(); // create the structure of the Polyhedron
+        polyhedron = Constructor.GetPolyhedron();
+    }
+    else if(q == 3)
+    {   
+        BuildPolyhedra Constructor(q, p);
+        Constructor.DataPolyhedra(); // create the structure of the Polyhedron
+        polyhedron = Constructor.GetPolyhedron();
+    }
 
-    // GEOPolyhedron polyhedron;
-    // if(p == 3)
-    // {
-    //     /* Following the directions of the project, we need to export the geodetic polyhedron 
-    //     for the polyhedra with p = 3, so we start by creating the polyhedron that we'll tessellate 
-    //     and then project on the unit sphere. The tetrahedron will follow this case: we'll 
-    //     export its geodetic polyhedron, which is the same as its generalized Goldberg polyhedron */
-
-    //     BuildPolyhedra Constructor(p, q); 
-    //     Constructor.DataPolyhedra(); // create the structure of the Polyhedron
-    //     polyhedron = Constructor.GetPolyhedron();
-    // }
-    // else if(q == 3)
-    // {
-    //     /* Following the directions of the project, we need to export the generalized Goldberg polyhedron 
-    //     for the polyhedra with q = 3, so we decide to create the geodetic polyhedron 
-    //     starting from the dual polyhedron of the polyhedron with q = 3 */
-        
-    //     BuildPolyhedra Constructor(q, p);
-    //     Constructor.DataPolyhedra(); // create the structure of the Polyhedron
-    //     polyhedron = Constructor.GetPolyhedron();
-    // }
-
-    BuildPolyhedra Constructor(p, q); 
-    Constructor.DataPolyhedra(); // create the structure of the Polyhedron
-    GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
+    // BuildPolyhedra Constructor(p, q); 
+    // Constructor.DataPolyhedra(); // create the structure of the Polyhedron
+    // GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
 
     bool tessI = false;
     bool tessII = false;
@@ -120,9 +109,7 @@ int main(int argc, char* argv[])
 		cout << "Tessellation type II" << endl;
         GEOPolyhedron type_I_tessellation = TypeITessellation(polyhedron, b);
 		tessellatedPolyhedron = TypeIITessellation(polyhedron, type_I_tessellation, b);
-        // BuildPolyhedra TesConstructor(tessellatedPolyhedron);
-        // TesConstructor.CreateCells();
-        // OntoTheUnitSphere(tessellatedPolyhedron);
+        OntoTheUnitSphere(tessellatedPolyhedron);
     } 
     else 
     {
