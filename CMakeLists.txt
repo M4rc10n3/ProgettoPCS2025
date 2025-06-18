@@ -91,17 +91,6 @@ target_compile_options(${PROJECT_NAME} PUBLIC -fPIC)
 #       main_Marco.cpp
 #       ${PlatonicSolids_SOURCES}
 #       ${PlatonicSolids_HEADERS}
-#       ${ManuExe_SOURCES}
-#       ${ManuExe_HEADERS})
-
-# target_link_libraries(ManuExe ${PlatonicSolids_LINKED_LIBRARIES})
-# target_include_directories(ManuExe PRIVATE ${PlatonicSolids_INCLUDE} ${ManuExe_INCLUDE})
-# target_compile_options(ManuExe PUBLIC -fPIC)
-
-# add_executable(MarcoExe
-#       main_Marco.cpp
-#       ${PlatonicSolids_SOURCES}
-#       ${PlatonicSolids_HEADERS}
 #       ${MarcoExe_SOURCES}
 #       ${MarcoExe_HEADERS})
 
