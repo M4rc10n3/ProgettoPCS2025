@@ -21,10 +21,6 @@ namespace PolyhedraLibrary
         IdEdges.reserve(NumEdges);
         IdFaces.reserve(NumFaces);
 
-        ListVertPolyhedra.reserve(NumVertices);
-        ListEdgePolyhedra.reserve(NumEdges);
-        ListFacePolyhedra.reserve(NumFaces);
-
         // Initialize all the Matrices 
         
         CoordVertices = Eigen::MatrixXd(3, NumVertices);
@@ -57,9 +53,6 @@ namespace PolyhedraLibrary
         }
 
         /* Finding the edges of the polyhedron*/
-        
-        // TODO: vedere se si riesce a definire una funzione che trova i lati del poliedro da richiamare più volte
-        // Per questa funzione ci servono "lenghtEdge", "NumEdges" e il poliedro da cui partire e su cui salvare
        
         /* We didn't find any sequentiality in the ids of the edges, so we decided to find 
         them using their length (which stays always the same)*/
@@ -67,7 +60,6 @@ namespace PolyhedraLibrary
         /* We need to keep track of how many edges we've found, in order not to waste any 
         computational power */
         int newEdgesFound = 0;
-        // const int& numberVerticesToCheck = NumVertices;
         vector<int> nullVec = {};
 
         FindEdges(nullVec, newEdgesFound, NumVertices);

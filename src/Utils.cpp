@@ -621,10 +621,6 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                 verticesOnFace.push_back(newVertexId);
             }
         }
-       
-        // Devo passare al metodo di polyhedron:
-        // verticesOnFace
-        // lengthEdge
 
         /* Now we'll find the polyhedron new edges using a similar algorithm used for the old polyhedra 
         based on the length of the edge. It will be modified because we would also find internal edges 
@@ -698,15 +694,11 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     MatrixXi MatEdgeVertices = MatrixXi::Zero(polyhedron.NumEdges, (2 * numberDivisions) - 1); // Every row of the matrix
     // is the id of each edge of the initial polyhedron; 
 
-    int vertexcounter = 0; // takes track of the number of vertices examined
+    GEOSolid.CoordVertices.leftCols(polyhedron.NumVertices) = polyhedron.CoordVertices.leftCols(polyhedron.NumVertices);
+    int vertexcounter = polyhedron.NumVertices; // takes track of the number of vertices examined
     int edgecounter = 0; // takes track of the number of edges examined
     int facecounter = 0; // takes track of the number of faces examined
 
-    for (int i = 0; i < polyhedron.NumVertices; i++)
-    {
-        GEOSolid.CoordVertices.col(i) = polyhedron.CoordVertices.col(i);
-        vertexcounter++;
-    }
 
     for (int i = 0; i < polyhedron.NumFaces; i++)
     {
