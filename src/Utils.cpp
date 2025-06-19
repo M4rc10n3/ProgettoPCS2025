@@ -17,8 +17,7 @@ Eigen::Vector3d findBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertF
 
     /* Let's find the coordinates of the barycenter by computing the mean of the coordinates 
     of the 3 vertices of the triangular face of the polyhedron */
-    for(int i = 0; i < 3; i++)
-    {
+    for(int i = 0; i < 3; i++){
         CoordX += polyhedron.CoordVertices(0, VertFace(i));
         CoordY += polyhedron.CoordVertices(1, VertFace(i));
         CoordZ += polyhedron.CoordVertices(2, VertFace(i));
