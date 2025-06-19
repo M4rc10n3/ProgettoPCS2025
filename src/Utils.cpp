@@ -294,25 +294,26 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     const double newLengthEdge = oldLengthEdge / numberDivisions;
     tessellatedPolyhedron.lengthEdge = newLengthEdge;
 
-    const int numberVerticesOnFace = ((numberDivisions + 1) * (numberDivisions + 2) / 2);
-
+    
     /* Let's initialize a vector that will save all of the edges that we have already divided.
     It will v1 with just "-1" as its elements. Then, we'll also need to keep track of its 
     index in order to increase it and to access the right element of the vector. */
     vector<int> edgesDone(oldNumEdges, -1);
     int edgesDoneIndex = 0;
-
+    
     /* In order not to get it out of scope, we need to initialize here the variable we'll 
     use to keep track of how many inner vertices we have found and saved. This variable 
     will be uesed to access the right column of the matrix "CoordVertices". */
     int innerVerticesSaved = 0;
-
+    
     /* Same thing with the variable we'll use to keep track of how many edges we have found and saved.
     This variable will be used to access the right column of the matrix "newExtremaEdges" and as an 
     element saved into the matrix "newMatrEdgeVertices". */
-    int edgeIndexFound = 0;
+    int newEdgesFound = 0;
+    const int numberVerticesOnFace = ((numberDivisions + 1) * (numberDivisions + 2) / 2);
     
     int faceCounter = 0;
+    int numAdjacentVertices = 6;
     
     /* Let's initialise the vector which stores unique triangles (the faces of the polyhedron) 
     as sorted arrays of 3 vertices. It will store the unique new faces found on the old polyhedron 
@@ -621,63 +622,23 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
             }
         }
        
+        // Devo passare al metodo di polyhedron:
+        // verticesOnFace
+        // lengthEdge
+
         /* Now we'll find the polyhedron new edges using a similar algorithm used for the old polyhedra 
         based on the length of the edge. It will be modified because we would also find internal edges 
-        that we don't need using the original algorithm . */
+        that we don't need using the original algorithm. */
     
         /* We need to find the edges that start from each vertex of the face (except for the last one, 
         because that would be a certain useless iteration: we'll have already found all of the edges 
         that have the last vertex as an extrema). We will use the "verticesOnFace" vector to find 
         the right index of each vertex in our data structures */
-        for(int verticesOnFaceIndex1 = 0; verticesOnFaceIndex1 < numberVerticesOnFace - 1; verticesOnFaceIndex1++)
-        {
-            /* Proceed only if all the edges have not been numbered yet */
-            if(edgeIndexFound < numberNewEdges)
-            {
-                /* Let's rename the index of the vertex for code readability */
-                int& firstVertexIndex = verticesOnFace[verticesOnFaceIndex1];
 
-                /* We'll check every other vertex of the current face in order to find the ones 
-                with the exact distance from the vertex with index "firsteVertexIndex" */
-                for(int verticesOnFaceIndex2 = verticesOnFaceIndex1 + 1; verticesOnFaceIndex2 < numberVerticesOnFace; verticesOnFaceIndex2++)
-                {
-                    int& secondVertexIndex = verticesOnFace[verticesOnFaceIndex2];
-
-                    /* We'll use a function we have implemented in order to find the 
-                    distance squared between the two vertices: */
-                    double distanceSquared = tessellatedPolyhedron.DistanceSquaredBetween(firstVertexIndex, secondVertexIndex);
-
-                    /* When the two vertices have the correct distance squared between them we could save them 
-                    as an edge of the polyhedron if they have not been saved yet (the tolerance was set arbitrarily 
-                    after some trial and error) */
-                    if(abs(distanceSquared - newLengthEdge * newLengthEdge) < 5e-15)
-                    {
-                        /* We need to check whether we have already saved the two vertices as the extrema of 
-                        an edge, therefore we need to check whether inside the matrix "newMatrEdgeVertices" 
-                        there's an element saved at the position "(firstVertexIndex, secondVertexIndex)" */
-                        if(newMatrEdgeVertices(firstVertexIndex, secondVertexIndex) < 0){
-                            /* Now that we know the two vertices have not been saved yet, we can save them 
-                            in the matrix "newExtremaEdges" at the column "edgeIndexFound": */
-                            newExtremaEdges(0, edgeIndexFound) = firstVertexIndex;
-                            newExtremaEdges(1, edgeIndexFound) = secondVertexIndex;
-
-                            /* We also save the index of the edge inside the matrix "MatrEdgeVertices": 
-                            we'll use it in order to find the adjacent vertices for each vertex and 
-                            the faces of the polyhedron */
-                            newMatrEdgeVertices(firstVertexIndex, secondVertexIndex) = edgeIndexFound;
-                            newMatrEdgeVertices(secondVertexIndex, firstVertexIndex) = edgeIndexFound;
-        
-                            /* Now that we've found an edge we can go on to the next edge: */
-                            edgeIndexFound++;
-                        }
-                    }
-                }
-            }
-        }
+        tessellatedPolyhedron.FindEdges(verticesOnFace, newEdgesFound, numberVerticesOnFace);
         
         /* Now we can look for the new faces of the polyhedron starting from each of the vertices 
         on the face of the old polyhedron */
-        int numAdjacentVertices = 6;
         tessellatedPolyhedron.FindFaces(verticesOnFace, faceCounter, vecVertFaces, numAdjacentVertices);
     }
 

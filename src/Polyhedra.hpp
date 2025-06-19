@@ -71,11 +71,21 @@ namespace PolyhedraLibrary
         - newFacesFound: integer representing how many faces of the polyhedron were already found;
         - vecVertFaces: structure containing the unique faces already found as an array made up by their 3 ids;
         - numAdjacentVertices: integer representing how many vertices are adjacent to each 
-                               vertex in the polyhedron */
+                               vertex in the polyhedron. */
         void FindFaces(vector<int>& verticesOnFace, 
                        int& newFacesFound, 
                        vector<array<int, 3>>& vecVertFaces, 
                        int& numAdjacentVertices);
+
+        /* Creating the matrix containing the vertices of each face as its column, which is "ListVertFaces"
+        and the matrix containing the ids of the edges of each face, which is "ListEdgeFaces" 
+        Inputs list:
+        - verticesOnFace: vector containing the ids of the vertices for the face considered;
+        - newEdgesFound: integer representing how many edges of the polyhedron were already found. 
+        - numberVerticesToCheck: integer representing the number of vertices to iterate on; 
+                                 it is the number of all the vertices or the number of vertices 
+                                 on a single face */
+        void FindEdges(vector<int>& verticesOnFace, int& newEdgesFound, const int& numberVerticesToCheck);
 
         /* "FindAdjacentFaces" saves inside "ListAdjacentFaces" the adjacent faces to each face. 
         Each column contains the ids of the adjacent faces for the face that has the column index as id */

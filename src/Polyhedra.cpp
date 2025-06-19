@@ -66,44 +66,11 @@ namespace PolyhedraLibrary
         
         /* We need to keep track of how many edges we've found, in order not to waste any 
         computational power */
-        int edgeIndexFound = 0;
+        int newEdgesFound = 0;
+        // const int& numberVerticesToCheck = NumVertices;
+        vector<int> nullVec = {};
 
-        /* We need to find the edges that start from each vertex (except for the last one, 
-        because that would be a certain useless iteration: we'll have already found all of the edges 
-        that have the last vertex as an extrema) */
-        for(int firstVertexIndex = 0; firstVertexIndex < NumVertices - 1; firstVertexIndex++)
-        {
-            /* Proceed only if all the edges have not been numbered yet */
-            if(edgeIndexFound <= NumEdges)
-            {
-                /* We'll check every other vertex of the polyhedron (for which we don't have already 
-                found all edges) in order to find the ones with the exact distance from the vertex 
-                with index "firsteVertexIndex" */
-                for(int secondVertexIndex = firstVertexIndex + 1; secondVertexIndex < NumVertices; secondVertexIndex++)
-                {
-                    /* We'll use a function we have implemented in "Utils.cpp" in order to find the 
-                    distance squared between the two vertices: */
-                    double distanceSquared = DistanceSquaredBetween(firstVertexIndex, secondVertexIndex);
-
-                    /* When the two vertices have the correct distance squared between them we save them as an 
-                    edge of the polyhedron (the tolerance was set arbitrarily after some trial and error) */
-                    if(abs(distanceSquared - lengthEdge * lengthEdge) < 5e-15)
-                    {
-                        ExtremaEdges(0, edgeIndexFound) = firstVertexIndex;
-                        ExtremaEdges(1, edgeIndexFound) = secondVertexIndex;
-
-                        /* We also save the index of the edge inside the matrix "MatrEdgeVertices": 
-                        we'll use it in order to find the adjacent vertices for each vertex and 
-                        the faces of the polyhedron */
-                        MatrEdgeVertices(firstVertexIndex, secondVertexIndex) = edgeIndexFound;
-                        MatrEdgeVertices(secondVertexIndex, firstVertexIndex) = edgeIndexFound;
-
-                        /* Now that we've found an edge we can go on to the next edge: */
-                        edgeIndexFound++;
-                    }
-                }
-            }
-        }
+        FindEdges(nullVec, newEdgesFound, NumVertices);
 
 
         /* We need to initialise the arguments we'll pass to the function that will find the faces 
@@ -111,7 +78,7 @@ namespace PolyhedraLibrary
         
         /* There aren't any vertices on the face except for the of the original polyhedron, 
         so the function works with a null vector as first argument */
-        vector<int> verticesOnFace = {};
+        // vector<int> verticesOnFace = {};
         
         /* The function needs to know if we've already found any faces before, but we didn't, 
         so we pass a variable equal to 0 to the function */
@@ -124,10 +91,10 @@ namespace PolyhedraLibrary
 
         /* The function needs to know how many adjacent vertices there are maximum for each vertex 
         of the polyhedron, so we pass this value to it */
-        int numAdjacentVertices = 3;
+        // int numAdjacentVertices = 3;
 
         /* Now we can call the function with all the arguments needed */
-        FindFaces(verticesOnFace, newFacesFound, vecVertFaces, numAdjacentVertices);
+        FindFaces(nullVec, newFacesFound, vecVertFaces, p);
     }
     
     /* FindAdjacentFaces is a function we'll need in order to avoid duplicating the edges and vertices 
@@ -258,6 +225,61 @@ namespace PolyhedraLibrary
         }
         /* After we've created the adjacency list for each vertex, we can return the structure */
         return adjacencyList;
+    }
+
+    void GEOPolyhedron::FindEdges(vector<int>& verticesOnFace, int& newEdgesFound, const int& numberVerticesToCheck)
+    {
+        for(int verticesOnFaceIndex1 = 0; verticesOnFaceIndex1 < numberVerticesToCheck - 1; verticesOnFaceIndex1++)
+        {
+            /* Proceed only if all the edges have not been numbered yet */
+            if(newEdgesFound < NumEdges)
+            {
+                /* Let's rename the index of the vertex for code readability */
+                int firstVertexIndex = verticesOnFaceIndex1;
+                if(verticesOnFace.size() > 0){
+                    firstVertexIndex = verticesOnFace[verticesOnFaceIndex1];
+                }
+
+                /* We'll check every other vertex of the current face in order to find the ones 
+                with the exact distance from the vertex with index "firsteVertexIndex" */
+                for(int verticesOnFaceIndex2 = verticesOnFaceIndex1 + 1; verticesOnFaceIndex2 < numberVerticesToCheck; verticesOnFaceIndex2++)
+                {
+                    int secondVertexIndex = verticesOnFaceIndex2;
+                    if(verticesOnFace.size() > 0){
+                        secondVertexIndex = verticesOnFace[verticesOnFaceIndex2];
+                    }
+
+                    /* We'll use a function we have implemented in order to find the 
+                    distance squared between the two vertices: */
+                    double distanceSquared = DistanceSquaredBetween(firstVertexIndex, secondVertexIndex);
+
+                    /* When the two vertices have the correct distance squared between them we could save them 
+                    as an edge of the polyhedron if they have not been saved yet (the tolerance was set arbitrarily 
+                    after some trial and error) */
+                    if(abs(distanceSquared - lengthEdge * lengthEdge) < 5e-15 
+                        && MatrEdgeVertices(firstVertexIndex, secondVertexIndex) < 0)
+                    {
+                        /* We need to check whether we have already saved the two vertices as the extrema of 
+                        an edge, therefore we need to check whether inside the matrix "newMatrEdgeVertices" 
+                        there's an element saved at the position "(firstVertexIndex, secondVertexIndex)" */
+
+                        /* Now that we know the two vertices have not been saved yet, we can save them 
+                        in the matrix "newExtremaEdges" at the column "edgeIndexFound": */
+                        ExtremaEdges(0, newEdgesFound) = firstVertexIndex;
+                        ExtremaEdges(1, newEdgesFound) = secondVertexIndex;
+
+                        /* We also save the index of the edge inside the matrix "MatrEdgeVertices": 
+                        we'll use it in order to find the adjacent vertices for each vertex and 
+                        the faces of the polyhedron */
+                        MatrEdgeVertices(firstVertexIndex, secondVertexIndex) = newEdgesFound;
+                        MatrEdgeVertices(secondVertexIndex, firstVertexIndex) = newEdgesFound;
+    
+                        /* Now that we've found an edge we can go on to the next edge: */
+                        newEdgesFound++;
+                    }
+                }
+            }
+        }
     }
 
     void GEOPolyhedron::FindFaces(vector<int>& verticesOnFace, int& newFacesFound, vector<array<int, 3>>& vecVertFaces, int& numAdjacentVertices)
@@ -450,7 +472,6 @@ namespace PolyhedraLibrary
         Cell3Ds();
     }
 
-    // C'è un problema in queste 4 funzioni, il resto del codice funziona
     void GEOPolyhedron::Cell0Ds()
     {
         ofstream file("../PolygonalData/Cell0Ds.txt"); // the program should be launched inside Debug or Release folders
@@ -586,14 +607,6 @@ namespace PolyhedraLibrary
 
         file.close();
     }
-
-    // void CreateCells()
-    // {
-    //     Cell0Ds();
-    //     Cell1Ds();
-    //     Cell2Ds();
-    //     Cell3Ds();
-    // }
 
     double GEOPolyhedron::DistanceSquaredBetween(int& idPoint1, int& idPoint2)
     {

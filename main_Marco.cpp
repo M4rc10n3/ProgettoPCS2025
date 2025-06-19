@@ -12,7 +12,7 @@ int main()
 {
     int p = 3;
     int q = 4;
-    int b = 6;
+    int b = 3;
     cout << "p = " << p << endl;
     cout << "q = " << q << endl;
 
@@ -24,6 +24,7 @@ int main()
     Path minimumPath;
     polyhedron.ExportPolyhedron(minimumPath);
     // GEOPolyhedron tessellatedPolyhedron = TypeITessellation(polyhedron, b);
+    // tessellatedPolyhedron.ExportPolyhedron(minimumPath);
     // GEOPolyhedron finalPolyhedron = TypeIITessellation(polyhedron, tessellatedPolyhedron, b);
     // Path minimumPath;
     // OntoTheUnitSphere(finalPolyhedron);
