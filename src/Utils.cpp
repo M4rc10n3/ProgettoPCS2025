@@ -1,4 +1,3 @@
-/* File containing the body of the functions we'll use */
 # include <vector>
 # include <queue>
 # include "Utils.hpp"
@@ -204,97 +203,6 @@ void OntoTheUnitSphere(GEOPolyhedron& polyhedron)
             CoordVertices(coord, vertexIndex) = vertexCoord(coord);
         }
     }
-}
-
-GEOPolyhedron Dualise(GEOPolyhedron& polyhedron)
-{
-    /* Let's initialise the object of type "GEOPolyhedron" that will be returned by the function */
-    GEOPolyhedron dualPolyhedron;
-
-    /* Let's rename the data structures we'll use in this function for code readability */
-    Eigen::MatrixXi& oldListAdjacentFaces = polyhedron.ListAdjacentFaces;
-    Eigen::MatrixXi& oldListVertFaces = polyhedron.ListVertFaces;
-    int& oldNumVertices = polyhedron.NumVertices;
-    int& NumEdges = polyhedron.NumEdges;
-    int& oldNumFaces = polyhedron.NumFaces;
-    
-    /* Let's initialise the data structures of the dual polyhedron: the dual polyhedron will 
-    have the number of vertices and faces swapped in comparison to the original polyhedron */
-    dualPolyhedron.NumVertices = oldNumFaces;
-    dualPolyhedron.NumEdges = NumEdges;
-    dualPolyhedron.NumFaces = oldNumVertices;
-
-    Eigen::MatrixXd& newCoordVertices = dualPolyhedron.CoordVertices;
-    newCoordVertices.resize(3, dualPolyhedron.NumVertices);
-
-    Eigen::MatrixXi& newExtremaEdges = dualPolyhedron.ExtremaEdges;
-    newExtremaEdges.resize(2, NumEdges);
-
-    Eigen::MatrixXi& newListVertFaces = dualPolyhedron.ListVertFaces;
-    newListVertFaces.resize(3, dualPolyhedron.NumFaces);
-
-    /* Let's initialise a structure we'll use in order to find the edges and not repeat them */
-    vector<array<int, 2>> edgesFound;
-    /* The structure will need just enough memory space to save all of edges (that are represented
-    by their extrema) */
-    edgesFound.reserve(NumEdges);
-
-
-
-    // Questa variabile potrebbe essere rimpiazzata con la size() di edgesFound, che dite? 
-    // Risparmiamo memoria o potenza di calcolo?
-    int edgeFoundIndex = 0;
-
-
-
-    /* For each face we'll calculate the coordinates of its barycenter and the edges that 
-    have it as one of their extrema */
-    for(int faceIndex = 0; faceIndex < oldNumFaces; faceIndex++)
-    {
-        /* Let's initialise a vector that will store the indexes of the vertices of the face */
-        Eigen::Vector3i verticesOfFace = Eigen::Vector3i::Zero();
-        verticesOfFace << oldListVertFaces(0, faceIndex),
-                          oldListVertFaces(1, faceIndex),
-                          oldListVertFaces(2, faceIndex);
-
-        /* Let's use the function "findBarycenter" we implemented in order to compute 
-        the barycenter coordinates */
-        Eigen::Vector3d barycenterCoordinates = findBarycenter(polyhedron, verticesOfFace);
-        /* Let's save the coordinates of the barycenter of the face with index "faceIndex" as the 
-        coordinates of the vertex with index "faceIndex" of "dualPolyhedron" */
-        newCoordVertices.col(faceIndex) = barycenterCoordinates;
-        
-        /* In order to minimize the computational strain, let's find the edges that have the barycenter
-        with index "faceIndex" as one of their extrema. By using the structure "oldListAdjacentFaces" we 
-        can know which faces are adjacent, therefore connect their barycenters and create an edge. 
-        We just need to make sure that we didn't save the edge yet in order to avoid repeating edges. */
-        for(int adjacentFace = 0; adjacentFace < 3; adjacentFace++)
-        {
-            /* Let's access the right "adjacentFaceIndex" using the structure "oldListAdjacentFaces"*/
-            int& adjacentFaceIndex = oldListAdjacentFaces(adjacentFace, faceIndex);
-
-            /* An edge is formed by the two adjacent faces */
-            array<int, 2> sortedEdge = {faceIndex, adjacentFaceIndex};
-            /* We sort it in order to save it inside the structure "edgesFound" just once */
-            sort(sortedEdge.begin(), sortedEdge.end());
-
-            if(find(edgesFound.begin(), edgesFound.end(), sortedEdge) == edgesFound.end()){
-                /* If the edge isn't in the vector yet, we save it inside of it and in all of our 
-                data structures */
-                edgesFound.push_back(sortedEdge);
-
-                newExtremaEdges(0, edgeFoundIndex) = sortedEdge[0];
-                newExtremaEdges(1, edgeFoundIndex) = sortedEdge[1];
-                
-                /* Let's update the counter of how many edges we've found in order to access the right 
-                column of the matrix "newExtremaEdges" */
-                edgeFoundIndex++;
-            }
-        }
-    }
-
-    /* Now that everything's done, we can return "dualPolyhedron" */
-    return dualPolyhedron;
 }
 
 GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
@@ -602,7 +510,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     
                         /* "distance" is the variable contanining the difference between the distance squared 
                         between the vertices and the length of the segment we're looking for */
-                        double distance = abs(DistanceSquaredBetween(tessellatedPolyhedron, idVertexWeStartFrom, idOpposingVertex) - 
+                        double distance = abs(tessellatedPolyhedron.DistanceSquaredBetween(idVertexWeStartFrom, idOpposingVertex) - 
                             newLengthEdge * (numberDivisions - 1 - time) * newLengthEdge * (numberDivisions - 1 - time));
     
                         /* When we found a vertex with a "distance" that's less than that we've already saved, 
@@ -650,7 +558,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                     
                     /* "distance" is the variable contanining the difference between the distance squared 
                     between the vertices and the length of the segment we're looking for */
-                    double distance = abs(DistanceSquaredBetween(tessellatedPolyhedron, idVertexWeStartFrom, idOpposingVertex) - 
+                    double distance = abs(tessellatedPolyhedron.DistanceSquaredBetween(idVertexWeStartFrom, idOpposingVertex) - 
                         newLengthEdge * (numberDivisions - 1 - time) * newLengthEdge * (numberDivisions - 1 - time));
 
                     /* When we found a vertex with a "distance" that's less than that we've already saved, 
@@ -719,7 +627,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         based on the length of the edge. It will be modified because we would also find internal edges 
         that we don't need using the original algorithm . */
     
-        /* We need to find the edges that v1 from each vertex of the face (except for the last one, 
+        /* We need to find the edges that start from each vertex of the face (except for the last one, 
         because that would be a certain useless iteration: we'll have already found all of the edges 
         that have the last vertex as an extrema). We will use the "verticesOnFace" vector to find 
         the right index of each vertex in our data structures */
@@ -739,7 +647,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
 
                     /* We'll use a function we have implemented in order to find the 
                     distance squared between the two vertices: */
-                    double distanceSquared = DistanceSquaredBetween(tessellatedPolyhedron, firstVertexIndex, secondVertexIndex);
+                    double distanceSquared = tessellatedPolyhedron.DistanceSquaredBetween(firstVertexIndex, secondVertexIndex);
 
                     /* When the two vertices have the correct distance squared between them we could save them 
                     as an edge of the polyhedron if they have not been saved yet (the tolerance was set arbitrarily 
@@ -769,7 +677,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
             }
         }
         
-        /* Now we can look for the new faces of the polyhedron v1ing from each of the vertices 
+        /* Now we can look for the new faces of the polyhedron starting from each of the vertices 
         on the face of the old polyhedron */
         int numAdjacentVertices = 6;
         tessellatedPolyhedron.FindFaces(verticesOnFace, faceCounter, vecVertFaces, numAdjacentVertices);
@@ -791,6 +699,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     NumFaces = 0; 
 
     int& p = polyhedron.p;
+    GEOSolid.p = p;
 
     // NumVertices = numV + numE(2b-1)+numF((3b^2)/2-3b/2+1)
     NumVertices = polyhedron.NumVertices + 
@@ -1022,28 +931,4 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
         GEOSolid.FindFaces(total_vertices, facecounter, vecVertFaces , numAdjecentVert);
     } 
     return GEOSolid;
-}
-
-double DistanceSquaredBetween(GEOPolyhedron& polyhedron, int& idPoint1, int& idPoint2)
-{
-
-    Eigen::MatrixXd& CoordVertices = polyhedron.CoordVertices;
-
-    double& point1XCoord = CoordVertices(0, idPoint1);
-    double& point1YCoord = CoordVertices(1, idPoint1);
-    double& point1ZCoord = CoordVertices(2, idPoint1);
-
-    double& point2XCoord = CoordVertices(0, idPoint2);
-    double& point2YCoord = CoordVertices(1, idPoint2);
-    double& point2ZCoord = CoordVertices(2, idPoint2);
-
-    double differenceXCoord = point1XCoord - point2XCoord;
-    double differenceYCoord = point1YCoord - point2YCoord;
-    double differenceZCoord = point1ZCoord - point2ZCoord;
-
-    double distanceSquared = differenceXCoord * differenceXCoord +
-                      differenceYCoord * differenceYCoord + 
-                      differenceZCoord * differenceZCoord;
-
-    return distanceSquared;
 }

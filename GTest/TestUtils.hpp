@@ -279,17 +279,17 @@ TEST(TestUtils, TestDistanceSquaredBetween)
     "DistanceSquaredBetween" */
     int vertex1 = 0;
     int vertex2 = 1;
-    EXPECT_DOUBLE_EQ(625, DistanceSquaredBetween(testPolyhedron, vertex1, vertex2));
+    EXPECT_DOUBLE_EQ(625, testPolyhedron.DistanceSquaredBetween(vertex1, vertex2));
 
     vertex1 = 2;
     vertex2 = 3;
-    EXPECT_DOUBLE_EQ(225, DistanceSquaredBetween(testPolyhedron, vertex1, vertex2));
+    EXPECT_DOUBLE_EQ(225, testPolyhedron.DistanceSquaredBetween(vertex1, vertex2));
 
     vertex1 = 4;
     vertex2 = 5;
-    EXPECT_DOUBLE_EQ(25, DistanceSquaredBetween(testPolyhedron, vertex1, vertex2));
+    EXPECT_DOUBLE_EQ(25, testPolyhedron.DistanceSquaredBetween(vertex1, vertex2));
 
     vertex1 = 6;
     vertex2 = 7;
-    EXPECT_DOUBLE_EQ(4, DistanceSquaredBetween(testPolyhedron, vertex1, vertex2));
+    EXPECT_DOUBLE_EQ(4, testPolyhedron.DistanceSquaredBetween(vertex1, vertex2));
 }

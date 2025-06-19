@@ -11,24 +11,24 @@ using namespace Eigen;
 int main()
 {
     int p = 3;
-    int q = 5;
-    int b = 17;
+    int q = 4;
+    int b = 6;
     cout << "p = " << p << endl;
     cout << "q = " << q << endl;
 
-    BuildPolyhedra Constructor(p, q); // create the structure of the Polyedron
-    Constructor.DataPolyhedra();
-    Constructor.CreateCells();
-    GEOPolyhedron polyhedron = Constructor.GetPolyhedron();
-    // polyhedron.ExportPolyhedron();
-    
-    GEOPolyhedron tessellatedPolyhedron = TypeITessellation(polyhedron, b);
-    // tessellatedPolyhedron.FindFacesWithVertex();
-    Path minimumPath;
-    OntoTheUnitSphere(tessellatedPolyhedron);
-    tessellatedPolyhedron.ExportPolyhedron(minimumPath);
+    GEOPolyhedron polyhedron;
+    polyhedron.p = p;
+    polyhedron.q = q;
 
-    // GEOPolyhedron dualPolyhedron = Dualise(tessellatedPolyhedron);
+    polyhedron.CreateStartingPolyhedron();
+    Path minimumPath;
+    polyhedron.ExportPolyhedron(minimumPath);
+    // GEOPolyhedron tessellatedPolyhedron = TypeITessellation(polyhedron, b);
+    // GEOPolyhedron finalPolyhedron = TypeIITessellation(polyhedron, tessellatedPolyhedron, b);
+    // Path minimumPath;
+    // OntoTheUnitSphere(finalPolyhedron);
+    // finalPolyhedron.ExportPolyhedron(minimumPath);
+
 
     return 0;
 }

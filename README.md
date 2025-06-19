@@ -8,7 +8,7 @@ Domande:
    Risposta: possiamo formattarli come vogliamo, basta che l'estensione sia .txt
 
 
-2. Dobbiamo solo fare in modo che il programma dia output solo per poliedri che hanno p = 3, così come dia il poliedro di Goldberg    solo per quelli con q = 3 ?
+2. Dobbiamo solo fare in modo che il programma dia output solo per poliedri che hanno p = 3, così come dia il poliedro di Goldberg solo per quelli con q = 3 ?
 
    Risposta: conferma. Per ottenere i poliedri di Goldberg per q=3 (partendo dal cubo e dodecaedro) si passa dai poliedri con p=3 (tetraedro, ottaedro, icosaedro), quindi sono questi ultimi quelli su cui dobbiamo concentrarci. Se ci dessero come _input_ {4, 3}, possiamo partire da {3, 4} e svolgere ciò che ci è richiesto.
 

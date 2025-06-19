@@ -71,112 +71,202 @@ int main(int argc, char* argv[])
         c << ")" << endl; 
     }
 
+    /* Let's define a boolean we'll use to tell the program to stop */
+    bool goOn = true;
+
+    /* Let's initialise the starting polyhedron */
     GEOPolyhedron polyhedron;
+    
+    /* Let's check whether the inputs are correct: 
+        - if that's the case, we can store p and q inside polyhedron in order to 
+          create the starting polyhedron later;
+        - if that's not the case, we print an error message and stop the program using 
+          the boolean "goOn" */
     if(p == 3)
     {
-        BuildPolyhedra Constructor(p, q); 
-        Constructor.DataPolyhedra(); // create the structure of the Polyhedron
-        polyhedron = Constructor.GetPolyhedron();
-    }
-    else if(q == 3)
-    {   
-        BuildPolyhedra Constructor(q, p);
-        Constructor.DataPolyhedra(); // create the structure of the Polyhedron
-        polyhedron = Constructor.GetPolyhedron();
-    }
-
-    bool tessI = false;
-    bool tessII = false;
-
-    GEOPolyhedron tessellatedPolyhedron;
-
-    // check the validity for the values b and c and perform the requested tessellation
-    if((b == 0 && c >= 1) || (b >= 1 && c == 0))
-    {
-        tessI = true;
-		cout << "Tessellation type I" << endl;
-		int n = max(b,c);
-		tessellatedPolyhedron = TypeITessellation(polyhedron, n);
-        OntoTheUnitSphere(tessellatedPolyhedron);
-	} 
-    else if(b == c && b != 0)
-    {
-        tessII = true;
-		cout << "Tessellation type II" << endl;
-        GEOPolyhedron type_I_tessellation = TypeITessellation(polyhedron, b);
-		tessellatedPolyhedron = TypeIITessellation(polyhedron, type_I_tessellation, b);
-        OntoTheUnitSphere(tessellatedPolyhedron);
-    } 
-    else 
-    {
-		cout << "Invalid values for b and c" << endl;
-    }
-
-
-    vector<int> nullVec = {};
-    int numAdjacentFaces = 6;
-    Path minimumPath;
-
-    if(findMinPath)
-    {
-        vector<int> minPath;
-        double lengthPath;
-        int num_experiment = 100;
-        double time_elapsed_heap = 0.0;
-        if(id_vertex_1 >= 0 && id_vertex_1 < tessellatedPolyhedron.NumVertices && id_vertex_2 >= 0 && id_vertex_2 < tessellatedPolyhedron.NumVertices)
+        polyhedron.p = p;
+        cout << "polyhedron.p: " << polyhedron.p << endl;
+        if(q == 3)
         {
-            // Eigen::MatrixXd matrWeights = Eigen::MatrixXd::Zero(tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.NumVertices);
-            // for(int i = 0; i < tessellatedPolyhedron.NumVertices; i++){
-            //     for(int j = 0; j < tessellatedPolyhedron.NumVertices; j++){
-            //         if(tessellatedPolyhedron.MatrEdgeVertices(i,j) > -1){
-            //             matrWeights(i,j) = tessellatedPolyhedron.lengthEdge;
-            //         }
-            //     }
-            // }
-            if(tessI)
-            {
-                cout << "BFS algorithm to find the minimum path" << endl;
-                for(int t = 0; t < num_experiment; t++)
-                {
-                    lengthPath = 0.0;
-                    std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
-
-                    minPath = BFS(tessellatedPolyhedron.AdjacencyList(nullVec, numAdjacentFaces), id_vertex_1, id_vertex_2, tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.lengthEdge, lengthPath);
-
-                    std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
-                    time_elapsed_heap += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();                    
-                }
-                time_elapsed_heap /= num_experiment;
-                cout << "Average time to run the algorithm: " << time_elapsed_heap << " µs" << endl;            
-            } 
-            else if(tessII)
-            {                
-                cout << "Dijkstra algorithm to find the minimum path" << endl;
-                // for(unsigned int t = 0; t < num_experiment; t++)
-                // {
-                //     lengthPath = 0.0;
-                //     std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
-
-                //     minPath = Dijkstra(tessellatedPolyhedron.AdjacencyList(), id_vertex_1, id_vertex_2, tessellatedPolyhedron.NumVertices, matrWeights, lengthPath);
-                    
-                //     std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
-                //     time_elapsed_heap += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();                    
-                // }
-                // time_elapsed_heap /= num_experiment;
-                // cout << "Average time to run the algorithm: " << time_elapsed_heap << " µs" << endl;            
-            }
-            MinimumPath(minPath, tessellatedPolyhedron.MatrEdgeVertices, tessellatedPolyhedron.NumVertices, 
-                        tessellatedPolyhedron.NumEdges, lengthPath, minimumPath.VerticesShortPath, 
-                        minimumPath.EdgesShortPath);
-    
-        } else {
-            cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
+            polyhedron.q = q;
+            cout << "Your starting polyhedron is a Tetrahedron. " << endl;
+        }
+        else if(q == 4)
+        {
+            polyhedron.q = q;
+            cout << "polyhedron.q: " << polyhedron.q << endl;
+            cout << "Your starting polyhedron is a Octahedron. " << endl;
+        }
+        else if(q == 5)
+        {
+            polyhedron.q = q;
+            cout << "Your starting polyhedron is an Icosahedron. " << endl;
+        }
+        else
+        {    
+            goOn = false;
+            cerr << "Invalid values for p and q" << endl;
+            cerr << "This program cannot handle your polyhedron."  << endl;
+            cerr << "This program only works with platonic polyhedra."  << endl;
+            cerr << "If you want a platonic polyhedra with p = 3, try inputting 3, 4 or 5 for q." << endl << endl;
         }
     }
+    else if(p == 4){
+        if(q == 3)
+        {
+            polyhedron.p = q;
+            polyhedron.q = p;
 
-    tessellatedPolyhedron.ExportPolyhedron(minimumPath);
+            cout << "Your starting polyhedron is a Cube. " << endl;
+        }
+        else
+        {
+            goOn = false;
+            cerr << "Invalid values for p and q" << endl;
+            cerr << "This program cannot handle your polyhedron."  << endl;
+            cerr << "This program only works with platonic polyhedra."  << endl;
+            cerr << "If you want a platonic polyhedra with p = 4, try inputting 3 for q." << endl << endl;
+        }
+    }
+    else if(p == 5){
+        if(q == 3)
+        {
+            polyhedron.p = q;
+            polyhedron.q = p;
 
-    // Constructor.CreateCells();
+            cout << "Your starting polyhedron is a Dodecahedron. " << endl;
+        }
+        else
+        {
+            goOn = false;
+            cerr << "Invalid values for p and q" << endl;
+            cerr << "This program cannot handle your polyhedron."  << endl;
+            cerr << "This program only works with platonic polyhedra."  << endl;
+            cerr << "If you want a platonic polyhedra with p = 5, try inputting 3 for q." << endl << endl;
+        }
+    }
+    else
+    {
+        goOn = false;
+        cerr << "Invalid values for p and q" << endl;
+        cerr << "This program cannot handle your polyhedron."  << endl;
+        cerr << "This program only works with platonic polyhedra."  << endl;
+        cerr << "If you want a platonic polyhedra, you need to choose p and q among 3, 4 or 5." << endl << endl;
+    }
+
+    if(goOn)
+    {
+        /* Let's create the starting polyhedron if we can "goOn" */
+        polyhedron.CreateStartingPolyhedron();
+    
+
+        // tessellation
+        bool tessI = false;
+        bool tessII = false;
+    
+        GEOPolyhedron tessellatedPolyhedron;
+    
+        // check the validity for the values b and c and perform the requested tessellation
+        if((b == 0 && c >= 1) || (b >= 1 && c == 0))
+        {
+            tessI = true;
+            cout << "Tessellation type I" << endl;
+            int n = max(b,c);
+            tessellatedPolyhedron = TypeITessellation(polyhedron, n);
+            OntoTheUnitSphere(tessellatedPolyhedron);
+        } 
+        else if(b == c && b != 0)
+        {
+            tessII = true;
+            cout << "Tessellation type II" << endl;
+            GEOPolyhedron type_I_tessellation = TypeITessellation(polyhedron, b);
+            tessellatedPolyhedron = TypeIITessellation(polyhedron, type_I_tessellation, b);
+            OntoTheUnitSphere(tessellatedPolyhedron);
+        } 
+        else 
+        {
+            goOn = false;
+            cerr << "Invalid values for b and c" << endl;
+            cerr << "This program can only handle positive integer values for b and c; \n" <<
+                "in particular, just one of them can be equal to 0 or they can be the same value." << endl;
+        }
+
+
+        // minimum path finding
+        Path minimumPath;
+    
+        if(findMinPath)
+        {
+            vector<int> minPath;
+            double lengthPath;
+
+            /* Let's define here two variables we'll need for the function 
+            "AdjacencyList" used in the minimum path finding */
+            vector<int> nullVec = {};
+            int numAdjacentFaces = 6;
+    
+            if(id_vertex_1 >= 0 && id_vertex_1 < tessellatedPolyhedron.NumVertices 
+                && id_vertex_2 >= 0 && id_vertex_2 < tessellatedPolyhedron.NumVertices)
+            {
+                if(tessI)
+                {
+                    cout << "BFS algorithm to find the minimum path" << endl;
+    
+                    minPath = BFS(tessellatedPolyhedron.AdjacencyList(nullVec, numAdjacentFaces), 
+                                  id_vertex_1, 
+                                  id_vertex_2, 
+                                  tessellatedPolyhedron.NumVertices, 
+                                  tessellatedPolyhedron.lengthEdge, 
+                                  lengthPath);
+              
+                } 
+                else if(tessII)
+                {           
+                    cout << "Dijkstra algorithm to find the minimum path" << endl;
+    
+                    Eigen::MatrixXd matrWeights = Eigen::MatrixXd::Zero(tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.NumVertices);
+                    for(int i = 0; i < tessellatedPolyhedron.NumVertices; i++){
+                        for(int j = 0; j < tessellatedPolyhedron.NumVertices; j++){
+                            if(tessellatedPolyhedron.MatrEdgeVertices(i,j) > -1){
+                                matrWeights(i,j) = tessellatedPolyhedron.lengthEdge;
+                            }
+                        }
+                    }
+    
+                    minPath = Dijkstra(tessellatedPolyhedron.AdjacencyList(nullVec, numAdjacentFaces), 
+                                       id_vertex_1, 
+                                       id_vertex_2, 
+                                       tessellatedPolyhedron.NumVertices, 
+                                       matrWeights, 
+                                       lengthPath);      
+                }
+                MinimumPath(minPath, 
+                            tessellatedPolyhedron.MatrEdgeVertices, 
+                            tessellatedPolyhedron.NumVertices, 
+                            tessellatedPolyhedron.NumEdges, 
+                            lengthPath, 
+                            minimumPath.VerticesShortPath, 
+                            minimumPath.EdgesShortPath);
+        
+            } else {
+                cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
+                cout << "They should be between 0 and " << tessellatedPolyhedron.NumVertices << endl;
+            }
+        }
+    
+        /* If every input was correct, then we can export the tessellated polyhedron, 
+        otherwise we export the starting polyhedron in order to give the user something 
+        instead of a simple error message */
+        if(goOn)
+        {
+            tessellatedPolyhedron.ExportPolyhedron(minimumPath);
+        }
+        else
+        {
+            polyhedron.ExportPolyhedron(minimumPath);
+        }
+
+    }
 
     return 0;
 }

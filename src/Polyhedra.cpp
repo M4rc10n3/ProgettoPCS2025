@@ -1,12 +1,137 @@
 #include <vector>
+#include <iomanip>
 #include "Polyhedra.hpp"
+#include "Utils.hpp"
 #include "UCDUtilities.hpp"
 
 using namespace std;
 
 namespace PolyhedraLibrary
 {
+    void GEOPolyhedron::CreateStartingPolyhedron()
+    {
+        NumFaces = (4 * q) / ((2 * p) - (p * q) + 2 * q); // determines the number of faces using p and q 
+        NumEdges = (p * NumFaces) / 2;
+        NumVertices = (p * NumFaces) / q;
 
+        // Reserves the exact amount of memory for the differents IDs
+        IdVertices.resize(NumVertices);
+        for(unsigned int i = 0; i < IdVertices.size(); i++){
+            IdVertices[i] = i;
+        }
+        IdEdges.reserve(NumEdges);
+        IdFaces.reserve(NumFaces);
+
+        ListVertPolyhedra.reserve(NumVertices);
+        ListEdgePolyhedra.reserve(NumEdges);
+        ListFacePolyhedra.reserve(NumFaces);
+
+        // Initialize all the Matrices 
+        
+        CoordVertices = Eigen::MatrixXd(3, NumVertices);
+        ExtremaEdges = Eigen::MatrixXi(2, NumEdges);
+        MatrEdgeVertices = Eigen::MatrixXi::Constant(NumVertices, NumVertices, -1);
+        ListEdgeFaces = Eigen::MatrixXi(p, NumFaces);
+        ListVertFaces = Eigen::MatrixXi(p, NumFaces);
+        ListAdjacentFaces = Eigen::MatrixXi(p, NumFaces);
+        
+        switch (q)
+        {
+        case 3:
+            lengthEdge = 2 * sqrt(6) / 3;
+            CoordVertices << 0, -0.942809041582063, 0.471404520791031, 0.471404520791031,
+                             0, 0, -0.816496580927726, 0.816496580927726,
+                             1, -0.333333333333333, -0.333333333333333, -0.333333333333333;
+            break;
+        case 4:
+            lengthEdge = sqrt(2);
+            CoordVertices << 0, 0, 0, 0, 1, -1,
+                             0, 0, 1, -1, 0, 0,
+                             1, -1, 0, 0, 0, 0;
+            break;
+        case 5:
+            lengthEdge = 4 / sqrt(10 + 2 * sqrt(5)); 
+            CoordVertices << 0, 0.894427190999916, 0.276393202250021, 0.723606797749979, -0.276393202250021, 0, -0.894427190999916, -0.276393202250021, -0.723606797749979, 0.276393202250021, 0.723606797749979, -0.723606797749979,
+                             0, 0, 0.85065080835204, 0.525731112119134, 0.85065080835204, 0, 0, -0.85065080835204, -0.525731112119134, -0.85065080835204, -0.525731112119133, 0.525731112119134,
+                             1, 0.447213595499958, 0.447213595499958, -0.447213595499958, -0.447213595499958, -1, -0.447213595499958, -0.447213595499958, 0.447213595499958, 0.447213595499957, -0.447213595499958, 0.447213595499958;   
+            break;
+
+        }
+
+        /* Finding the edges of the polyhedron*/
+        
+        // TODO: vedere se si riesce a definire una funzione che trova i lati del poliedro da richiamare più volte
+        // Per questa funzione ci servono "lenghtEdge", "NumEdges" e il poliedro da cui partire e su cui salvare
+       
+        /* We didn't find any sequentiality in the ids of the edges, so we decided to find 
+        them using their length (which stays always the same)*/
+        
+        /* We need to keep track of how many edges we've found, in order not to waste any 
+        computational power */
+        int edgeIndexFound = 0;
+
+        /* We need to find the edges that start from each vertex (except for the last one, 
+        because that would be a certain useless iteration: we'll have already found all of the edges 
+        that have the last vertex as an extrema) */
+        for(int firstVertexIndex = 0; firstVertexIndex < NumVertices - 1; firstVertexIndex++)
+        {
+            /* Proceed only if all the edges have not been numbered yet */
+            if(edgeIndexFound <= NumEdges)
+            {
+                /* We'll check every other vertex of the polyhedron (for which we don't have already 
+                found all edges) in order to find the ones with the exact distance from the vertex 
+                with index "firsteVertexIndex" */
+                for(int secondVertexIndex = firstVertexIndex + 1; secondVertexIndex < NumVertices; secondVertexIndex++)
+                {
+                    /* We'll use a function we have implemented in "Utils.cpp" in order to find the 
+                    distance squared between the two vertices: */
+                    double distanceSquared = DistanceSquaredBetween(firstVertexIndex, secondVertexIndex);
+
+                    /* When the two vertices have the correct distance squared between them we save them as an 
+                    edge of the polyhedron (the tolerance was set arbitrarily after some trial and error) */
+                    if(abs(distanceSquared - lengthEdge * lengthEdge) < 5e-15)
+                    {
+                        ExtremaEdges(0, edgeIndexFound) = firstVertexIndex;
+                        ExtremaEdges(1, edgeIndexFound) = secondVertexIndex;
+
+                        /* We also save the index of the edge inside the matrix "MatrEdgeVertices": 
+                        we'll use it in order to find the adjacent vertices for each vertex and 
+                        the faces of the polyhedron */
+                        MatrEdgeVertices(firstVertexIndex, secondVertexIndex) = edgeIndexFound;
+                        MatrEdgeVertices(secondVertexIndex, firstVertexIndex) = edgeIndexFound;
+
+                        /* Now that we've found an edge we can go on to the next edge: */
+                        edgeIndexFound++;
+                    }
+                }
+            }
+        }
+
+
+        /* We need to initialise the arguments we'll pass to the function that will find the faces 
+        of the polyhedron */
+        
+        /* There aren't any vertices on the face except for the of the original polyhedron, 
+        so the function works with a null vector as first argument */
+        vector<int> verticesOnFace = {};
+        
+        /* The function needs to know if we've already found any faces before, but we didn't, 
+        so we pass a variable equal to 0 to the function */
+        int newFacesFound = 0;
+
+        /* The function needs a structure where the unique faces of the polyhedron are stored, 
+        so we initialise it as empty*/
+        vector<array<int, 3>> vecVertFaces;
+        vecVertFaces.reserve(NumFaces);
+
+        /* The function needs to know how many adjacent vertices there are maximum for each vertex 
+        of the polyhedron, so we pass this value to it */
+        int numAdjacentVertices = 3;
+
+        /* Now we can call the function with all the arguments needed */
+        FindFaces(verticesOnFace, newFacesFound, vecVertFaces, numAdjacentVertices);
+    }
+    
     /* FindAdjacentFaces is a function we'll need in order to avoid duplicating the edges and vertices 
     in the tessellations. It finds the adjacent faces "i" for each face "j" and saves them in the matrix 
     "ListAdjacentFaces" (which is part of the "polyhedron" class) at position (i,j)*/
@@ -35,7 +160,6 @@ namespace PolyhedraLibrary
                 /* Checking that we haven't found all of the adjacent faces for the face with id "faceIndex" */
                 else if(adjacentFacesFound < 3)
                 {
-                    // Non funziona ancora per il poliedro tassellato: indagare
                     if(find(face.begin(), face.end(), vertexToFind1) != face.end())
                     {
                         /* In this case we've found the first vertex inside one face of the 
@@ -79,11 +203,6 @@ namespace PolyhedraLibrary
                 }
             }
         }
-
-        // Stampa finale per controllo
-        // cout << "ListVertFaces: " << endl << ListVertFaces << endl;
-        // cout << "ListAdjacentFaces: " << endl << ListAdjacentFaces << endl;
-
     }
 
     vector<vector<int>> GEOPolyhedron::AdjacencyList(vector<int>& verticesOnFace, int& numAdjacentVertices)
@@ -128,23 +247,14 @@ namespace PolyhedraLibrary
                     adjVert = verticesOnFace[adjVertId];
                 }
 
-                /* We'll go on only if the two vertices are distinct, otherwise we would check 
-                a useless edge, wasting computational power */
+                /* Let's rename the edge we'll check for code readability */            
+                int& edgeIdToCheck = MatrEdgeVertices(vertex, adjVert);
 
-                // è anche vero che questa cosa succede solo una volta e le nostre strutture 
-                // non memorizzano lati sbagliati, quindi a una sola iterazione questo if è utile, 
-                // altrimenti è spreco di controllo (e di potenza computazionale) a mio avviso
-                if(vertex != adjVert) 
-                {        
-                    /* Let's rename the edge we'll check for code readability */            
-                    int& edgeIdToCheck = MatrEdgeVertices(vertex, adjVert);
-
-                    /* If the edge exists, then "adjVert" is an adjacent vertex of "vertex" 
-                    and we can save it inside its adjacency list */
-                    if(edgeIdToCheck >= 0)
-                    {
-                        adjacencyList[vertex].push_back(adjVert);
-                    }
+                /* If the edge exists, then "adjVert" is an adjacent vertex of "vertex" 
+                and we can save it inside its adjacency list */
+                if(edgeIdToCheck >= 0)
+                {
+                    adjacencyList[vertex].push_back(adjVert);
                 }
             }
         }
@@ -335,6 +445,213 @@ namespace PolyhedraLibrary
                                   {},
                                   {},
                                   FacesMarkers);
+        
+        Cell0Ds();
+        Cell1Ds();
+        Cell2Ds();
+        Cell3Ds();
+    }
+
+    // C'è un problema in queste 4 funzioni, il resto del codice funziona
+    void GEOPolyhedron::Cell0Ds()
+    {
+        ofstream file("../PolygonalData/Cell0Ds.txt"); // the program should be launched inside Debug or Release folders
+        
+        if (file.fail()) 
+        {
+            std::cerr << "Error opening file\n";
+            return;
+        }
+
+        file << "Id,X,Y,Z\n";
+        for (int i = 0; i < NumVertices; i++)
+        {
+            file << i << "," << 
+            scientific << setprecision(16) <<
+            CoordVertices(0, i) << "," << 
+            CoordVertices(1, i) << "," << 
+            CoordVertices(2, i) << "\n";
+
+            IdVertices.push_back(i);
+        }
+
+        file.close();
+    }
+
+    void GEOPolyhedron::Cell1Ds()
+    {   
+        ofstream file("../PolygonalData/Cell1Ds.txt"); // the program should be launched inside Debug or Release folders
+        
+        if (file.fail()) 
+        {
+            std::cerr << "Error opening file\n";
+            return;
+        }
+
+        file << "Id,Origin,End\n";
+        for (int i = 0; i < NumEdges; i++)
+        {
+            file << i << "," << ExtremaEdges(0, i) << "," << 
+            ExtremaEdges(1, i) << "\n";
+            
+            IdEdges.push_back(i);
+        }
+
+        file.close();
+    }
+
+    void GEOPolyhedron::Cell2Ds()
+    {   
+        ofstream file("../PolygonalData/Cell2Ds.txt"); // the program needs to be launched inside Debug or Release folders
+        
+        if (file.fail()) 
+        {
+            std::cerr << "Error opening file\n";
+            return;
+        }
+
+        file << "Id,NumVertices,Vertices,NumEdges,Edges\n";
+        for (int i = 0; i < NumFaces; i++)
+        {
+            file << i << "," << p;
+            for (int j = 0; j < p; j++)
+            {
+                file << "," << ListVertFaces(j, i);
+            }
+            
+            file << "," << p;
+            for (int j = 0; j < p; j++)
+            {
+                file << "," << ListEdgeFaces(j, i);
+            }
+            file << "\n";
+
+            IdFaces.push_back(i);
+        }
+
+        file.close();
+    }
+
+    void GEOPolyhedron::Cell3Ds()
+    {   
+        ofstream file("../PolygonalData/Cell3Ds.txt"); // the program should be launched inside Debug or Release folders
+
+        if (file.fail()) 
+        {
+            std::cerr << "Error opening file\n";
+            return;
+        }
+        
+        file << "IdVertices:";
+        for (int i = 0; i < NumVertices; i++)
+        {
+            if(i == NumVertices - 1)
+            {
+                file << "V" << IdVertices[i];
+            }
+            else
+            {
+                file << "V" << IdVertices[i] << ",";
+            }
+        }
+        file << endl;
+
+        file  << "\n" << "IdEdges:";
+        for (int j = 0; j < NumEdges; j++)
+        {
+            if(j == NumEdges - 1)
+            {
+                file << "E" << IdEdges[j];
+            }
+            else
+            {
+                file << "E" << IdEdges[j] << ",";
+            }
+        }
+        file << endl;
+
+        file  << "\n" << "IdFaces:";
+        for (int k = 0; k < NumFaces; k++)
+        {
+            if(k == NumFaces - 1)
+            {
+                file << "F" << IdFaces[k];
+            }
+            else
+            {
+                file << "F" << IdFaces[k] << ",";
+            }
+                
+        }
+
+        // E tutta questa roba qui a cosa serve?
+
+        // file << "Id,NumVertices,Vertices,NumEdges,Edges,NumFaces,Faces\n";
+        // for (int i = 0; i < allPolyhedra.size(); i++)
+        // {
+        //     file << i << "," << allPolyhedra[i].NumVertices;
+        //     for (int j = 0; j < allPolyhedra[i].NumVertices; j++)
+        //     {
+        //         int v = allPolyhedra[i].IdVertices[j];
+        //         file << "," << "V" << v;
+        //         allPolyhedra[i].ListVertPolyhedra.push_back(v);
+        //         cout << v << endl;
+        //     }
+            
+            // file << "," << allPolyhedra[i].NumEdges;
+            // std::cout << "NumEdges: " << allPolyhedra[i].NumEdges << std::endl;
+            // std::cout << "IdEdges.size() = " << allPolyhedra[i].IdEdges.size() << std::endl;
+            // for(int k :allPolyhedra[i].IdEdges)
+            //     cout << k << endl;
+            // for (int j = 0; j < allPolyhedra[i].NumEdges; j++)
+            // {
+            //     int e = allPolyhedra[i].IdEdges[j];
+            //     cout << e << endl;
+            //     file << "," << "E" << e;
+            //     allPolyhedra[i].ListEdgePolyhedra.push_back(e);
+            //     cout << j << endl;
+            // }
+            // std::cout << "IdFaces.size() = " << allPolyhedra[i].IdFaces.size() << std::endl;
+            // file << "," << allPolyhedra[i].NumFaces;
+            // for (int j = 0; j < allPolyhedra[i].NumFaces; j++)
+            // {
+            //     int f = allPolyhedra[i].IdFaces[j];
+            //     file << "," << "F" << f;
+            //     allPolyhedra[i].ListFacePolyhedra.push_back(f);
+            //     cout << j << endl;
+            // }
+            file << "\n";
+
+        file.close();
+    }
+
+    // void CreateCells()
+    // {
+    //     Cell0Ds();
+    //     Cell1Ds();
+    //     Cell2Ds();
+    //     Cell3Ds();
+    // }
+
+    double GEOPolyhedron::DistanceSquaredBetween(int& idPoint1, int& idPoint2)
+    {
+        double& point1XCoord = CoordVertices(0, idPoint1);
+        double& point1YCoord = CoordVertices(1, idPoint1);
+        double& point1ZCoord = CoordVertices(2, idPoint1);
+
+        double& point2XCoord = CoordVertices(0, idPoint2);
+        double& point2YCoord = CoordVertices(1, idPoint2);
+        double& point2ZCoord = CoordVertices(2, idPoint2);
+
+        double differenceXCoord = point1XCoord - point2XCoord;
+        double differenceYCoord = point1YCoord - point2YCoord;
+        double differenceZCoord = point1ZCoord - point2ZCoord;
+
+        double distanceSquared = differenceXCoord * differenceXCoord +
+                                 differenceYCoord * differenceYCoord + 
+                                 differenceZCoord * differenceZCoord;
+
+        return distanceSquared;
     }
 
 }

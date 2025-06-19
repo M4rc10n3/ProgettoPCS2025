@@ -68,11 +68,6 @@ void MinimumPath(const vector<int>& minPath,
                  vector<double>& verticesShortPath, 
                  vector<double>& edgesShortPath);
 
-/* "Dualise" is a function that outputs the dual, expressed as the type "Polyhedron", of a <polyhedron> given as input 
-Inputs list:
-- polyhedron: object of type "Polyhedron" that the function uses to create its dual */
-GEOPolyhedron Dualise(GEOPolyhedron& polyhedron);
-
 /* "TypeITessellation" is a function that modifies the attributes of the object <polyhedron> in order to 
 output its tassellations of type I regarding geodetic polyhedra 
 Inputs list:
@@ -88,14 +83,3 @@ numberDivisions */
 GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, 
                                  GEOPolyhedron& tessellatedPolyhedron, 
                                  int& numberDivisions);
-
-/* "DistanceSquaredBetween" is a method that calculates the squared distance between two vertices or points 
-just by using their ids 
-Inputs list:
-- polyhedron: the polyhedron to which the points belong
-- idPoint1: id of the first point 
-- idPoint2: id of the second point */
-double DistanceSquaredBetween(GEOPolyhedron& polyhedron, 
-                              int& idPoint1, 
-                              int& idPoint2);
-// Test done
