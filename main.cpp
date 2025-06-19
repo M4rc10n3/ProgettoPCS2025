@@ -12,9 +12,12 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     int p, q, b, c, id_vertex_1, id_vertex_2; // initialize all the variables
+    // TODO: da togliere prima di consegnare
     string executable;
+    //
     vector<string> parameters;
 
+    // TODO: da togliere prima di consegnare
     if (strcmp(argv[0], "gdb") == 0) // check if you're using gdb for Debug and avoids unnecessary input errors
     {
         argc--;
@@ -24,9 +27,10 @@ int main(int argc, char* argv[])
     else {
         executable = argv[0];
     }
+    //
     
 
-    if (argc != 5 && argc != 7) // check if there is a compatible number of inputs 
+    if(argc != 5 && argc != 7) // check if there is a compatible number of inputs 
     {
         cout << "Invalid tuple" << endl;
         return 1;        
@@ -49,9 +53,9 @@ int main(int argc, char* argv[])
     b = stoi(parameters[2]);
     c = stoi(parameters[3]);
 
-    bool findMinPath = false;
+    bool findMinPath = false; // boolean variable to know whether the program needs to find a minimum path
 
-    if (argc == 7) // prints the tuple 
+    if(argc == 7) // prints the tuple for the user to check
     {
         id_vertex_1 = stoi(parameters[4]);
         id_vertex_2 = stoi(parameters[5]);
@@ -71,39 +75,32 @@ int main(int argc, char* argv[])
         c << ")" << endl; 
     }
 
-    /* Let's define a boolean we'll use to tell the program to stop */
+    /* Let's define a boolean we'll use to tell the program to stop if something's wrong */
     bool goOn = true;
 
     /* Let's initialise the starting polyhedron */
     GEOPolyhedron polyhedron;
     
     /* Let's check whether the inputs are correct: 
-        - if that's the case, we can store p and q inside polyhedron in order to 
-          create the starting polyhedron later;
+        - if that's the case, we can store p and q inside the respective polyhedron data structures 
+          in order to create the starting polyhedron later;
         - if that's not the case, we print an error message and stop the program using 
-          the boolean "goOn" */
-    if(p == 3)
-    {
+          the boolean variable "goOn" */
+    if(p == 3){
         polyhedron.p = p;
-        cout << "polyhedron.p: " << polyhedron.p << endl;
-        if(q == 3)
-        {
+        if(q == 3){
             polyhedron.q = q;
             cout << "Your starting polyhedron is a Tetrahedron. " << endl;
         }
-        else if(q == 4)
-        {
+        else if(q == 4){
             polyhedron.q = q;
-            cout << "polyhedron.q: " << polyhedron.q << endl;
             cout << "Your starting polyhedron is a Octahedron. " << endl;
         }
-        else if(q == 5)
-        {
+        else if(q == 5){
             polyhedron.q = q;
             cout << "Your starting polyhedron is an Icosahedron. " << endl;
         }
-        else
-        {    
+        else{    
             goOn = false;
             cerr << "Invalid values for p and q" << endl;
             cerr << "This program cannot handle your polyhedron."  << endl;
@@ -112,15 +109,15 @@ int main(int argc, char* argv[])
         }
     }
     else if(p == 4){
-        if(q == 3)
-        {
+        if(q == 3){
+            /* If the polyhedron requested is a cube, we start from a octahedron, which has the values 
+            of p and q of the cube, but reversed */
             polyhedron.p = q;
             polyhedron.q = p;
 
             cout << "Your starting polyhedron is a Cube. " << endl;
         }
-        else
-        {
+        else{
             goOn = false;
             cerr << "Invalid values for p and q" << endl;
             cerr << "This program cannot handle your polyhedron."  << endl;
@@ -129,15 +126,15 @@ int main(int argc, char* argv[])
         }
     }
     else if(p == 5){
-        if(q == 3)
-        {
+        if(q == 3){
+            /* If the polyhedron requested is a dodecahedron, we start from an icosahedron, which has 
+            the values of p and q of the dodecahedron, but reversed */
             polyhedron.p = q;
             polyhedron.q = p;
 
             cout << "Your starting polyhedron is a Dodecahedron. " << endl;
         }
-        else
-        {
+        else{
             goOn = false;
             cerr << "Invalid values for p and q" << endl;
             cerr << "This program cannot handle your polyhedron."  << endl;
@@ -145,8 +142,7 @@ int main(int argc, char* argv[])
             cerr << "If you want a platonic polyhedra with p = 5, try inputting 3 for q." << endl << endl;
         }
     }
-    else
-    {
+    else{
         goOn = false;
         cerr << "Invalid values for p and q" << endl;
         cerr << "This program cannot handle your polyhedron."  << endl;
@@ -154,11 +150,12 @@ int main(int argc, char* argv[])
         cerr << "If you want a platonic polyhedra, you need to choose p and q among 3, 4 or 5." << endl << endl;
     }
 
-    if(goOn)
-    {
-        /* Let's create the starting polyhedron if we can "goOn" */
+    /* Let's "goOn" with the program only if everything's alright, which happens when "goOn" is true*/
+    if(goOn){
+
+        /* Let's create the starting polyhedron */
         polyhedron.CreateStartingPolyhedron();
-    
+
 
         // tessellation
         bool tessI = false;
@@ -186,6 +183,11 @@ int main(int argc, char* argv[])
         else 
         {
             goOn = false;
+            /* The program cannot find a minimum path if the polyhedron wasn't tessellated, 
+            so let's set "findMinPath" to false*/
+            findMinPath = false;
+            /* Let's export the starting polyhedron if the tessellation never happened because of the inputs */
+            polyhedron.ExportPolyhedron(minimumPath);
             cerr << "Invalid values for b and c" << endl;
             cerr << "This program can only handle positive integer values for b and c; \n" <<
                 "in particular, just one of them can be equal to 0 or they can be the same value." << endl;
@@ -247,25 +249,19 @@ int main(int argc, char* argv[])
                             lengthPath, 
                             minimumPath.VerticesShortPath, 
                             minimumPath.EdgesShortPath);
-        
+                
+                /* Let's export the tessellated polyhedron with the proper minimum path */
+                tessellatedPolyhedron.ExportPolyhedron(minimumPath);
             } else {
+
                 cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
                 cout << "They should be between 0 and " << tessellatedPolyhedron.NumVertices << endl;
             }
         }
-    
-        /* If every input was correct, then we can export the tessellated polyhedron, 
-        otherwise we export the starting polyhedron in order to give the user something 
-        instead of a simple error message */
-        if(goOn)
-        {
+        else if(goOn){
+            /* Let's export the tessellated polyhedron without the minimum path */
             tessellatedPolyhedron.ExportPolyhedron(minimumPath);
         }
-        else
-        {
-            polyhedron.ExportPolyhedron(minimumPath);
-        }
-
     }
 
     return 0;
