@@ -65,49 +65,13 @@ target_link_libraries(${PROJECT_NAME} ${PlatonicSolids_LINKED_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${PlatonicSolids_INCLUDE})
 target_compile_options(${PROJECT_NAME} PUBLIC -fPIC)
 
-# add_executable(${PROJECT_NAME}_TEST
-#       main_test.cpp
-#       ${PlatonicSolids_SOURCES}
-#       ${PlatonicSolids_HEADERS}
-#       ${PlatonicSolids_TEST_SOURCES}
-#       ${PlatonicSolids_TEST_HEADERS})
+add_executable(${PROJECT_NAME}_TEST
+      main_test.cpp
+      ${PlatonicSolids_SOURCES}
+      ${PlatonicSolids_HEADERS}
+      ${PlatonicSolids_TEST_SOURCES}
+      ${PlatonicSolids_TEST_HEADERS})
 
-# target_link_libraries(${PROJECT_NAME}_TEST ${PlatonicSolids_LINKED_LIBRARIES})
-# target_include_directories(${PROJECT_NAME}_TEST PRIVATE ${PlatonicSolids_INCLUDE} ${PlatonicSolids_TEST_INCLUDE})
-# target_compile_options(${PROJECT_NAME}_TEST PUBLIC -fPIC)
-
-# add_executable(ManuExe
-#       main_Manu.cpp
-#       ${PlatonicSolids_SOURCES}
-#       ${PlatonicSolids_HEADERS}
-#       ${ManuExe_SOURCES}
-#       ${ManuExe_HEADERS})
-
-# target_link_libraries(ManuExe ${PlatonicSolids_LINKED_LIBRARIES})
-# target_include_directories(ManuExe PRIVATE ${PlatonicSolids_INCLUDE} ${ManuExe_INCLUDE})
-# target_compile_options(ManuExe PUBLIC -fPIC)
-
-# add_executable(MarcoExe
-#       main_Marco.cpp
-#       ${PlatonicSolids_SOURCES}
-#       ${PlatonicSolids_HEADERS}
-#       ${MarcoExe_SOURCES}
-#       ${MarcoExe_HEADERS})
-
-# target_link_libraries(MarcoExe ${PlatonicSolids_LINKED_LIBRARIES})
-# target_include_directories(MarcoExe PRIVATE ${PlatonicSolids_INCLUDE} ${MarcoExe_INCLUDE})
-# target_compile_options(MarcoExe PUBLIC -fPIC)
-
-# add_executable(AnnaExe
-#       main_Anna.cpp
-#       ${PlatonicSolids_SOURCES}
-#       ${PlatonicSolids_HEADERS}
-#       ${AnnaExe_SOURCES}
-#       ${AnnaExe_HEADERS})
-
-# target_link_libraries(AnnaExe ${PlatonicSolids_LINKED_LIBRARIES})
-# target_include_directories(AnnaExe PRIVATE ${PlatonicSolids_INCLUDE} ${AnnaExe_INCLUDE})
-# target_compile_options(AnnaExe PUBLIC -fPIC)
-
-# file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/PlatonicSolids/Cell0Ds.csv  ${CMAKE_CURRENT_SOURCE_DIR}/PlatonicSolids/Cell1Ds.csv  ${CMAKE_CURRENT_SOURCE_DIR}/PlatonicSolids/Cell2Ds.csv
-#       DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(${PROJECT_NAME}_TEST ${PlatonicSolids_LINKED_LIBRARIES})
+target_include_directories(${PROJECT_NAME}_TEST PRIVATE ${PlatonicSolids_INCLUDE} ${PlatonicSolids_TEST_INCLUDE})
+target_compile_options(${PROJECT_NAME}_TEST PUBLIC -fPIC)

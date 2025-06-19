@@ -12,6 +12,7 @@ of each triangular face
 Inputs list:
 - ListVertFace: object of type "MatrixXi" containing the ids of each vertex of the face */
 Eigen::Vector3d findBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertFace);
+//Test done
 
 /* "OntoTheUnitSphere" is a function that normalizes the matrix "CoordVertices" of an object of 
 type "polyhedron" using the Eigen::VectorXd method ".normalized()"

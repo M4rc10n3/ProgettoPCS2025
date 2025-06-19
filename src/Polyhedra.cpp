@@ -55,7 +55,6 @@ namespace PolyhedraLibrary
                              0, 0, 0.85065080835204, 0.525731112119134, 0.85065080835204, 0, 0, -0.85065080835204, -0.525731112119134, -0.85065080835204, -0.525731112119133, 0.525731112119134,
                              1, 0.447213595499958, 0.447213595499958, -0.447213595499958, -0.447213595499958, -1, -0.447213595499958, -0.447213595499958, 0.447213595499958, 0.447213595499957, -0.447213595499958, 0.447213595499958;   
             break;
-
         }
 
         /* Finding the edges of the polyhedron*/
@@ -542,7 +541,7 @@ namespace PolyhedraLibrary
             return;
         }
         
-        file << "IdVertices:";
+        file << "IdVertices: ";
         for (int i = 0; i < NumVertices; i++)
         {
             if(i == NumVertices - 1)
@@ -556,7 +555,7 @@ namespace PolyhedraLibrary
         }
         file << endl;
 
-        file  << "\n" << "IdEdges:";
+        file  << "\n" << "IdEdges: ";
         for (int j = 0; j < NumEdges; j++)
         {
             if(j == NumEdges - 1)
@@ -570,7 +569,7 @@ namespace PolyhedraLibrary
         }
         file << endl;
 
-        file  << "\n" << "IdFaces:";
+        file  << "\n" << "IdFaces: ";
         for (int k = 0; k < NumFaces; k++)
         {
             if(k == NumFaces - 1)
@@ -584,42 +583,6 @@ namespace PolyhedraLibrary
                 
         }
 
-        // E tutta questa roba qui a cosa serve?
-
-        // file << "Id,NumVertices,Vertices,NumEdges,Edges,NumFaces,Faces\n";
-        // for (int i = 0; i < allPolyhedra.size(); i++)
-        // {
-        //     file << i << "," << allPolyhedra[i].NumVertices;
-        //     for (int j = 0; j < allPolyhedra[i].NumVertices; j++)
-        //     {
-        //         int v = allPolyhedra[i].IdVertices[j];
-        //         file << "," << "V" << v;
-        //         allPolyhedra[i].ListVertPolyhedra.push_back(v);
-        //         cout << v << endl;
-        //     }
-            
-            // file << "," << allPolyhedra[i].NumEdges;
-            // std::cout << "NumEdges: " << allPolyhedra[i].NumEdges << std::endl;
-            // std::cout << "IdEdges.size() = " << allPolyhedra[i].IdEdges.size() << std::endl;
-            // for(int k :allPolyhedra[i].IdEdges)
-            //     cout << k << endl;
-            // for (int j = 0; j < allPolyhedra[i].NumEdges; j++)
-            // {
-            //     int e = allPolyhedra[i].IdEdges[j];
-            //     cout << e << endl;
-            //     file << "," << "E" << e;
-            //     allPolyhedra[i].ListEdgePolyhedra.push_back(e);
-            //     cout << j << endl;
-            // }
-            // std::cout << "IdFaces.size() = " << allPolyhedra[i].IdFaces.size() << std::endl;
-            // file << "," << allPolyhedra[i].NumFaces;
-            // for (int j = 0; j < allPolyhedra[i].NumFaces; j++)
-            // {
-            //     int f = allPolyhedra[i].IdFaces[j];
-            //     file << "," << "F" << f;
-            //     allPolyhedra[i].ListFacePolyhedra.push_back(f);
-            //     cout << j << endl;
-            // }
             file << "\n";
 
         file.close();
