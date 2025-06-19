@@ -6,7 +6,7 @@ using namespace PolyhedraLibrary;
 using namespace std;
 using namespace Eigen;
 
-Eigen::Vector3d findBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertFace)
+Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertFace)
 {
     /* Let's initialise a vector where the coordinates of the barycenter will be stored and 
     let's rename its components for code readability */
@@ -830,7 +830,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                 }
             }
             
-            Vector3d barycenter = findBarycenter(tessellatedPolyhedron, VertFace);
+            Vector3d barycenter = FindBarycenter(tessellatedPolyhedron, VertFace);
 
             GEOSolid.CoordVertices.col(vertexcounter) = barycenter;
             innerpoints.push_back(barycenter);

@@ -35,7 +35,7 @@ TEST(TestUtils, TestFindBarycenter)
     barycenterTetraEx(2) = (v1(2) + v2(2) + v3(2))/3.0;
 
     // Compute the barycenter using the function to be tested
-    Eigen::Vector3d barycenterTetraToCheck = findBarycenter(tetrahedron, vertFace);
+    Eigen::Vector3d barycenterTetraToCheck = FindBarycenter(tetrahedron, vertFace);
 
     // Let's create the octahedron
     GEOPolyhedron octahedron;
@@ -58,7 +58,7 @@ TEST(TestUtils, TestFindBarycenter)
     barycenterOctaEx(2) = (v1(2) + v2(2) + v3(2))/3.0;
 
     // Compute the barycenter using the function to be tested
-    Eigen::Vector3d barycenterOctaToCheck = findBarycenter(octahedron, vertFace);
+    Eigen::Vector3d barycenterOctaToCheck = FindBarycenter(octahedron, vertFace);
 
     // Let's create the icosahedron
     GEOPolyhedron icosahedron;
@@ -81,7 +81,7 @@ TEST(TestUtils, TestFindBarycenter)
     barycenterIcosaEx(2) = (v1(2) + v2(2) + v3(2))/3.0;
 
     // Compute the barycenter using the function to be tested
-    Eigen::Vector3d barycenterIcosaToCheck = findBarycenter(icosahedron, vertFace);
+    Eigen::Vector3d barycenterIcosaToCheck = FindBarycenter(icosahedron, vertFace);
 
     // Compare the computed barycenters' coordinates with the expected values
     EXPECT_DOUBLE_EQ(barycenterTetraToCheck(0), barycenterTetraEx(0));
