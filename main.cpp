@@ -53,8 +53,6 @@ int main(int argc, char* argv[])
     b = stoi(parameters[2]);
     c = stoi(parameters[3]);
 
-    bool findMinPath = false; // boolean variable to know whether the program needs to find a minimum path
-
     if(argc == 7) // prints the tuple for the user to check
     {
         id_vertex_1 = stoi(parameters[4]);
@@ -66,7 +64,6 @@ int main(int argc, char* argv[])
         c << "," <<
         id_vertex_1 << "," <<
         id_vertex_2 << ")" << endl;
-        // findMinPath = true;
     } else {
         cout << "Your tuple is: (p,q,b,c) = (" <<
         p << "," << 
@@ -194,6 +191,12 @@ int main(int argc, char* argv[])
                 "in particular, just one of them can be equal to 0 or they can be the same value." << endl;
         }
 
+        if(argc != 7){
+            /* If the program didn't ask for the minimum path finding we set "goOn" to false 
+            in order to stop the program before the minimum path finding*/
+            goOn = false
+        }
+
 
         // minimum path finding
         Path minimumPath;
@@ -254,6 +257,10 @@ int main(int argc, char* argv[])
                 tessellatedPolyhedron.ExportPolyhedron(minimumPath);
             
             } else {
+                /* If the ids of the vertices weren't right, we should export the tessellated 
+                polyhedron anyway */
+                tessellatedPolyhedron.ExportPolyhedron(minimumPath);
+
                 cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
                 cout << "They should be between 0 and " << tessellatedPolyhedron.NumVertices << endl;
             }
