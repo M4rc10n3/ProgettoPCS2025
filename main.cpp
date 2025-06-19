@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
         c << "," <<
         id_vertex_1 << "," <<
         id_vertex_2 << ")" << endl;
-        findMinPath = true;
+        // findMinPath = true;
     } else {
         cout << "Your tuple is: (p,q,b,c) = (" <<
         p << "," << 
@@ -182,10 +182,11 @@ int main(int argc, char* argv[])
         } 
         else 
         {
-            goOn = false;
+            
             /* The program cannot find a minimum path if the polyhedron wasn't tessellated, 
-            so let's set "findMinPath" to false*/
-            findMinPath = false;
+            so let's set "goOn" to false*/
+            goOn = false;
+
             /* Let's export the starting polyhedron if the tessellation never happened because of the inputs */
             polyhedron.ExportPolyhedron(minimumPath);
             cerr << "Invalid values for b and c" << endl;
@@ -196,9 +197,8 @@ int main(int argc, char* argv[])
 
         // minimum path finding
         Path minimumPath;
-    
-        if(findMinPath)
-        {
+
+        if(goOn){
             vector<int> minPath;
             double lengthPath;
 
@@ -250,16 +250,16 @@ int main(int argc, char* argv[])
                             minimumPath.VerticesShortPath, 
                             minimumPath.EdgesShortPath);
                 
-                /* Let's export the tessellated polyhedron with the proper minimum path */
+                /* Let's export the tessellated polyhedron with the proper minimum path if we found one */
                 tessellatedPolyhedron.ExportPolyhedron(minimumPath);
+            
             } else {
-
                 cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
                 cout << "They should be between 0 and " << tessellatedPolyhedron.NumVertices << endl;
             }
         }
-        else if(goOn){
-            /* Let's export the tessellated polyhedron without the minimum path */
+        else{
+            /* Let's export the tessellated polyhedron without the minimum path if it wasn't computed */
             tessellatedPolyhedron.ExportPolyhedron(minimumPath);
         }
     }
