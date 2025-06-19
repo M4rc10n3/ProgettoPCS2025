@@ -190,78 +190,79 @@ int main(int argc, char* argv[])
             cerr << "This program can only handle positive integer values for b and c; \n" <<
                 "in particular, just one of them can be equal to 0 or they can be the same value." << endl;
         }
-    }
+
+        if(argc != 7){
+            /* If the program didn't ask for the minimum path finding we set "goOn" to false 
+            in order to stop the program before the minimum path finding and we export the polyhedron 
+            obtained until here */
+            goOn = false;
+            tessellatedPolyhedron.ExportPolyhedron(minimumPath);
+        }
     
-    if(argc != 7){
-        /* If the program didn't ask for the minimum path finding we set "goOn" to false 
-        in order to stop the program before the minimum path finding and we export the polyhedron 
-        obtained until here */
-        goOn = false
-        tessellatedPolyhedron.ExportPolyhedron(minimumPath);
-    }
-
-    // minimum path finding
-
-    if(goOn){
-        vector<int> minPath;
-        double lengthPath;
-
-        /* Let's define here two variables we'll need for the function 
-        "AdjacencyList" used in the minimum path finding */
-        vector<int> nullVec = {};
-        int numAdjacentFaces = 6;
-
-        if(id_vertex_1 >= 0 && id_vertex_1 < tessellatedPolyhedron.NumVertices 
-            && id_vertex_2 >= 0 && id_vertex_2 < tessellatedPolyhedron.NumVertices)
-        {
-            if(tessI)
+        // minimum path finding
+    
+        if(goOn){
+            vector<int> minPath;
+            double lengthPath;
+    
+            /* Let's define here two variables we'll need for the function 
+            "AdjacencyList" used in the minimum path finding */
+            vector<int> nullVec = {};
+            int numAdjacentFaces = 6;
+    
+            if(id_vertex_1 >= 0 && id_vertex_1 < tessellatedPolyhedron.NumVertices 
+                && id_vertex_2 >= 0 && id_vertex_2 < tessellatedPolyhedron.NumVertices)
             {
-                cout << "BFS algorithm to find the minimum path" << endl;
-
-                minPath = BFS(tessellatedPolyhedron.AdjacencyList(nullVec, numAdjacentFaces), 
-                              id_vertex_1, 
-                              id_vertex_2, 
-                              tessellatedPolyhedron.NumVertices, 
-                              tessellatedPolyhedron.lengthEdge, 
-                              lengthPath);
-          
-            } 
-            else if(tessII)
-            {           
-                cout << "Dijkstra algorithm to find the minimum path" << endl;
-
-                Eigen::MatrixXd matrWeights = Eigen::MatrixXd::Zero(tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.NumVertices);
-                for(int i = 0; i < tessellatedPolyhedron.NumVertices; i++){
-                    for(int j = 0; j < tessellatedPolyhedron.NumVertices; j++){
-                        if(tessellatedPolyhedron.MatrEdgeVertices(i,j) > -1){
-                            matrWeights(i,j) = tessellatedPolyhedron.lengthEdge;
+                if(tessI)
+                {
+                    cout << "BFS algorithm to find the minimum path" << endl;
+    
+                    minPath = BFS(tessellatedPolyhedron.AdjacencyList(nullVec, numAdjacentFaces), 
+                                  id_vertex_1, 
+                                  id_vertex_2, 
+                                  tessellatedPolyhedron.NumVertices, 
+                                  tessellatedPolyhedron.lengthEdge, 
+                                  lengthPath);
+              
+                } 
+                else if(tessII)
+                {           
+                    cout << "Dijkstra algorithm to find the minimum path" << endl;
+    
+                    Eigen::MatrixXd matrWeights = Eigen::MatrixXd::Zero(tessellatedPolyhedron.NumVertices, tessellatedPolyhedron.NumVertices);
+                    for(int i = 0; i < tessellatedPolyhedron.NumVertices; i++){
+                        for(int j = 0; j < tessellatedPolyhedron.NumVertices; j++){
+                            if(tessellatedPolyhedron.MatrEdgeVertices(i,j) > -1){
+                                matrWeights(i,j) = tessellatedPolyhedron.lengthEdge;
+                            }
                         }
                     }
+    
+                    minPath = Dijkstra(tessellatedPolyhedron.AdjacencyList(nullVec, numAdjacentFaces), 
+                                       id_vertex_1, 
+                                       id_vertex_2, 
+                                       tessellatedPolyhedron.NumVertices, 
+                                       matrWeights, 
+                                       lengthPath);      
                 }
-
-                minPath = Dijkstra(tessellatedPolyhedron.AdjacencyList(nullVec, numAdjacentFaces), 
-                                   id_vertex_1, 
-                                   id_vertex_2, 
-                                   tessellatedPolyhedron.NumVertices, 
-                                   matrWeights, 
-                                   lengthPath);      
+                MinimumPath(minPath, 
+                            tessellatedPolyhedron.MatrEdgeVertices, 
+                            tessellatedPolyhedron.NumVertices, 
+                            tessellatedPolyhedron.NumEdges, 
+                            lengthPath, 
+                            minimumPath.VerticesShortPath, 
+                            minimumPath.EdgesShortPath);
+            
+            } else {
+                cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
+                cout << "They should be between 0 and " << tessellatedPolyhedron.NumVertices << endl;
             }
-            MinimumPath(minPath, 
-                        tessellatedPolyhedron.MatrEdgeVertices, 
-                        tessellatedPolyhedron.NumVertices, 
-                        tessellatedPolyhedron.NumEdges, 
-                        lengthPath, 
-                        minimumPath.VerticesShortPath, 
-                        minimumPath.EdgesShortPath);
-        
-        } else {
-            cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;
-            cout << "They should be between 0 and " << tessellatedPolyhedron.NumVertices << endl;
+            /* In both cases we can export the tessellated polyhedron. If the ids were correct there 
+            will be a minimum path, otherwise there will not be any */
+            tessellatedPolyhedron.ExportPolyhedron(minimumPath);
         }
-        /* In both cases we can export the tessellated polyhedron. If the ids were correct there 
-        will be a minimum path, otherwise there will not be any */
-        tessellatedPolyhedron.ExportPolyhedron(minimumPath);
     }
+    
 
     return 0;
 }
