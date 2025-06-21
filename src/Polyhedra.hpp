@@ -43,7 +43,7 @@ namespace PolyhedraLibrary
         vector<int> ListEdgePolyhedra = {}; // All the edges of each polyhedra
         vector<int> ListFacePolyhedra = {}; // All the faces of each polyhedra
                                                 
-        /* "CreatePolyhedron" creates the astrting polyhedron */
+        /* "CreatePolyhedron" creates the starting polyhedron */
         void CreateStartingPolyhedron();
 
         /* "DistanceSquaredBetween" is a method that calculates the squared distance between two vertices or points 
@@ -53,7 +53,6 @@ namespace PolyhedraLibrary
         - idPoint2: id of the second point */
         double DistanceSquaredBetween(int& idPoint1, 
                                       int& idPoint2);
-        // Test done
 
         /* "AdjacencyList" finds for each vertex the adjacency list composed by the vertices of the same 
         face of the polyhedron
@@ -85,10 +84,13 @@ namespace PolyhedraLibrary
         - numberVerticesToCheck: integer representing the number of vertices to iterate on; 
                                  it is the number of all the vertices or the number of vertices 
                                  on a single face */
-        void FindEdges(vector<int>& verticesOnFace, int& newEdgesFound, const int& numberVerticesToCheck);
+        void FindEdges(vector<int>& verticesOnFace,
+                       int& newEdgesFound, 
+                       const int& numberVerticesToCheck);
 
-        /* "FindAdjacentFaces" saves inside "ListAdjacentFaces" the adjacent faces to each face. 
-        Each column contains the ids of the adjacent faces for the face that has the column index as id */
+        /* FindAdjacentFaces is a function we'll need in order to avoid duplicating the edges and vertices 
+        in the tessellations. It finds the adjacent faces "i" for each face "j" and saves them in the matrix 
+        "ListAdjacentFaces" (which is part of the "polyhedron" class) at position (i,j)*/
         void FindAdjacentFaces(); // Create one matrix as explained above
         
         /* "ExportPolyhedron" exports the structures of the polyhedron colouring them if they belong 
@@ -102,9 +104,6 @@ namespace PolyhedraLibrary
         void Cell1Ds();
         void Cell2Ds();
         void Cell3Ds();
-
-        /* "CreateCells" recalls all the CellXDs methods */
-        void CreateCells();
     };
 
 }

@@ -89,9 +89,6 @@ namespace PolyhedraLibrary
         FindFaces(nullVec, newFacesFound, vecVertFaces, p);
     }
     
-    /* FindAdjacentFaces is a function we'll need in order to avoid duplicating the edges and vertices 
-    in the tessellations. It finds the adjacent faces "i" for each face "j" and saves them in the matrix 
-    "ListAdjacentFaces" (which is part of the "polyhedron" class) at position (i,j)*/
     void GEOPolyhedron::FindAdjacentFaces()
     {
         /* We need to find the adjacent faces for each face: 
