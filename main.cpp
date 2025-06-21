@@ -249,12 +249,9 @@ int main(int argc, char* argv[])
                                        lengthPath);      
                 }
                 MinimumPath(minPath, 
-                            tessellatedPolyhedron.MatrEdgeVertices, 
-                            tessellatedPolyhedron.NumVertices, 
-                            tessellatedPolyhedron.NumEdges, 
+                            tessellatedPolyhedron, 
                             lengthPath, 
-                            minimumPath.VerticesShortPath, 
-                            minimumPath.EdgesShortPath);
+                            minimumPath);
             
             } else {
                 cout << "Invalid values for id_vertex_1 and id_vertex_2" << endl;

@@ -144,25 +144,30 @@ vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const in
 }
 
 void MinimumPath(const vector<int>& minPath, 
-                 const Eigen::MatrixXi& MatrEdgeVertices, 
-                 const int& numVert, 
-                 const int& numEdge, 
-                 const double& lengthPath, 
-                 vector<double>& verticesShortPath, 
-                 vector<double>& edgesShortPath)
+                 GEOPolyhedron& polyhedron,
+                 const double& lengthPath,
+                 Path& minimumPath)
 {
-    verticesShortPath.resize(numVert, 0.0);
-    edgesShortPath.resize(numEdge, 0.0);
+    const int& numVert = polyhedron.NumVertices;
+    const int& numEdge = polyhedron.NumEdges;
+    Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
+
+    vector<double>& VerticesShortPath = minimumPath.VerticesShortPath;
+    vector<double>& EdgesShortPath = minimumPath.EdgesShortPath;
+
+    
+    VerticesShortPath.resize(numVert, 0.0);
+    EdgesShortPath.resize(numEdge, 0.0);
 
     for(auto vertexId : minPath){
-        verticesShortPath[vertexId] = 1.0;
+        VerticesShortPath[vertexId] = 1.0;
     }
 
     for(unsigned int vertexId = 0; vertexId < minPath.size() - 1; vertexId++){
         const int& vertex1 = minPath[vertexId];
         const int& vertex2 = minPath[vertexId + 1];
         const int& edgeId = MatrEdgeVertices(vertex1, vertex2);
-        edgesShortPath[edgeId] = 1.0;
+        EdgesShortPath[edgeId] = 1.0;
     }
     
     // Output the minimum path (through the ids of the vertices that compose it) and its length

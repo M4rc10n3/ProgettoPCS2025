@@ -22,9 +22,9 @@ int main()
 
     polyhedron.CreateStartingPolyhedron();
     Path minimumPath;
-    polyhedron.ExportPolyhedron(minimumPath);
-    // GEOPolyhedron tessellatedPolyhedron = TypeITessellation(polyhedron, b);
-    // tessellatedPolyhedron.ExportPolyhedron(minimumPath);
+    // polyhedron.ExportPolyhedron(minimumPath);
+    GEOPolyhedron tessellatedPolyhedron = TypeITessellation(polyhedron, b);
+    tessellatedPolyhedron.ExportPolyhedron(minimumPath);
     // GEOPolyhedron finalPolyhedron = TypeIITessellation(polyhedron, tessellatedPolyhedron, b);
     // Path minimumPath;
     // OntoTheUnitSphere(finalPolyhedron);

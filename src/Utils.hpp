@@ -55,19 +55,15 @@ vector<int> Dijkstra(const vector<vector<int>>& adjList,
 /* "MinimumPath" is a function that sets the property ShortPath = 1 to the vertices and the edges that compose 
 the minimum path and ShortPath = 0 to the other vertices and edges
 Inputs list:
-- minPath: vector with the ids of the vertices that compose the minimum path (created with BFS or Dijkstra algorithm)
-- MatrEdgeVertices: matrix of the edges connecting each pair of extrema
-- numVert: number of vertices of the polyhedron
-- numEdge: number of edges of the polyhedron
-- vertShortPath: binary vector for the vertices used in the minimum path
-- edgeShortPath: binary vector for the edges used in the minimum path */
+- minPath: vector with the ids of the vertices that compose the minimum path 
+           (created with BFS or Dijkstra algorithm)
+- polyhedron: the "GEOPolyhedron" on which we found the minimum path;
+- minimumPath: the "Path" containing the binary vectors for the vertices and 
+               edges used in the minimum path */
 void MinimumPath(const vector<int>& minPath, 
-                 const Eigen::MatrixXi& MatrEdgeVertices, 
-                 const int& numVert, 
-                 const int& numEdge, 
-                 const double& lengthPath, 
-                 vector<double>& verticesShortPath, 
-                 vector<double>& edgesShortPath);
+                 GEOPolyhedron& polyhedron,
+                 const double& lengthPath,
+                 Path& minimumPath);
 
 /* "TypeITessellation" is a function that modifies the attributes of the object <polyhedron> in order to 
 output its tassellations of type I regarding geodetic polyhedra 
