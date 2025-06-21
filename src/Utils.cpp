@@ -33,11 +33,13 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
     queue<int> q;
     vector<bool> reached(numVert); // boolean vector to save the visited vertices
     vector<int> predecessor(numVert); // vector to save the predecessor of each vertex in order to reconstruct the minimum path
+    
     for(int i = 0; i < numVert; i++) // initialize reached and predecessor vectors
     {
         reached[i] = false;
         predecessor[i] = -1;
     }
+    
     q.push(v1);
     reached[v1] = true;
     while(!q.empty())
@@ -54,7 +56,8 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
             }    
             if(w == v2)
             {
-                // Reconstruct the path from v2 back to v1  (using the predecessor of each vertex and finally reversing the created vector)
+                // Reconstruct the path from v2 back to v1  (using the predecessor of each vertex 
+                // and finally reversing the created vector)
                 vector<int> minPath;
                 int v = v2;
                 while(v != -1) 
@@ -78,11 +81,13 @@ vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const in
     vector<int> predecessor(numVert); // vector to save the predecessor of each vertex
     vector<double> distance(numVert); // vector to store the current known shortest distance from v1 to each vertex
     const double inf = 1e9; // use a large number to represent "infinity"
+    
     for(int i = 0; i < numVert; i++) 
     {
         predecessor[i] = -1; // Initialize all predecessors to -1
         distance[i] = inf; // initialize all distances to "infinity"
     }
+    
     // Set the source vertex v1
     predecessor[v1] = v1;
     distance[v1] = 0.0;
@@ -134,7 +139,7 @@ vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const in
     minPath.push_back(v1);
     reverse(minPath.begin(), minPath.end());
     
-    // Calculate the minimum path's length
+    // Calculate the length of the minimum path
     for(unsigned int i = 1; i < minPath.size(); i++)
     {
         lengthPath += matrWeights(minPath[i-1], minPath[i]);
@@ -172,8 +177,14 @@ void MinimumPath(const vector<int>& minPath,
     
     // Output the minimum path (through the ids of the vertices that compose it) and its length
     cout << "The minimum path is: ";
-    for(int i : minPath)
-        cout << i << " ";
+    for(unsigned int i = 0; i < minPath.size(); i++){
+        if(i != minPath.size() - 1){
+            cout << minPath[i] << " -> ";
+        }
+        else{
+            cout << minPath[i];
+        }
+    }
     cout << endl;
     cout << "The minimum path is composed of " << minPath.size() - 1 << " edges" << endl;
     cout << "The minimum path length is " << lengthPath << endl;
@@ -643,12 +654,6 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     int& NumVertices = GEOSolid.NumVertices;
     int& NumEdges = GEOSolid.NumEdges;
     int& NumFaces = GEOSolid.NumFaces;
-    NumVertices = 0;
-    NumEdges = 0; 
-    NumFaces = 0; 
-
-    int& p = polyhedron.p;
-    GEOSolid.p = p;
 
     // NumVertices = numV + numE(2b-1)+numF((3b^2)/2-3b/2+1)
     NumVertices = polyhedron.NumVertices + 
@@ -664,11 +669,10 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     // Numfaces = numF((3b^2)+3b)
     NumFaces = polyhedron.NumFaces * ((3 * numberDivisions * numberDivisions) + 3 * numberDivisions);
 
-    unsigned int FacesperFace = tessellatedPolyhedron.NumFaces/polyhedron.NumFaces; // Number of polygons per face derived by Tessellation I
+    int& p = polyhedron.p;
+    GEOSolid.p = p;
 
-    vector<array<int, 3>> vecVertFaces;
-    vecVertFaces.reserve(NumFaces / polyhedron.NumFaces); // this array is needed to store the new faces 
-                                                          // on each face of the old polyhedron
+    unsigned int FacesperFace = tessellatedPolyhedron.NumFaces/polyhedron.NumFaces; // Number of polygons per face derived by Tesselation I
 
     GEOSolid.CoordVertices = MatrixXd::Zero(3, NumVertices);
     GEOSolid.ExtremaEdges = MatrixXi::Zero(2, NumEdges);
@@ -685,7 +689,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     vector<bool> vertexbool(tessellatedPolyhedron.NumVertices); // checked vertices of the tesselated polyhedron
     // useful for recognizing all the vertices that are inside of the polyhedron
 
-    MatrixXi MatEdgeVertices = MatrixXi::Zero(polyhedron.NumEdges, (2 * numberDivisions) - 1); // Every row of the matrix
+    MatrixXi MatEdgeVertices = MatrixXi::Zero(polyhedron.NumEdges, (2 * numberDivisions) - 1); // Every row of this matrix
     // is the id of each edge of the initial polyhedron; 
 
     GEOSolid.CoordVertices.leftCols(polyhedron.NumVertices) = polyhedron.CoordVertices.leftCols(polyhedron.NumVertices);
@@ -693,13 +697,18 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     int edgecounter = 0; // takes track of the number of edges examined
     int facecounter = 0; // takes track of the number of faces examined
 
+    vector<array<int, 3>> vecVertFaces;
+    vecVertFaces.reserve(NumFaces / polyhedron.NumFaces); // this array is needed to store the new faces 
+                                                          // on each face of the old polyhedron (it's an 
+                                                          // argument for the "GEOPolyhedron" method "FindFaces")
+
 
     for (int i = 0; i < polyhedron.NumFaces; i++)
     {
-        // First we divide points between edgepoints and innerpoints (barycenters),
-        vector<Vector3d> innerpoints;
-        vector<Vector3d> edgepoints;
-        vector<int> total_vertices; //stores all the ID's of all vertices
+        // First we divide points between edgepoints and innerpoints (called barycenters)
+        vector<Vector3d> innerpoints; // vector containing the innerpoint coordinates
+        vector<Vector3d> edgepoints; // vector containing the edgepoints coordinates
+        vector<int> total_vertices; // stores all the IDs of all vertices on the face "i"
         vector<int> IDbarycenters;
         vector<int> IDedgepoints;
 
@@ -710,10 +719,10 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
             total_vertices.push_back(polyhedron.ListVertFaces(z,i));
         }
 
-        for (int k = 0; k < p; k++) // generates the edgepoints of a Face of the initial polyhedron (not tesselateds)
+        for (int k = 0; k < p; k++) // generates the edgepoints of a Face of the initial polyhedron (not tesselated)
         {
             int& edge = polyhedron.ListEdgeFaces(k, i);
-            if (edgetracker(edge) == 0) // checks if the edge is already been partioned
+            if (edgetracker(edge) == 0) // checks if the edge is already been partitioned
             {
                 int& IDVertex_1 = polyhedron.ExtremaEdges(0, edge);
                 int& IDVertex_2 = polyhedron.ExtremaEdges(1, edge);
@@ -743,7 +752,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
                     edgepoints.push_back(Vector3d(x, y, z));
                     MatEdgeVertices(edge, w) = vertexcounter;
                     
-                    if (w == 0) // if it's the first iteration we consider IDVertex_2 as first point
+                    if (w == 0) // if it's the first iteration we consider IDVertex_2 as the first point
                     {
                         GEOSolid.ExtremaEdges(0, edgecounter) = IDVertex_2;
                         GEOSolid.ExtremaEdges(1, edgecounter) = vertexcounter;
@@ -797,7 +806,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
             VertFace(1) = tessellatedPolyhedron.ListVertFaces(1, j + (i * FacesperFace)); // ID of the second point of a face
             VertFace(2) = tessellatedPolyhedron.ListVertFaces(2, j + (i * FacesperFace)); // ID of the third point of a face
 
-            for (int y = 0; y < p; y++) // checks if a vertex of Vertface is on the edge of the face or inside
+            for (int y = 0; y < p; y++) // checks if a vertex of Vertface is on the edge of the face or inside it
             {
                 if (vertexbool[VertFace(y)] == false)
                 {
@@ -859,7 +868,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
             {   
                 distance = (innerpoints[k] - innerpoints[j]).norm();
 
-                int flag_edge = GEOSolid.MatrEdgeVertices(IDbarycenters[k], IDbarycenters[j]); // is -1 if we didn't check it before
+                int& flag_edge = GEOSolid.MatrEdgeVertices(IDbarycenters[k], IDbarycenters[j]); // it's -1 if we didn't check it before
 
                 if (distance < GEOSolid.lengthEdge + 1e-6 && flag_edge == -1 && k != j)
                 {
@@ -873,8 +882,8 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
             }
         }
 
-        int numAdjecentVert = 6;
-        GEOSolid.FindFaces(total_vertices, facecounter, vecVertFaces , numAdjecentVert);
+        int numAdjacentVert = 6;
+        GEOSolid.FindFaces(total_vertices, facecounter, vecVertFaces , numAdjacentVert);
     } 
     return GEOSolid;
 }
