@@ -716,7 +716,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
             total_vertices.push_back(polyhedron.ListVertFaces(z,i));
         }
 
-        for (int k = 0; k < p; k++) // generates the edgepoints of a Face
+        for (int k = 0; k < p; k++) // generates the edgepoints of a Face of the initial polyhedron (not tesselateds)
         {
             int& edge = polyhedron.ListEdgeFaces(k, i);
             if (edgetracker(edge) == 0) // checks if the edge is already been partioned
