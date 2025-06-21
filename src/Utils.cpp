@@ -31,7 +31,7 @@ Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertF
 vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const double& lengthEdge, double& lengthPath)
 {
     queue<int> q;
-    vector<bool> reached(numVert); // boolean vector to save visited vertices
+    vector<bool> reached(numVert); // boolean vector to save the visited vertices
     vector<int> predecessor(numVert); // vector to save the predecessor of each vertex in order to reconstruct the minimum path
     for(int i = 0; i < numVert; i++) // initialize reached and predecessor vectors
     {
@@ -664,7 +664,7 @@ GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tesse
     // Numfaces = numF((3b^2)+3b)
     NumFaces = polyhedron.NumFaces * ((3 * numberDivisions * numberDivisions) + 3 * numberDivisions);
 
-    unsigned int FacesperFace = tessellatedPolyhedron.NumFaces/polyhedron.NumFaces; // Number of polygons per face derived by Tesselation I
+    unsigned int FacesperFace = tessellatedPolyhedron.NumFaces/polyhedron.NumFaces; // Number of polygons per face derived by Tessellation I
 
     vector<array<int, 3>> vecVertFaces;
     vecVertFaces.reserve(NumFaces / polyhedron.NumFaces); // this array is needed to store the new faces 
