@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
     }
     else if(p == 4){
         if(q == 3){
-            /* If the polyhedron requested is a cube, we start from a octahedron, which has the values 
+            /* If the polyhedron requested is a cube, we start from an octahedron, which has the values 
             of p and q of the cube, but reversed */
             polyhedron.p = q;
             polyhedron.q = p;
@@ -153,6 +153,9 @@ int main(int argc, char* argv[])
         /* Let's create the starting polyhedron */
         polyhedron.CreateStartingPolyhedron();
         
+        /* Let's define here the object of type "Path", which starts as an empty object: we'll use it 
+        to export all of the polyhedron obtained through the code and then, if requested by the user correctly,
+        we'll use it to find the minimum path between the two vertices whose ids were input by the user */
         Path minimumPath;
 
         // tessellation
@@ -184,17 +187,17 @@ int main(int argc, char* argv[])
             so let's set "goOn" to false*/
             goOn = false;
 
-            /* Let's export the starting polyhedron if the tessellation never happened because of the inputs */
+            /* Let's export the starting polyhedron if the tessellation never happened because of an incorrect input of b and c */
             polyhedron.ExportPolyhedron(minimumPath);
             cerr << "Invalid values for b and c" << endl;
             cerr << "This program can only handle positive integer values for b and c; \n" <<
                 "in particular, just one of them can be equal to 0 or they can be the same value." << endl;
         }
 
-        if(argc != 7){
-            /* If the program didn't ask for the minimum path finding we set "goOn" to false 
-            in order to stop the program before the minimum path finding and we export the polyhedron 
-            obtained until here */
+        if(argc != 7 && goOn){
+            /* If the program didn't ask for the minimum path finding, we set "goOn" to false 
+            in order to stop the program before the minimum-path-finding algorithm and we export the 
+            tessellated polyhedron obtained until here */
             goOn = false;
             tessellatedPolyhedron.ExportPolyhedron(minimumPath);
         }
@@ -206,7 +209,7 @@ int main(int argc, char* argv[])
             double lengthPath;
     
             /* Let's define here two variables we'll need for the function 
-            "AdjacencyList" used in the minimum path finding */
+            "AdjacencyList" used in the minimum path finding algorithm */
             vector<int> nullVec = {};
             int numAdjacentFaces = 6;
     

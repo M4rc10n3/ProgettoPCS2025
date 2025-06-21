@@ -11,7 +11,7 @@ using namespace Eigen;
 int main()
 {
     int p = 3;
-    int q = 4;
+    int q = 3;
     int b = 3;
     cout << "p = " << p << endl;
     cout << "q = " << q << endl;
@@ -22,9 +22,9 @@ int main()
 
     polyhedron.CreateStartingPolyhedron();
     Path minimumPath;
-    // polyhedron.ExportPolyhedron(minimumPath);
-    GEOPolyhedron tessellatedPolyhedron = TypeITessellation(polyhedron, b);
-    tessellatedPolyhedron.ExportPolyhedron(minimumPath);
+    polyhedron.ExportPolyhedron(minimumPath);
+    // GEOPolyhedron tessellatedPolyhedron = TypeITessellation(polyhedron, b);
+    // tessellatedPolyhedron.ExportPolyhedron(minimumPath);
     // GEOPolyhedron finalPolyhedron = TypeIITessellation(polyhedron, tessellatedPolyhedron, b);
     // Path minimumPath;
     // OntoTheUnitSphere(finalPolyhedron);

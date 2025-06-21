@@ -214,19 +214,16 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     int& numberNewVertices = tessellatedPolyhedron.NumVertices;
     int& numberNewEdges = tessellatedPolyhedron.NumEdges;
     int& numberNewFaces = tessellatedPolyhedron.NumFaces;
-    numberNewVertices = 0; // V = 2 * T + 2
-    numberNewEdges = 0; // E = 6 * T
-    numberNewFaces = 0; // F = 4 * T
+    numberNewVertices = 0; 
+    numberNewEdges = 0; 
+    numberNewFaces = 0;
 
-    int& q = polyhedron.q;
-    
-    /* We need to copy these two variables into the new polyhedron in order to make other functions 
-    (needed to dualise the polyhedron) work */
-    tessellatedPolyhedron.q = polyhedron.q;
-    tessellatedPolyhedron.p = polyhedron.p;
-    /* The formulas for the new values of the polyhedron depend on the value of the Schläfli number q,
-    so let's divide the different cases: */
-    switch (q)
+    const int& q = polyhedron.q;
+    const int& p = polyhedron.p;
+
+    /* The formulas for the new values of the polyhedron depend on the value of 
+    the Schläfli number q, so let's divide the different cases: */
+    switch(q)
     {
         case 3:
             numberNewVertices = 2 * numberTrianglesForFace + 2; // V = 2 * T + 2
@@ -245,14 +242,15 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
             break;
     }
     
-    /* We'll use the old polyhedron data structures to save the new vertices, edges and faces, so
-    let's rename them for code readability and resize them (conservatively) using the values 
-    calculated above. */
-
+    /* Let's rename the old polyhedron data structures and the new polyhedron data structures
+    for code readability */
     const int& oldNumFaces = polyhedron.NumFaces;
     const int& oldNumEdges = polyhedron.NumEdges;
     const int& oldNumVertices = polyhedron.NumVertices;
     const double& oldLengthEdge = polyhedron.lengthEdge;
+
+    tessellatedPolyhedron.q = q;
+    tessellatedPolyhedron.p = p;
 
     Eigen::MatrixXd& oldCoordVertices = polyhedron.CoordVertices;
     Eigen::MatrixXd& newCoordVertices = tessellatedPolyhedron.CoordVertices;
@@ -265,23 +263,17 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         - the last columns of the matrix will be for the coordinates of the inner vertices of each 
         face which we'll no longer access, so we don't care of their order as a function of 
         other values */    
+
+    /* Let's start by copying the first columns of "oldCoordVertices" into "newCoordVertices" */
     newCoordVertices.leftCols(oldNumVertices) = oldCoordVertices.leftCols(oldNumVertices);
 
-    /* We'll use the matrix "ExtremaEdges" for finding the vertices of the new polyhedron, 
-    but we won't update it with the new edges found. We will substitute it at the end of 
-    the edge-finding algorithm with the matrix "newExtremaEdges". 
-    We'll do the same thing with "MatrEdgeVertices", which will be substitued by 
-    the matrix "newMatrEdgeVertices" */
     Eigen::MatrixXi& oldExtremaEdges = polyhedron.ExtremaEdges;
     Eigen::MatrixXi& newExtremaEdges = tessellatedPolyhedron.ExtremaEdges;
     newExtremaEdges.resize(2, numberNewEdges);
 
-    // Eigen::MatrixXi& oldMatrEdgeVertices = polyhedron.MatrEdgeVertices;
     Eigen::MatrixXi& newMatrEdgeVertices = tessellatedPolyhedron.MatrEdgeVertices;
     newMatrEdgeVertices = Eigen::MatrixXi::Constant(numberNewVertices, numberNewVertices, -1);
 
-    const int& p = polyhedron.p;
-    // Eigen::MatrixXi& oldListVertFaces = polyhedron.ListVertFaces;
     Eigen::MatrixXi& newListVertFaces = tessellatedPolyhedron.ListVertFaces;
     newListVertFaces.resize(p, numberNewFaces);
 
@@ -293,17 +285,16 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     of each face and most importantly all of its edges, so let's compute it: */
     const double newLengthEdge = oldLengthEdge / numberDivisions;
     tessellatedPolyhedron.lengthEdge = newLengthEdge;
-
     
     /* Let's initialize a vector that will save all of the edges that we have already divided.
-    It will v1 with just "-1" as its elements. Then, we'll also need to keep track of its 
+    It will start with just "-1" as its elements. Then, we'll also need to keep track of its 
     index in order to increase it and to access the right element of the vector. */
     vector<int> edgesDone(oldNumEdges, -1);
     int edgesDoneIndex = 0;
     
     /* In order not to get it out of scope, we need to initialize here the variable we'll 
     use to keep track of how many inner vertices we have found and saved. This variable 
-    will be uesed to access the right column of the matrix "CoordVertices". */
+    will be uesed to access the right column of the matrix "newCoordVertices". */
     int innerVerticesSaved = 0;
     
     /* Same thing with the variable we'll use to keep track of how many edges we have found and saved.
@@ -312,13 +303,13 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     int newEdgesFound = 0;
     const int numberVerticesOnFace = ((numberDivisions + 1) * (numberDivisions + 2) / 2);
     
-    int faceCounter = 0;
+    /* Same thing with the variables and structures we'll use as arguments for the 
+    function "FindFaces": they will be increased inside this function */
+    int newFacesFound = 0;
     int numAdjacentVertices = 6;
-    
-    /* Let's initialise the vector which stores unique triangles (the faces of the polyhedron) 
-    as sorted arrays of 3 vertices. It will store the unique new faces found on the old polyhedron 
-    face with index "faceIndex" */
     vector<array<int, 3>> vecVertFaces;
+    /* For this data structure we need just enough memory space to contain the number of 
+    faces on a face of the old polyhedron */
     vecVertFaces.reserve(numberNewFaces / oldNumFaces);
     
     /* We need to tesselate each face of the polyhedron given as input, so we need a "for" 
@@ -326,9 +317,10 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
     for(int faceIndex = 0; faceIndex < oldNumFaces; faceIndex++)
     {   
         /* Let's create a vector containing the ids of the vertices on each face. 
-        We'll use it to find the polyhedron new edges using on each face the same algorithm 
-        we used for the original polyhedron. We cannot use it in all of the polyhedron because we 
-        would otherwise find other edges inside the polyhedron itself which we don't need. */
+        We'll use it to find the polyhedron new edges and new faces using on each face 
+        the same algorithms used for the starting polyhedron. We cannot use the orignal algorithms 
+        on all of the polyhedron because we would otherwise find other edges and faces inside 
+        the polyhedron itself which we don't need. */
         vector<int> verticesOnFace;
         verticesOnFace.reserve(numberVerticesOnFace);
 
@@ -339,18 +331,21 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         Eigen::VectorXd newZCoordVerticesOnEdge = VectorXd::Zero(numberDivisions + 1);
 
         /* In order to tesselate, we need to divide each edge into "numberDivisions" parts,
-         so we need a "for" cycle on the edges of each face: */
+        so we need a "for" cycle on the 3 edges of each face: */
         for(int edge = 0; edge < p; edge++)
         {
-            /* Let's find the index we used in our data structures for the edge of the face: */
+            /* Let's find the index we used in our data structures for the edge of the face
+            and rename it for code readability: */
             int& edgeIndex = oldListEdgeFaces(edge, faceIndex);
             
-            /* Let's save inside "verticesOnFace" the vertices of the edges that are already divided */
+            /* Let's check if we've already divided the edge with index "edgeIndex": 
+            if that's the case, we save inside "verticesOnFace" their vertices */
             if(find(edgesDone.begin(), edgesDone.end(), edgeIndex) != edgesDone.end()){
                 /* First of all, let's save the vertices that are the extrema of the edges */
                 for(int extremum = 0; extremum < 2; extremum++){
-                    /* Let's rename a variable for code readability */
+                    /* Let's rename the "edgeExtremum" for code readability */
                     int& edgeExtremum = oldExtremaEdges(extremum, edgeIndex);
+
                     /* We can save the vertex with a simple "push_back" if we haven't already 
                     saved it before */
                     if(find(verticesOnFace.begin(), verticesOnFace.end(), edgeExtremum) == verticesOnFace.end())
@@ -373,7 +368,7 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
             }      
             else
             {
-                /* Using the edgeIndex we found above we can access the right vertices 
+                /* Using the "edgeIndex" we found above we can access the right vertices 
                 indexes inside our data structures and rename them for code readability: */
                 int& firstVertexWeAreDividing = oldExtremaEdges(0, edgeIndex);
                 int& secondVertexWeAreDividing = oldExtremaEdges(1, edgeIndex);
@@ -384,10 +379,12 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                 {
                     verticesOnFace.push_back(firstVertexWeAreDividing);
                 }
+                
                 if(find(verticesOnFace.begin(), verticesOnFace.end(), secondVertexWeAreDividing) == verticesOnFace.end())
                 {
                     verticesOnFace.push_back(secondVertexWeAreDividing);
                 }
+
 
                 /* Let's rename the coordinates of the two vertices for code readability: */
                 double& firstVertexXCoord = oldCoordVertices(0, firstVertexWeAreDividing);
@@ -429,7 +426,6 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
 
                     /* Let's also add the id of the new vertex to the vector "verticesOnFace": */
                     verticesOnFace.push_back(newVertexId);
-
                 }
 
                 /* Now that we have divided an edge, we can save it inside the vector "edgesDone" 
@@ -440,19 +436,17 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         }
 
         /* Now we need to find the coordinates of the inner vertices of each face of the 
-        old polyhedron */
-
-        /* Let's find the vertices that have the exact distance we need to create the internal points. 
-        For example, for b = 3, we'll search for the vertices on the edges (except for their extrema) 
-        that have distance equal to two times the length of the new smaller edge. 
-        For b = 4, we'll firstly look for the vertex that has a distance equal to 3 times that of the edge, 
-        then we'll save the edge index and search on it for the vertex that has a distance equal to 2 times 
-        that of the edge.
-        Once we'll have found the two etrema of the inner segment, we'll use the same algorithm as above 
-        to find the inner vertices subdividing the segment into the exact number of parts */
+        old polyhedron. Firstly, let's find the two vertices that have the exact distance we need 
+        to create the internal points. For example, for b = 3, we'll search for the vertices on the edges 
+        (except for their extrema) that have distance equal to two times the length of the new smaller edge. 
+        For b = 4, we'll firstly look for the vertex that has a distance equal to 3 times that of the new 
+        smaller edge, then we'll save the edge index and search on it for the vertex that has a distance 
+        equal to 2 times that of the new smaller edge. Once we'll have found the two etrema of the inner 
+        segment, we'll use the same algorithm as above to find the inner vertices subdividing the segment 
+        into the exact number of parts using the "LinSpaced" method*/
 
         /* We'll always start our search from the vertices on the first edge of the face and we'll look for 
-        the vertices on the other edges of the same face */
+        the vertices on the other edges of the same face. Let's rename its index for code readability */
         int& edgeWeStartFromIndex = oldListEdgeFaces(0, faceIndex);
 
         /* Let's create the variable that will save the index of the opposing edge to the one with index 
@@ -463,41 +457,43 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
         for(int time = 0; time < numberDivisions - 2; time++)
         /* "time" represents the number of inner segments that each face has */
         {
-            /* Let's set a "minimumDistance" we'll use to find the exact vertex we're looking for. 
+            /* Let's set a "minimumDistance" we'll use as a tolerance in order to find 
+            the exact vertex we're looking for. Let's initialise with a big value, like  "newLengthEdge". 
             Unfortunately, a tolerance wasn't feasible because on some faces the distance from the 
             first vertex and the vertex we're looking for was of the order of e-15 and on some other 
-            faces it was of the order of e-16 without folloqing an understandable logic */
+            faces it was of the order of e-16 without following any logic */
             double minimumDistance = newLengthEdge;
 
             /* Let's create here the variable that save the indexes of the vertices which we'll divide
-             into the exact number of parts at each iteration of "time" */
-            int minimumDistanceIdVertexWeStartFrom = -1;
-            int minimumDistanceIdOpposingVertex = -1;
+            into the exact number of parts at each iteration of "time" */
+            int minimumDistanceVertexWeStartFromId = -1;
+            int minimumDistanceOpposingVertexId = -1;
+
+            /* In order to access the proper vertex where we'll start from, we should ignore:
+                - the vertices of the old polyhedron;
+                - the vertices we found above on the edges before the current one; 
+            then we should access the vertex with id "time". 
+            Each of these members is represented in a line in the next sum for code readability: */
+            int idVertexWeStartFrom = oldNumVertices + 
+                                      (numberDivisions - 1) * edgeWeStartFromIndex +
+                                      time;
 
             /* At the first iteration of "time" we'll look for the edge with the vertex we're looking 
             for and then we'll save it inside "minimumDistanceOpposingEdge" in order to use it afterwards.
-            After the second iteration we'll look for the vertex only on the edge with index "minimumDistanceOpposingEdge"
-            in order not to create repeating sides.*/
+            After the second iteration we'll look for the second extrema of the inner segment only on the 
+            edge with index "minimumDistanceOpposingEdge" in order not to create repeating inner sides. */
             if(time == 0)
             {
                 /* We'll look for the right vertex on both the opposing vertices: */
                 for(int opposingEdgeIndex = 1; opposingEdgeIndex < p; opposingEdgeIndex++)
                 {
-                    /* Let's find the right index of the edge accessing our data structures:  */
+                    /* Let's find and rename (for code readability) the right index of the edge 
+                    accessing our data structures: */
                     int& opposingEdge = oldListEdgeFaces(opposingEdgeIndex, faceIndex);
                     
                     /* Now we can look for the right vertex on the edge: */
                     for(int idVertexOnEdge = 0; idVertexOnEdge < (numberDivisions - 1); idVertexOnEdge++)
                     {
-                        /* In order to access the proper vertex where we'll v1 from, we should ignore:
-                            - the vertices of the old polyhedron;
-                            - the vertices we found above on the edges before the current one; 
-                        then we should access the vertex with id "time". 
-                        Each of these members is represented in a line in the next sum for code readability: */
-                        int idVertexWeStartFrom = oldNumVertices + 
-                                                  (numberDivisions - 1) * edgeWeStartFromIndex +
-                                                  time;
-    
                         /* In order to access the proper vertex where we'll end at, we should ignore:
                             - the vertices of the old polyhedron;
                             - the vertices we found above on the edges before the current one; 
@@ -507,21 +503,21 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                                                (numberDivisions - 1) * opposingEdge +
                                                idVertexOnEdge;
     
-                        /* "distance" is the variable contanining the difference between the distance squared 
-                        between the vertices and the length of the segment we're looking for */
+                        /* "distance" is the variable containing the difference of the distance between 
+                        the vertices squared and the length of the segment we're looking for squared */
                         double distance = abs(tessellatedPolyhedron.DistanceSquaredBetween(idVertexWeStartFrom, idOpposingVertex) - 
                             newLengthEdge * (numberDivisions - 1 - time) * newLengthEdge * (numberDivisions - 1 - time));
     
-                        /* When we found a vertex with a "distance" that's less than that we've already saved, 
-                        then we update the value of "minimumDistance", the indexes of the vertices of the segment we 
-                        will divide and the index of the edge where we'll look for the vertices after the first 
-                        iteration of "time" */
+                        /* When we find a vertex with a "distance" that's less than that we've already saved inside 
+                        "minimumDistance", then we update the value of "minimumDistance", the indexes of the vertices 
+                        of the segment we will divide and the index of the edge where we'll look for the vertices 
+                        after the first iteration of "time" */
                         if(distance < minimumDistance)
                         {
                             minimumDistance = distance;
 
-                            minimumDistanceIdVertexWeStartFrom = idVertexWeStartFrom;
-                            minimumDistanceIdOpposingVertex = idOpposingVertex;
+                            minimumDistanceVertexWeStartFromId = idVertexWeStartFrom;
+                            minimumDistanceOpposingVertexId = idOpposingVertex;
 
                             minimumDistanceOpposingEdge = opposingEdge;
                         }
@@ -534,18 +530,9 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                 which is saved in the variable initialised outside the "for" cycle on the "time" variable */
                 int& opposingEdge = minimumDistanceOpposingEdge;
                     
-                /* Now we can look for the right vertex on the edge we saved: */
+                /* Now we can look for the right vertex on the "opposingEdge" we saved: */
                 for(int idVertexOnEdge = 0; idVertexOnEdge < (numberDivisions - 1); idVertexOnEdge++)
                 {
-                    /* In order to access the proper vertex where we'll v1 from, we should ignore:
-                        - the vertices of the old polyhedron;
-                        - the vertices we found above on the edges before the current one; 
-                    then we should access the vertex with id "time". 
-                    Each of these members is represented in a line in the next sum for code readability: */
-                    int idVertexWeStartFrom = oldNumVertices + 
-                                              (numberDivisions - 1) * edgeWeStartFromIndex +
-                                              time;
-
                     /* In order to access the proper vertex where we'll end at, we should ignore:
                         - the vertices of the old polyhedron;
                         - the vertices we found above on the edges before the current one; 
@@ -555,27 +542,32 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                                            (numberDivisions - 1) * opposingEdge +
                                            idVertexOnEdge;
                     
-                    /* "distance" is the variable contanining the difference between the distance squared 
-                    between the vertices and the length of the segment we're looking for */
+                    /* "distance" is the variable containing the difference of the distance between 
+                        the vertices squared and the length of the segment we're looking for squared */
                     double distance = abs(tessellatedPolyhedron.DistanceSquaredBetween(idVertexWeStartFrom, idOpposingVertex) - 
                         newLengthEdge * (numberDivisions - 1 - time) * newLengthEdge * (numberDivisions - 1 - time));
 
-                    /* When we found a vertex with a "distance" that's less than that we've already saved, 
-                    then we update the value of "minimumDistance" and the indexes of the vertices of the segment we 
-                    will divide (we don't know to update the variable "minimumDistanceOpposingEdge" anymore) */
-                    if(distance < minimumDistance){
-                            minimumDistance = distance;
-                            minimumDistanceIdVertexWeStartFrom = idVertexWeStartFrom;
-                            minimumDistanceIdOpposingVertex = idOpposingVertex;
-                        }
+                    /* When we found a vertex with a "distance" that's less than that we've already saved 
+                    inside "minimumDistance", then we update the value of "minimumDistance" and the indexes 
+                    of the vertices of the segment we will divide (we don't need to update the variable 
+                    "minimumDistanceOpposingEdge" anymore) */
+                    if(distance < minimumDistance)
+                    {
+                        minimumDistance = distance;
+
+                        minimumDistanceVertexWeStartFromId = idVertexWeStartFrom;
+                        minimumDistanceOpposingVertexId = idOpposingVertex;
+                    }
                 }
             }
-            /* After we've found the vertices with the minimum "distance" we'll divide them using
-            the same algorithm as above (used for the vertices on the edges) in order to find 
-            the coordinates of the inner vertices (in this case we need to access the coordinates 
-            in the matrix "newCoordVertices" of the new polyhedron)*/
-            int& firstVertexWeAreDividing = minimumDistanceIdVertexWeStartFrom;
-            int& secondVertexWeAreDividing = minimumDistanceIdOpposingVertex;
+
+            /* After we've found the vertices with the minimum "distance" between them, 
+            we'll divide them using the same algorithm as above (used for the vertices on 
+            the edges) in order to find the coordinates of the inner vertices (in this 
+            case we need to access the coordinates in the matrix "newCoordVertices" 
+            of the new polyhedron). Let's rename everything for code readability */
+            int& firstVertexWeAreDividing = minimumDistanceVertexWeStartFromId;
+            int& secondVertexWeAreDividing = minimumDistanceOpposingVertexId;
 
             double& firstVertexXCoord = newCoordVertices(0, firstVertexWeAreDividing);
             double& firstVertexYCoord = newCoordVertices(1, firstVertexWeAreDividing);
@@ -609,6 +601,11 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                 int newVertexId = oldNumVertices + 
                                     (numberDivisions - 1) * oldNumEdges + 
                                     innerVerticesSaved;
+                                    
+                /* Let's also add the id of the new vertex to the vector "verticesOnFace": */
+                verticesOnFace.push_back(newVertexId);
+
+                /* Let's save the coordinates of the new vertex: */
                 newCoordVertices(0, newVertexId) = newXCoordVerticesOnEdge(vertexSaved + 1);
                 newCoordVertices(1, newVertexId) = newYCoordVerticesOnEdge(vertexSaved + 1);
                 newCoordVertices(2, newVertexId) = newZCoordVerticesOnEdge(vertexSaved + 1);
@@ -616,26 +613,18 @@ GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
                 /* Now that we've found an inner vertex, we can increase the variable 
                 that counts them: */
                 innerVerticesSaved++;
-
-                /* Let's also add the id of the new vertex to the vector "verticesOnFace": */
-                verticesOnFace.push_back(newVertexId);
             }
         }
 
-        /* Now we'll find the polyhedron new edges using a similar algorithm used for the old polyhedra 
-        based on the length of the edge. It will be modified because we would also find internal edges 
-        that we don't need using the original algorithm. */
-    
-        /* We need to find the edges that start from each vertex of the face (except for the last one, 
-        because that would be a certain useless iteration: we'll have already found all of the edges 
-        that have the last vertex as an extrema). We will use the "verticesOnFace" vector to find 
-        the right index of each vertex in our data structures */
-
-        tessellatedPolyhedron.FindEdges(verticesOnFace, newEdgesFound, numberVerticesOnFace);
+        /* Now we can look for the new edges of the polyhedron using just the vertices 
+        on this face with index "faceIndex" of the old polyhedron, whose ids are 
+        stored inside "verticesOnFace". Let's do it using the "GEOPolyhedron" method "FindEdges": */
+        tessellatedPolyhedron.FindEdges(verticesOnFace, newEdgesFound);
         
-        /* Now we can look for the new faces of the polyhedron starting from each of the vertices 
-        on the face of the old polyhedron */
-        tessellatedPolyhedron.FindFaces(verticesOnFace, faceCounter, vecVertFaces, numAdjacentVertices);
+        /* Now we can look for the new faces of the polyhedron using just the vertices 
+        on this face with index "faceIndex" of the old polyhedron, whose ids are 
+        stored inside "verticesOnFace". Let's do it using the "GEOPolyhedron" method "FindFaces": */
+        tessellatedPolyhedron.FindFaces(verticesOnFace, newFacesFound, vecVertFaces, numAdjacentVertices);
     }
 
 
