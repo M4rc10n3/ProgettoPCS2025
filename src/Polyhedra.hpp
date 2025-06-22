@@ -82,11 +82,6 @@ namespace PolyhedraLibrary
         - verticesOnFace: vector containing the ids of the vertices for the face considered;
         - edgesFound: integer representing how many edges of the polyhedron were already found. */
         void FindEdges(vector<int>& verticesOnFace, int& edgesFound);
-
-        /* "FindAdjacentFaces" saves inside "ListAdjacentFaces" the adjacent faces to each face. 
-        Each column contains the ids of the adjacent faces for the face that has the column index as id.
-        We'll need it in order to avoid duplicating the edges and vertices in the tessellation of type I. */
-        void FindAdjacentFaces();
         
         /* "ExportPolyhedron" exports the structures of the polyhedron colouring them and using 
         the code of Mr. Vicini in order to create a file readable by ParaView. 

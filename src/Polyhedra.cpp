@@ -285,69 +285,6 @@ namespace PolyhedraLibrary
         return adjacencyList;
     }
 
-    void GEOPolyhedron::FindAdjacentFaces()
-    {
-        /* We need to find the adjacent faces for each face: 
-        we'll do it by finding two faces of the matrix "ListVertFace" that contain 
-        the same two vertices ids */
-        for(int faceIndex = 0; faceIndex < NumFaces; faceIndex ++)
-        {
-            // Saving the vertices we'll need to find with an alias for code readability
-            int& vertexToFind1 = ListVertFaces(0, faceIndex);
-            int& vertexToFind2 = ListVertFaces(1, faceIndex);
-            int& vertexToFind3 = ListVertFaces(2, faceIndex);
-            
-            /* We need to save the number of adjacent faces found in order to save computational power
-            by avoiding useless iterations */
-            int adjacentFacesFound = 0;
-
-            /* Let's iterate on all the other faces of the polyhedron in order to find the 3 adjacent 
-            faces of the polyhedron */
-            for(int faceWeAreChecking = 0; faceWeAreChecking < NumFaces; faceWeAreChecking++)
-            {
-                const auto& face = ListVertFaces.col(faceWeAreChecking);
-                /* We need to skip the face which we're looking the adjacent faces for */
-                if(faceWeAreChecking == faceIndex){
-                    continue;
-                }
-                /* Checking that we haven't found all of the adjacent faces for the face with id "faceIndex" */
-                else if(adjacentFacesFound < 3)
-                {
-                    /* Whenever we found 1 of the 3 vertices of the face inside the "faceWeAreChecking", 
-                    we have to check if there's also another one */
-                    if(find(face.begin(), face.end(), vertexToFind1) != face.end() && 
-                        (find(face.begin(), face.end(), vertexToFind2) != face.end() ||
-                         find(face.begin(), face.end(), vertexToFind3) != face.end()))
-                    {
-                        /* In this case we've found an adjacent face for the face with id "faceIndex". 
-                        We can save it inside the matrix "ListAdjacentFaces" */
-                        ListAdjacentFaces(adjacentFacesFound, faceIndex) = faceWeAreChecking;
-
-                        /* Then, we increase "adjacentFacesFound" and continue to the next iteration */
-                        adjacentFacesFound++;
-                        continue;
-                    }
-                    else if(find(face.begin(), face.end(), vertexToFind2) != face.end() && 
-                            (find(face.begin(), face.end(), vertexToFind1) != face.end() ||
-                             find(face.begin(), face.end(), vertexToFind3) != face.end()))
-                    {
-                        ListAdjacentFaces(adjacentFacesFound, faceIndex) = faceWeAreChecking;
-                        adjacentFacesFound++;
-                        continue;
-                    }
-                    else if(find(face.begin(), face.end(), vertexToFind3) != face.end() && 
-                            (find(face.begin(), face.end(), vertexToFind1) != face.end() ||
-                             find(face.begin(), face.end(), vertexToFind2) != face.end()))
-                    {
-                        ListAdjacentFaces(adjacentFacesFound, faceIndex) = faceWeAreChecking;
-                        adjacentFacesFound++;
-                        continue;
-                    }
-                }
-            }
-        }
-    }
-
     void GEOPolyhedron::ExportPolyhedron(Path& minimumPath)
     {
         /* Let's initialise two vectors with elements of type "Gedim::UCDProperty<double>" as empty vectors */

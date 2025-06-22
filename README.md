@@ -60,59 +60,80 @@ Cose da fare:
 8. Il codice del prof. Vicini esporta solo triangoli (pare), quindi possiamo esportare solo quelli su ParaView per provare a visualizzare i poliedri.
 
 
-Documentazione:
+Documentazione con PlantUML:
+
+Activity diagram per spiegare le condizioni in main e i poliedri che esporta
+Activity diagram per le funzioni più particolari del nostro programma
+Sequence diagram per spiegare il processo seguito dal programma
+Class diagram per gli oggetti del nostro codice
+MindMaps per esporre concetti (potrebbero essere utili)
 
 Sequence diagram per il processo seguito del codice
 
 @startuml
 'skinparam plain true
+skinparam titleBorderRoundCorner 10
+skinparam titleBorderThickness 2
+skinparam titleBorderColor black
+skinparam titleFontSize 20
 title Code sequence for a <color #76232E>geodetic polyhedron</color>
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
-participant Main 
-collections BuildPolyhedra as BP
-collections Tessellations as Ts
+participant main as m
+collections GEOPolyhedron as GP
+'box "Tessellations algorithms" #C0DFB1
 participant TypeITessellation as TI
 participant TypeIITessellation as TII
-participant Dualise
+'end box
 participant OntoTheUnitSphere as OS
+'box "Minimum path \nfinding algorithms" #B5D1E8
+participant BFS
+participant Dijkstra as Dj
+'end box
 
 'separator for each major part of code
-== Building the polyhedron ==
+== Building the starting polyhedron ==
 
-Main -\ BP ** : (//p//, //q//)
-Main \-- BP : original **<color #470968>polyhedron</color>**
-'spacing
-||5||
+m -\ GP ** : (//p//, //q//)
+m \- GP : **<color #470968>polyhedron</color> **
+||15||
 == Tessellating ==
 
-Main -\ Ts ** : **<color #470968>polyhedron</color> ** and (//b//, //c//)
 'rnote over Ts #FDDE03 : Choosing the \n right tessellation
 
-group#Gold Type I Tessellation [if  b > 0, c = 0 \n         or\n b = 0, c > 0]
-    Ts -\ TI ** : **<color #470968>polyhedron</color> **
-    Ts \-- TI : **<color #FD5201>tessellated</color>** polyhedron
+group#8EC740 Type I Tessellation [if  b > 0, c = 0 or b = 0, c > 0]
+    m -\ TI ** : **<color #470968>polyhedron</color> **
+    m \-- TI : **<color #FD5201>tessellated</color>** polyhedron
     end
 
-group#Gold Type I Tessellation [if  b > 0, c > 0 and b = c]
-    Ts -\ TII ** : **<color #470968>polyhedron</color> **
-    Ts \-- TII : **<color #FD5201>tessellated</color>** polyhedron
+group#06B25A Type II Tessellation [if  b > 0, c > 0 and b = c]
+    m -\ TII ** : **<color #470968>polyhedron</color> **
+    m \-- TII : **<color #FD5201>tessellated</color>** polyhedron
     end
+||15|| 
 
-Main \-- Ts : **<color #FD5201>tessellated</color>** polyhedron
-||20|| 
-== Dualising and normalising ==
+== Projecting onto the sphere ==
 
-Main -\ Dualise ** : **<color #FD5201>tessellated</color>** polyhedron
-Main \-- Dualise : **<color #9EC3D4>dual</color>** of the tessellated polyhedron
+m -\ OS ** : **<color #FD5201>tessellated</color>** polyhedron
+m \-- OS : **<color #76232E>geodetic polyhedron</color>**
+||15|| 
 
-'spacing
-||5||
-Main -\ OS ** : **<color #9EC3D4>dual</color>** of the tessellated polyhedron
-Main \-- OS : **<color #76232E>geodetic polyhedron</color>**
+== Finding the minimum path ==
+group#8EC740 Type I Tessellation
+    m -\ BFS ** : **<color #FD5201>tessellated</color>** polyhedron and (//idVert1//, //idVert2//)
+    m \-- BFS : **<color #022F73>minimum path</color>** 
+    end
+    
+group#06B25A Type II Tessellation
+    m -\ Dj ** : **<color #FD5201>tessellated</color>** polyhedron and (//idVert1//, //idVert2//)
+    m \-- Dj : **<color #022F73>minimum path</color>** 
+    end
+    
+||15||
 
-
-
+== Exporting ==
+m -> GP : **<color #76232E>geodetic polyhedron</color>** \nand **<color #022F73>minimum path</color>** 
+GP ->]  ** : exporting using //UCDUtilities// on //.inp// files inside //PolygonalData//
 
 
 
