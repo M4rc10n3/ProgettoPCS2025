@@ -1,0 +1,64 @@
+@startuml
+<style>
+partition{
+    RoundCorner 7
+}
+
+package{
+    RoundCorner 7
+    LineColor #6BC2FA
+    BackgroundColor #BCE5FF}
+</style>
+skinparam defaultFontSize 14
+skinparam titleFontName Serif
+skinparam titleFontSize 18
+skinparam titleBorderColor Black
+skinparam titleBorderThickness 2
+skinparam titleBorderRoundCorner 10
+title TypeITessellation
+split
+    -[hidden]->
+    :polyhedron; <<input>>
+split again
+    -[hidden]->
+    :numberDivisions; <<input>>
+end split
+-> Passing arguments to function;
+:Initialising the **<color #FD5201>tessellated</color>** polyhedron attributes; <<task>>
+
+repeat
+    partition Computing on each face of **<color #470968>polyhedron</color>** {
+    repeat
+        partition New vertices on edges{
+            :Access edge extrema from <i>ExtremaEdges</i>; <<load>>
+            :Divide their coordinates using <i>.LinSpaced()</i>; <<procedure>>
+            :Save coordinates in <i>CoordVertices</i>; <<save>>
+        }
+    repeat while (All edges of the face done?) is (no) not (yes)
+    repeat
+        partition New vertices inside the face{
+            if (First time dividing?) then (yes)
+            :Find correct edge points 
+                 through distance; <<procedure>>
+            :Save the opposing edge; <<save>>
+            else (no)
+            :Access the opposing edge; <<load>>
+            :Find correct edge points
+                through distance; <<procedure>>
+            endif
+            :Divide their coordinates using <i>.LinSpaced()</i>; <<procedure>>
+            :Save coordinates in <i>CoordVertices</i>; <<save>>
+        }
+    repeat while (Did it went through all the edge points of the edge?) is (no) not (yes)
+    package "**GEOPolyhedron** \nmethods"{
+        :.FindEdges(); <<procedure>>
+        :.FindFaces(); <<procedure>>
+        }
+    }
+repeat while (All **<color #470968>polyhedron</color>** \nfaces **<color #FD5201>tessellated</color>**?) is (no) not (yes)
+:Outputting the 
+**<color #FD5201>tessellated</color>** polyhedron; <<output>>
+-> Returning to <i>main.cpp</i>;
+
+stop
+@enduml

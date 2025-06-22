@@ -87,15 +87,15 @@ int main(int argc, char* argv[])
         polyhedron.p = p;
         if(q == 3){
             polyhedron.q = q;
-            cout << "Your starting polyhedron is a Tetrahedron. " << endl;
+            cout << "Your requested starting polyhedron is a Tetrahedron. " << endl;
         }
         else if(q == 4){
             polyhedron.q = q;
-            cout << "Your starting polyhedron is a Octahedron. " << endl;
+            cout << "Your requested starting polyhedron is a Octahedron. " << endl;
         }
         else if(q == 5){
             polyhedron.q = q;
-            cout << "Your starting polyhedron is an Icosahedron. " << endl;
+            cout << "Your requested starting polyhedron is an Icosahedron. " << endl;
         }
         else{    
             goOn = false;
@@ -112,7 +112,8 @@ int main(int argc, char* argv[])
             polyhedron.p = q;
             polyhedron.q = p;
 
-            cout << "Your starting polyhedron is a Cube. " << endl;
+            cout << "Your requested starting polyhedron is a Cube;" << 
+                " this code will start producing an Octahedron. " << endl;
         }
         else{
             goOn = false;
@@ -129,7 +130,8 @@ int main(int argc, char* argv[])
             polyhedron.p = q;
             polyhedron.q = p;
 
-            cout << "Your starting polyhedron is a Dodecahedron. " << endl;
+            cout << "Your requested starting polyhedron is a Dodecahedron;" << 
+                " this code will start producing an Icosahedron. " << endl;
         }
         else{
             goOn = false;
