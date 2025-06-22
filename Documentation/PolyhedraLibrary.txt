@@ -1,0 +1,95 @@
+@startuml 
+
+title Create Geodetic or Goldberg Polyhedron
+
+package PolyhedraLibrary <<Folder>>
+{
+
+struct Path {
+  + VerticesShortPath : vector<double>
+  + EdgesShortPath : vector<double>
+  }
+
+struct GEOPolyhedron {
+
+  + p : int
+  + q : int
+  + lengthEdge : double
+
+  + NumVertices : int
+  + IdVertices : vector<int>
+  + CoordVertices : MatrixXd
+  + ShortPathCell0Ds : map<int, list<int>>
+
+  + NumEdges : int
+  + IdEdges : vector<int>
+  + ExtremaEdges : MatrixXi
+  + MatrEdgeVertices : MatrixXi
+
+  + NumFaces : int
+  + IdFaces : vector<int>
+  + Cell2DsVertices : vector<vector<int>>
+  + Cell2DsEdges : vector<vector<int>>
+
+  + NumCell3Ds : int
+  + Cell3DsId : vector<int>
+  + ListVertFaces : MatrixXi
+  + ListEdgeFaces : MatrixXi
+  + ListAdjacentFaces : MatrixXi
+  
+  + IdPolyhedra : int
+  + ListVertPolyhedra : vector<int>
+  + ListEdgePolyhedra : vector<int>
+  + ListFacePolyhedra : vector<int>
+--
+
+  + void CreateStartingPolyhedron()
+  
+  + double DistanceSquaredBetween(int& idPoint1, int& idPoint2);
+  
+  + vector<vector<int>> AdjacencyList(vector<int>& verticesOnFace, int& numAdjacentVertices)
+  
+  + void FindFaces(vector<int>& verticesOnFace, int& newFacesFound, vector<array<int, 3>>& vecVertFaces, int& numAdjacentVertices)
+  + void FindEdges(vector<int>& verticesOnFace, int& newEdgesFound, const int& numberVerticesToCheck)
+  + void FindAdjacentFaces();
+  
+  + void ExportPolyhedron(Path& minimumPath)
+  
+  + void Cell0Ds()
+  + void Cell1Ds()
+  + void Cell2Ds()
+  + void Cell3Ds()
+
+.. TESTPolyhedron ..
+
+
+
+}
+}
+
+package Gedim <<Frame>>
+{
+
+}
+package GTest <<Frame>>
+{
+
+}
+package Eigen <<Frame>>
+{
+
+}
+
+GEOPolyhedron::ExportPolyhedron --left--> Path 
+
+GEOPolyhedron::GedimInterface --down--> Gedim
+GEOPolyhedron::GedimInterface --down--> Eigen
+GEOPolyhedron::GedimInterface --down--> GTest
+
+
+note "These are external packages" as ExternalNote
+Gedim --down.. ExternalNote
+Eigen --down.. ExternalNote
+GTest --down.. ExternalNote
+
+@enduml
