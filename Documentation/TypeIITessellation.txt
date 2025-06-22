@@ -60,7 +60,7 @@ repeat
             
             repeat
             if (The vertex is on the edge?) then (<color:red>yes)
-            :continue; <<task>>
+            :continue; <<continuous>>
             else (no)
             :Save coordinates in <b>CoordVertices</b>; <<save>>
             endif

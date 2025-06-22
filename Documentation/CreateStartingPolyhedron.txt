@@ -1,0 +1,58 @@
+@startuml
+<style>
+partition{
+    RoundCorner 7
+}
+
+package{
+    RoundCorner 7
+    LineColor #6BC2FA
+    BackgroundColor #BCE5FF}
+    
+note{
+    BackgroundColor #FFE739}
+</style>
+skinparam defaultFontSize 14
+skinparam titleFontName Serif
+skinparam titleFontSize 18
+skinparam titleBorderColor Black
+skinparam titleBorderThickness 2
+skinparam titleBorderRoundCorner 10
+title GEOPolyhedron.CreateStartingPolyhedron()
+split
+    -[hidden]->
+    :p; <<input>>
+split again
+    -[hidden]->
+    :q; <<input>>
+end split
+-> Passing arguments to method;
+:Initialising the **<color #470968>polyhedron</color>** attributes; <<task>>
+-> All the coordinates were
+found using <i>GeoGebra</i>: using 
+it we created the **<color #470968>polyhedra</color>** 
+and then copied their 
+<b>coordinates</b> in the code
+
+;
+partition Creating <b>CoordVertices</b>{
+switch (q)
+case (3)
+    :Tetrahedron;
+case (4)
+    :Octahedron;
+case (5)
+    :Icosahedron;
+endswitch
+:Saving their coordinates into <b>CoordVertices</b>; <<save>>
+}
+
+skinparam PartitionBorderColor #Black
+package "**GEOPolyhedron** \nmethods"{
+    :<i>.FindEdges()</i>; <<procedure>>
+    :<i>.FindFaces()</i>; <<procedure>>
+    }
+
+:The **<color #470968>polyhedron</color>** is complete;
+detach
+@enduml
