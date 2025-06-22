@@ -1,0 +1,95 @@
+@startuml
+<style>
+partition{
+    RoundCorner 7
+}
+
+package{
+    RoundCorner 7
+    LineColor #6BC2FA
+    BackgroundColor #BCE5FF}
+</style>
+skinparam defaultFontSize 14
+skinparam titleFontName Serif
+skinparam titleFontSize 18
+skinparam titleBorderColor Black
+skinparam titleBorderThickness 2
+skinparam titleBorderRoundCorner 10
+title TypeIITessellation
+split
+    -[hidden]->
+    :**<color #470968>polyhedron</color>** ; <<input>>
+split again
+    -[hidden]->
+    :**<color #AE0D17>typeITessellated</color>** 
+        polyhedron; <<input>>
+split again
+    -[hidden]->
+    :numberDivisions; <<input>>
+end split
+-> Passing arguments to function;
+:Initialising the **<color #FD5201>tessellated</color>** polyhedron attributes; <<task>>
+
+repeat
+    skinparam PartitionBorderColor #3C035A
+    partition Computing on each face of **<color #470968>polyhedron</color>** {
+    repeat
+        skinparam PartitionBorderColor #F03844
+        partition New vertices on <b>edges</b>{
+            :Access edge extrema from <b>ExtremaEdges</b>; <<load>>
+            :Compute their distance and divide it; <<procedure>>
+            
+            repeat
+                :Add the distance divided 
+                  to the starting vertex; <<procedure>>
+                :Save coordinates in <b>CoordVertices</b>; <<save>>
+                :Save edge in <b>ExtremaEdges</b> 
+                    and <b>MatrEdgeVertices</b>; <<save>>
+                :Updating starting vertex coordinates; <<task>>
+            repeat while (Last vertex?) is(<color:red>no) not (yes)
+            
+            :Save last edge in <b>ExtremaEdges</b> 
+               and <b>MatrEdgeVertices</b>; <<save>>
+            
+        }
+    repeat while (All edges of the face done?) is (<color:red>no) not (yes)
+    
+    skinparam PartitionBorderColor #042347
+    partition New vertices <b>inside</b> the face{
+        repeat
+            
+            repeat
+            if (The vertex is on the edge?) then (<color:red>yes)
+            :continue; <<task>>
+            else (no)
+            :Save coordinates in <b>CoordVertices</b>; <<save>>
+            endif
+            repeat while ( Did it went through all the vertices of the \nface of the **<color #AE0D17>typeITessellated</color>**  polyhedron?) is (<color:red>no) not (yes)
+            
+            :   Compute the coordinates of the 
+            barycenter through <i>.FindBarycenter()</i>; <<procedure>>
+            :Save coordinates in <b>CoordVertices</b>; <<save>>
+        repeat while (Did it went through all the faces of \nthe **<color #AE0D17>typeITessellated</color>**  polyhedron?) is (<color:red>no) not (yes)
+    }
+    
+    skinparam PartitionBorderColor #006A46
+    partition Finding the <b>edges</b>{
+        repeat
+            :  Find the edges connecting the 
+            inner vertex to the <u>edge vertices</u>; <<procedure>>
+            :   Find the edges connecting the 
+            inner vertex to other <u>inner vertices</u>; <<procedure>>
+        repeat while (  Did it went through all the inner vertices \nof the face of the **<color #FD5201>tessellated</color>** polyhedron ?) is (<color:red>no) not(yes)
+    }
+    skinparam PartitionBorderColor Black
+    package "**GEOPolyhedron** \nmethods"{
+        :<i>.FindFaces()</i>; <<procedure>>
+        }
+    }
+repeat while (Were all **<color #470968>polyhedron</color>** \n  faces **<color #FD5201>tessellated</color>**?) is (<color:red>no) not (yes)
+:       Outputting the 
+**<color #FD5201>tessellated</color>** polyhedron; <<output>>
+-> Returning to <i>main.cpp</i>;
+
+stop
+@enduml

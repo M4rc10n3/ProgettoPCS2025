@@ -18,7 +18,7 @@ skinparam titleBorderRoundCorner 10
 title TypeITessellation
 split
     -[hidden]->
-    :polyhedron; <<input>>
+    :**<color #470968>polyhedron</color>**; <<input>>
 split again
     -[hidden]->
     :numberDivisions; <<input>>
@@ -27,17 +27,22 @@ end split
 :Initialising the **<color #FD5201>tessellated</color>** polyhedron attributes; <<task>>
 
 repeat
+    
+    skinparam PartitionBorderColor #3C035A
     partition Computing on each face of **<color #470968>polyhedron</color>** {
     repeat
-        partition New vertices on edges{
-            :Access edge extrema from <i>ExtremaEdges</i>; <<load>>
+        skinparam PartitionBorderColor #F03844
+        partition New vertices on <b>edges</b>{
+            :Access edge extrema from <b>ExtremaEdges</b>; <<load>>
             :Divide their coordinates using <i>.LinSpaced()</i>; <<procedure>>
-            :Save coordinates in <i>CoordVertices</i>; <<save>>
+            :Save coordinates in <b>CoordVertices</b>; <<save>>
         }
-    repeat while (All edges of the face done?) is (no) not (yes)
+    repeat while (All edges of the face done?) is (<color:red>no) not (yes)
+    
     repeat
-        partition New vertices inside the face{
-            if (First time dividing?) then (yes)
+        skinparam PartitionBorderColor #042347
+        partition New vertices <b>inside</b> the face{
+            if (First time dividing?) then (<color:red>yes)
             :Find correct edge points 
                  through distance; <<procedure>>
             :Save the opposing edge; <<save>>
@@ -47,15 +52,16 @@ repeat
                 through distance; <<procedure>>
             endif
             :Divide their coordinates using <i>.LinSpaced()</i>; <<procedure>>
-            :Save coordinates in <i>CoordVertices</i>; <<save>>
+            :Save coordinates in <b>CoordVertices</b>; <<save>>
         }
-    repeat while (Did it went through all the edge points of the edge?) is (no) not (yes)
+    repeat while (Did it went through all the edge points of the edge?) is (<color:red>no) not (yes)
+    skinparam PartitionBorderColor #Black
     package "**GEOPolyhedron** \nmethods"{
-        :.FindEdges(); <<procedure>>
-        :.FindFaces(); <<procedure>>
+        :<i>.FindEdges()</i>; <<procedure>>
+        :<i>.FindFaces()</i>; <<procedure>>
         }
     }
-repeat while (All **<color #470968>polyhedron</color>** \nfaces **<color #FD5201>tessellated</color>**?) is (no) not (yes)
+repeat while (Were all **<color #470968>polyhedron</color>** \nfaces **<color #FD5201>tessellated</color>**?) is (<color:red>no) not (yes)
 :Outputting the 
 **<color #FD5201>tessellated</color>** polyhedron; <<output>>
 -> Returning to <i>main.cpp</i>;
