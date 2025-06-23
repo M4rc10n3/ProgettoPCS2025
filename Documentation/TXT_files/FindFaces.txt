@@ -1,0 +1,83 @@
+@startuml
+<style>
+partition{
+    RoundCorner 7
+}
+
+package{
+    RoundCorner 7
+    LineColor #6BC2FA
+    BackgroundColor #BCE5FF}
+</style>
+skinparam defaultFontSize 14
+skinparam titleFontName Serif
+skinparam titleFontSize 18
+skinparam titleBorderColor Black
+skinparam titleBorderThickness 2
+skinparam titleBorderRoundCorner 10
+title GEOPolyhedron.FindFaces()
+split
+    -[hidden]->
+    :**<color:#A70E18>verticesOnFace</color>**; <<input>>
+split again
+    -[hidden]->
+    :**<color:#0B91D5>facesFound</color>**; <<input>>
+split again
+    -[hidden]->
+    :**<color:#13463D>vecVertFaces</color>**; <<input>>
+split again
+    -[hidden]->
+    :**<color:#4D018F>numAdjacentVertices</color>**; <<input>>
+end split
+-> Passing arguments to method
+;
+package "**GEOPolyhedron** methods"{
+    :<i>.AdjacencyList(**<color:#A70E18>verticesOnFace</color>**, **<color:#4D018F>numAdjacentVertices</color>**)</i>; <<procedure>>
+    }
+
+if (**<color:#A70E18>verticesOnFace</color>**.size() > 0) then (yes)
+:verticesToCheck = **<color:#A70E18>verticesOnFace</color>**.size();
+else (no)
+:verticesToCheck = **<color:#022839>NumVertices</color>**;
+endif
+
+repeat
+:Access next vertex; <<load>>
+:Save it as <i>firstVertex</i>; <<save>>
+
+    repeat
+    :Access next vertex; <<load>>
+    :Save it as <i>secondVertex</i>; <<save>>
+    
+        repeat
+        :Access next vertex; <<load>>
+        :Save it as <i>thirdVertex</i>; <<save>>
+        if (Does the edge between the \n two adjacent vertices exist?) then (<color:green>yes)
+            :Sort face vertices using <i>sort()</i>;
+            if (  The face was already \nsaved in **<color:#13463D>vecVertFaces</color>**?) then (<color:red>yes)
+            :continue; <<continuous>>
+            else (<color:green>no)
+            :     Save face in <b>ListVertFaces</b>, 
+            <b>ListEdgeFaces</b> and **<color:#13463D>vecVertFaces</color>**; <<save>>
+            :Increase **<color:#0B91D5>facesFound</color>**; <<task>>
+            endif
+        else (<color:red>no)
+            :continue; <<continuous>>
+        endif
+        repeat while (Did it go through all the other vertices of the vertexAdjacencyList?) is (<color:red>no) not (<color:green>yes)
+    repeat while (Did it go through all the vertices of the vertexAdjacencyList?) is (<color:red>no) not (<color:green>yes)
+
+repeat while (Did it go through all the verticesToCheck?)  is (<color:red>no) not (<color:green>yes)
+
+if (**<color:#A70E18>verticesOnFace</color>**.size() > 0) then (yes)
+:  All the faces on the face of 
+the **<color #470968>polyhedron</color>** were found;
+else (no)
+:     All the faces of the 
+**<color #470968>polyhedron</color>** were found;
+endif
+
+stop
+
+
+@enduml

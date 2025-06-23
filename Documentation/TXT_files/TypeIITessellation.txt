@@ -21,11 +21,11 @@ split
     :**<color #470968>polyhedron</color>** ; <<input>>
 split again
     -[hidden]->
-    :**<color #AE0D17>typeITessellated</color>** 
+    :**<color #97562B>typeITessellated</color>** 
         polyhedron; <<input>>
 split again
     -[hidden]->
-    :numberDivisions; <<input>>
+    :**<color:#008A58>numberDivisions</color>**; <<input>>
 end split
 -> Passing arguments to function;
 :Initialising the **<color #FD5201>tessellated</color>** polyhedron attributes; <<task>>
@@ -40,19 +40,20 @@ repeat
             :Compute their distance and divide it; <<procedure>>
             
             repeat
-                :Add the distance divided 
-                  to the starting vertex; <<procedure>>
-                :Save coordinates in <b>CoordVertices</b>; <<save>>
+                :Add distance divided 
+                  to starting vertex; <<procedure>>
+                :Save coordinates in <b>CoordVertices</b>
+                 and vertex ID in **<color:#A70E18>verticesOnFace</color>**; <<save>>
                 :Save edge in <b>ExtremaEdges</b> 
                     and <b>MatrEdgeVertices</b>; <<save>>
                 :Updating starting vertex coordinates; <<task>>
-            repeat while (Last vertex?) is(<color:red>no) not (yes)
+            repeat while (Last vertex?) is(<color:red>no) not (<color:green>yes)
             
             :Save last edge in <b>ExtremaEdges</b> 
                and <b>MatrEdgeVertices</b>; <<save>>
             
         }
-    repeat while (All edges of the face done?) is (<color:red>no) not (yes)
+    repeat while (Did it go through all the edges of the face?) is (<color:red>no) not (<color:green>yes)
     
     skinparam PartitionBorderColor #042347
     partition New vertices <b>inside</b> the face{
@@ -61,15 +62,17 @@ repeat
             repeat
             if (The vertex is on the edge?) then (<color:red>yes)
             :continue; <<continuous>>
-            else (no)
-            :Save coordinates in <b>CoordVertices</b>; <<save>>
+            else (<color:green>no)
+            :Save coordinates in <b>CoordVertices</b>
+             and vertex ID in **<color:#A70E18>verticesOnFace</color>**; <<save>>
             endif
-            repeat while ( Did it went through all the vertices of the \nface of the **<color #AE0D17>typeITessellated</color>**  polyhedron?) is (<color:red>no) not (yes)
+            repeat while (  Did it go through all the vertices of the \nface of the **<color #97562B>typeITessellated</color>** polyhedron?) is (<color:red>no) not (<color:green>yes)
             
             :   Compute the coordinates of the 
             barycenter through <i>.FindBarycenter()</i>; <<procedure>>
-            :Save coordinates in <b>CoordVertices</b>; <<save>>
-        repeat while (Did it went through all the faces of \nthe **<color #AE0D17>typeITessellated</color>**  polyhedron?) is (<color:red>no) not (yes)
+            :Save coordinates in <b>CoordVertices</b>
+             and vertex ID in **<color:#A70E18>verticesOnFace</color>**; <<save>>
+        repeat while (  Did it go through all the faces of \nthe **<color #97562B>typeITessellated</color>** polyhedron?) is (<color:red>no) not (<color:green>yes)
     }
     
     skinparam PartitionBorderColor #006A46
@@ -79,14 +82,15 @@ repeat
             inner vertex to the <u>edge vertices</u>; <<procedure>>
             :   Find the edges connecting the 
             inner vertex to other <u>inner vertices</u>; <<procedure>>
-        repeat while (  Did it went through all the inner vertices \nof the face of the **<color #FD5201>tessellated</color>** polyhedron ?) is (<color:red>no) not(yes)
+        repeat while (Did it go through all the inner vertices \n     of the face of the **<color #470968>polyhedron</color>**?) is (<color:red>no) not (<color:green>yes)
     }
     skinparam PartitionBorderColor Black
     package "**GEOPolyhedron** \nmethods"{
-        :<i>.FindFaces()</i>; <<procedure>>
+        :<i>.FindFaces</i>(**<color:#A70E18>verticesOnFace</color>**, **<color:#0B91D5>facesFound</color>**, 
+             **<color:#13463D>vecVertFaces</color>**,, **<color:#4D018F>numAdjacentVertices</color>**); <<procedure>>
         }
     }
-repeat while (Were all **<color #470968>polyhedron</color>** \n  faces **<color #FD5201>tessellated</color>**?) is (<color:red>no) not (yes)
+repeat while (Were all **<color #470968>polyhedron</color>** \n  faces **<color #FD5201>tessellated</color>**?) is (<color:red>no) not (<color:green>yes)
 :       Outputting the 
 **<color #FD5201>tessellated</color>** polyhedron; <<output>>
 -> Returning to <i>main.cpp</i>;

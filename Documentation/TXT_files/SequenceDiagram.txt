@@ -2,10 +2,12 @@
 'skinparam plain true
 <style>
 participant{
-    BackgroundColor #C7FFFE}
+    BackgroundColor #C7FFFE
+    LineColor #52B5E0}
     
 collections{
-    BackgroundColor #84C7F2}
+    BackgroundColor #84C7F2
+    LineColor #002B7F}
 
 note{
     BackgroundColor #FFEC0F}

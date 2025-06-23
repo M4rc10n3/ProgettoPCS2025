@@ -27,11 +27,11 @@ split again
     :q; <<input>>
 end split
 -> Passing arguments to method;
-:Initialising the **<color #470968>polyhedron</color>** attributes; <<task>>
+:Initialising starting **<color #470968>polyhedron</color>** attributes; <<task>>
 -> All the coordinates were
 found using <i>GeoGebra</i>: using 
 it we created the **<color #470968>polyhedra</color>** 
-and then copied their 
+and then copied their full
 <b>coordinates</b> in the code
 
 ;
@@ -49,10 +49,11 @@ endswitch
 
 skinparam PartitionBorderColor #Black
 package "**GEOPolyhedron** \nmethods"{
-    :<i>.FindEdges()</i>; <<procedure>>
-    :<i>.FindFaces()</i>; <<procedure>>
+    :<i>.FindEdges</i>(**<color:#A70E18>nullVec</color>**, **<color:#0B91D5>edgesFound</color>**); <<procedure>>
+    :     <i>.FindFaces</i>(**<color:#A70E18>nullVec</color>**, **<color:#0B91D5>facesFound</color>**, 
+    **<color:#13463D>vecVertFaces</color>**,, **<color:#4D018F>numAdjacentVertices</color>**); <<procedure>>
     }
 
-:The **<color #470968>polyhedron</color>** is complete;
+:Starting **<color #470968>polyhedron</color>** complete;
 detach
 @enduml

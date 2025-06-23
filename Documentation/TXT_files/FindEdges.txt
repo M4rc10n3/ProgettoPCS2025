@@ -6,11 +6,7 @@ partition{
 
 package{
     RoundCorner 7
-    LineColor #6BC2FA
     BackgroundColor #BCE5FF}
-    
-note{
-    BackgroundColor #FFE739}
 </style>
 skinparam defaultFontSize 14
 skinparam titleFontName Serif
@@ -21,14 +17,14 @@ skinparam titleBorderRoundCorner 10
 title GEOPolyhedron.FindEdges()
 split
     -[hidden]->
-    :**<color:#8A444A>verticesOnFace</color>**; <<input>>
+    :**<color:#A70E18>verticesOnFace</color>**; <<input>>
 split again
     -[hidden]->
     :**<color:#0B91D5>edgesFound</color>**; <<input>>
 end split
 -> Passing arguments to method;
-if (**<color:#8A444A>verticesOnFace</color>**.size() > 0) then (yes)
-:verticesToCheck = **<color:#8A444A>verticesOnFace</color>**.size();
+if (**<color:#A70E18>verticesOnFace</color>**.size() > 0) then (yes)
+:verticesToCheck = **<color:#A70E18>verticesOnFace</color>**.size();
 else (no)
 :verticesToCheck = **<color:#022839>NumVertices</color>**;
 endif
@@ -41,16 +37,24 @@ repeat
     :Access next vertex; <<load>>
     :Save it as <i>secondVertex</i>; <<save>>
     :<i>DistanceSquaredBetween()</i> the two vertices; <<procedure>>
-    if (Distance = lengthEdge) then (yes)
+    if (Distance = lengthEdge) then (<color:green>yes)
         :Save edge in <b>ExtremaEdges</b> 
         and <b>MatrEdgeVertices</b>; <<save>>
         :Increase **<color:#0B91D5>edgesFound</color>**; <<task>>
-    else (no)
+    else (<color:red>no)
         :continue; <<continuous>>
     endif
-    repeat while (Did it went through all the others verticesToCheck?) is (no) not (yes)
+    repeat while (Did it go through all the others verticesToCheck?) is (<color:red>no) not (<color:green>yes)
 
-repeat while (Did it went through all the verticesToCheck?)  is (no) not (yes)
+repeat while (Did it go through all the verticesToCheck?) is (<color:red>no) not (<color:green>yes)
+
+if (**<color:#A70E18>verticesOnFace</color>**.size() > 0) then (yes)
+:  All the edges on the face of 
+the **<color #470968>polyhedron</color>** were found;
+else (no)
+:     All the edges of the 
+**<color #470968>polyhedron</color>** were found;
+endif
 
 stop
 

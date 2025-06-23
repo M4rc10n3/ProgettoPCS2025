@@ -200,20 +200,11 @@ namespace PolyhedraLibrary
                                 {
                                     /* Let's add the face to our list of unique faces */
                                     vecVertFaces.push_back(sortedVertFace);
-                                    
-                                    /* Just for aesthetic reasons, we decided to sort the edges of the face, 
-                                    so that the columns of "ListEdgeFaces" will be sorted like those of "ListVertFaces" */
-                                    // array<int, 3> sortedEdgeFace = {e1, e2, e3};
-                                    // sort(sortedEdgeFace.begin(), sortedEdgeFace.end());
                                           
                                     /* Let's save the new face in our data structures */
                                     ListVertFaces(0, facesFound) = sortedVertFace[0];
                                     ListVertFaces(1, facesFound) = sortedVertFace[1];
                                     ListVertFaces(2, facesFound) = sortedVertFace[2];
-
-                                    // ListEdgeFaces(0, facesFound) = sortedEdgeFace[0];
-                                    // ListEdgeFaces(1, facesFound) = sortedEdgeFace[1];
-                                    // ListEdgeFaces(2, facesFound) = sortedEdgeFace[2];
 
                                     ListEdgeFaces(0, facesFound) = e1;
                                     ListEdgeFaces(1, facesFound) = e2;
