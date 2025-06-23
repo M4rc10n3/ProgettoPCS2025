@@ -10,9 +10,9 @@ Il programma accetta una tupla di valori come input, secondo la seguente sintass
 
 Dove:
 
-    p e q: identificano il tipo di poliedro platonico di partenza (come icosaedro, dodecaedro, ecc.), secondo le convenzioni dei simboli di Schlafli {p, q}.
+p e q: identificano il tipo di poliedro platonico di partenza (come icosaedro, dodecaedro, ecc.), secondo le convenzioni dei simboli di Schlafli {p, q}.
 
-    b e c: definiscono i parametri di tassellazione, determinando il numero di suddivisioni delle facce e la complessità della mesh generata.
+b e c: definiscono i parametri di tassellazione, determinando il numero di suddivisioni delle facce e la complessità della mesh generata.
 
 -Funzionalità Aggiuntive
 
@@ -30,8 +30,8 @@ Il codice produce in output tre file con estensione .inp, che contengono la desc
 
 Per visualizzare il modello generato, è necessario seguire i seguenti passaggi:
 
-    Caricare i file .inp ottenuti sul sito https://meshconverter.it/it, convertirli da file .ucd a file .vtu.
+   Caricare i file .inp ottenuti sul sito https://meshconverter.it/it, convertirli da file .ucd a file .vtu.
 
-    Una volta ottenuto il file .vtu, è possibile caricarlo nel visualizzatore online https://kitware.github.io/glance/app/ per esplorare in modo interattivo la geometria del poliedro proiettato sulla sfera.
+   Una volta ottenuto il file .vtu, è possibile caricarlo nel visualizzatore online https://kitware.github.io/glance/app/ per esplorare in modo interattivo la geometria del poliedro proiettato sulla sfera.
 
 Per maggiori informazioni consultare la cartella Documentation con una spiegazione più dettagliata del progetto. 
