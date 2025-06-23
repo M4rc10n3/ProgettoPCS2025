@@ -28,8 +28,14 @@ Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertF
     return barycenterCoordinates;
 }
 
-vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const double& lengthEdge, double& lengthPath)
+vector<int> BFS(const vector<vector<int>>& adjList, 
+                GEOPolyhedron& polyhedron,
+                const int& v1, 
+                const int& v2, 
+                double& lengthPath)
 {
+    const int& numVert = polyhedron.NumVertices;
+    
     queue<int> q;
     vector<bool> reached(numVert); // boolean vector to save the visited vertices
     vector<int> predecessor(numVert); // vector to save the predecessor of each vertex in order to reconstruct the minimum path
@@ -67,7 +73,12 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
                 }
                 reverse(minPath.begin(), minPath.end());
 
-                lengthPath = (minPath.size() - 1) * lengthEdge; // calculate the minimum path's length
+                // calculate the minimum path's length
+                for(unsigned int i = 0; i < minPath.size() - 1; i++){
+                    int& firstVertex = minPath[i];
+                    int& secondVertex = minPath[i + 1];
+                    lengthPath += sqrt(polyhedron.DistanceSquaredBetween(firstVertex, secondVertex));
+                }
                 
                 return minPath; // return the list of vertices in the minimum path            
             }
@@ -76,8 +87,14 @@ vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2
     return {}; // if no path was found, return an empty vector  
 }
 
-vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, Eigen::MatrixXd& matrWeights, double& lengthPath)
+vector<int> Dijkstra(const vector<vector<int>>& adjList, 
+                     GEOPolyhedron& polyhedron,
+                     const int& v1, 
+                     const int& v2, 
+                     Eigen::MatrixXd& matrWeights, 
+                     double& lengthPath)
 {
+    const int& numVert = polyhedron.NumVertices;
     vector<int> predecessor(numVert); // vector to save the predecessor of each vertex
     vector<double> distance(numVert); // vector to store the current known shortest distance from v1 to each vertex
     const double inf = 1e9; // use a large number to represent "infinity"

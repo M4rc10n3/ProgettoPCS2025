@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <vector>
-#include <cmath>
 
 #include <gtest/gtest.h>
 #include "Eigen/Core"
@@ -202,7 +201,6 @@ TEST(TestUtils, TestOntoTheUnitSphereMoreGeneral)
     }
 }
 
-
 TEST(TestUtils, TestBFS)
 {
     vector<vector<int>> adjList = { {1, 2},     // vertex 0 
@@ -213,10 +211,10 @@ TEST(TestUtils, TestBFS)
                                     {4, 3} };   // vertex 5  
     int v1 = 2;
     int v2 = 5;
-    int numVert = 6;
-    double lengthEdge = 1.0;
+    GEOPolyhedron polyhedron;
+    polyhedron.NumVertices = 6;
     double lengthPath = 0.0;
-    vector<int> minPathBFS = BFS(adjList, v1, v2, numVert, lengthEdge, lengthPath);
+    vector<int> minPathBFS = BFS(adjList, polyhedron, v1, v2, lengthPath);
     vector<int> minPathEx = {2, 4, 5};
     EXPECT_EQ(minPathBFS, minPathEx);
 }
@@ -236,9 +234,10 @@ TEST(TestUtils, TestDijkstra)
                    4, 1, 0, 0, 0; 
     int v1 = 3;
     int v2 = 0;
-    int numVert = 5;
+    GEOPolyhedron polyhedron;
+    polyhedron.NumVertices = 5;
     double lengthPath = 0.0;
-    vector<int> minPathDijkstra = Dijkstra(adjList, v1, v2, numVert, matrWeights, lengthPath);
+    vector<int> minPathDijkstra = Dijkstra(adjList, polyhedron, v1, v2, matrWeights, lengthPath);
     vector<int> minPathEx = {3, 4, 0};
     EXPECT_EQ(minPathDijkstra, minPathEx);
     EXPECT_DOUBLE_EQ(lengthPath, 6.0);
@@ -256,9 +255,9 @@ TEST(TestUtils, TestDijkstra)
                    0, 5, 20, 3, 0; 
     int v1_1 = 3;
     int v2_1 = 2;
-    int numVert1 = 5;
+    // int numVert1 = 5;
     double lengthPath1 = 0.0;
-    vector<int> minPathDijkstra1 = Dijkstra(adjList1, v1_1, v2_1, numVert1, matrWeights1, lengthPath1);
+    vector<int> minPathDijkstra1 = Dijkstra(adjList1, polyhedron, v1_1, v2_1, matrWeights1, lengthPath1);
     vector<int> minPathEx1 = {3, 4, 1, 2};
     EXPECT_EQ(minPathDijkstra1, minPathEx1);
     EXPECT_DOUBLE_EQ(lengthPath1, 10.0);

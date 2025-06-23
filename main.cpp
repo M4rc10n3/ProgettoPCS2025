@@ -29,10 +29,10 @@ int main(int argc, char* argv[])
     }
     //
     
-
     if(argc != 5 && argc != 7) // check if there is a compatible number of inputs 
     {
         cout << "Invalid tuple" << endl;
+        cout << "This program needs 4 inputs, which are all postitive integers: (p, q, b, c)" << endl;
         return 1;        
     }
 
@@ -43,6 +43,7 @@ int main(int argc, char* argv[])
             if (!isdigit(ch))
             {
                 cout << "Invalid tuple" << endl;
+                cout << "All of the inputs should be numbers" << endl;
                 return 1;
             }
         parameters.push_back(arg);
@@ -223,10 +224,9 @@ int main(int argc, char* argv[])
                     cout << "BFS algorithm to find the minimum path" << endl;
     
                     minPath = BFS(tessellatedPolyhedron.AdjacencyList(nullVec, numAdjacentFaces), 
+                                  tessellatedPolyhedron, 
                                   id_vertex_1, 
                                   id_vertex_2, 
-                                  tessellatedPolyhedron.NumVertices, 
-                                  tessellatedPolyhedron.lengthEdge, 
                                   lengthPath);
               
                 } 
@@ -244,9 +244,9 @@ int main(int argc, char* argv[])
                     }
     
                     minPath = Dijkstra(tessellatedPolyhedron.AdjacencyList(nullVec, numAdjacentFaces), 
+                                       tessellatedPolyhedron, 
                                        id_vertex_1, 
                                        id_vertex_2, 
-                                       tessellatedPolyhedron.NumVertices, 
                                        matrWeights, 
                                        lengthPath);      
                 }

@@ -12,45 +12,41 @@ of each triangular face
 Inputs list:
 - ListVertFace: object of type "MatrixXi" containing the ids of each vertex of the face */
 Eigen::Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Eigen::Vector3i& VertFace);
-//Test done
 
 /* "OntoTheUnitSphere" is a function that normalizes the matrix "CoordVertices" of an object of 
 type "polyhedron" using the Eigen::VectorXd method ".normalized()"
 Inputs list:
 - polyhedron: object of type "polyhedron" containing the matrix "CoordVertices" that will be normalized */
 void OntoTheUnitSphere(GEOPolyhedron& polyhedron);
-// Test done
 
 /* "BFS" is a function that finds the minimum path between the two vertices marked by the ids given as inputs
 using the BFS algorithm (for unweighted graphs, therefore useful for type I tessellation)
 Inputs list:
-- adjList: adjacency list that contains the adjacent vertices for each vertex in the polyhedron
-- v1: the id associated to the first vertex of the minimum path we're looking for 
-- v2: the id associated to the last vertex of the minimum path we're looking for 
-- numVert: number of vertices of the polyhedron
-- lengthEdge: length of the edges of the polyhedron (all equal to each other) */
+- adjList: adjacency list that contains the adjacent vertices for each vertex in the polyhedron;
+- polyhedron: polyhedron on which we look for the minimum path;
+- v1: the id associated to the first vertex of the minimum path we're looking for;
+- v2: the id associated to the last vertex of the minimum path we're looking for; */
 vector<int> BFS(const vector<vector<int>>& adjList, 
+                GEOPolyhedron& polyhedron,
                 const int& v1, 
                 const int& v2, 
-                const int& numVert, 
-                const double& lengthEdge, 
                 double& lengthPath);
-// Test done
 
 /* "Dijkstra" is a function that finds the minimum path between the two vertices marked by the ids given as inputs
 using the Dijkstra algorithm (for weighted graphs, therefore useful for type II tessellation)
 Inputs list:
-- adjList: adjacency list that contains the adjacent vertices for each vertex in the polyhedron
-- v1: the id associated to the first vertex of the minimum path we're looking for 
-- v2: the id associated to the last vertex of the minimum path we're looking for 
-- numVert: number of vertices of the polyhedron
-- matrWeights: matrix with the lengths of each edge of the polyhedron */
+- adjList: adjacency list that contains the adjacent vertices for each vertex in the polyhedron;
+- polyhedron: polyhedron on which we look for the minimum path;
+- v1: the id associated to the first vertex of the minimum path we're looking for;
+- v2: the id associated to the last vertex of the minimum path we're looking for;
+- matrWeights: matrix with the lengths of each edge of the polyhedron;
+- lengthPath: the length of the minimum */
 vector<int> Dijkstra(const vector<vector<int>>& adjList, 
+                     GEOPolyhedron& polyhedron,
                      const int& v1, 
                      const int& v2, 
-                     const int& numVert, 
-                     Eigen::MatrixXd& matrWeights, double& lengthPath);
-// Test done
+                     Eigen::MatrixXd& matrWeights, 
+                     double& lengthPath);
 
 /* "MinimumPath" is a function that sets the property ShortPath = 1 to the vertices and the edges that compose 
 the minimum path and ShortPath = 0 to the other vertices and edges

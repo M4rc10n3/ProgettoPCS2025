@@ -56,6 +56,17 @@ namespace PolyhedraLibrary
         vector<vector<int>> AdjacencyList(vector<int>& verticesOnFace, 
                                           int& numAdjacentVertices);
 
+       /* "FindEdges" creates the matrix containing the vertices of each edge as its column, 
+        which is "ExtremaEdges" and the matrix containing the ids of the edges in position 
+        (extremum1, extremum2), which is "MatrEdgeVertices" if we want to use it for a 
+        starting polyhedron. "FindEdges" can also do the same things for the tessellated polyhedron, 
+        but in this case it does everything on a single face of the starting polyhedron, 
+        so it needs the "verticesOnFace" as an argument.
+        Inputs list:
+        - verticesOnFace: vector containing the ids of the vertices for the face considered;
+        - edgesFound: integer representing how many edges of the polyhedron were already found. */
+        void FindEdges(vector<int>& verticesOnFace, int& edgesFound);
+       
         /* "FindFaces" creates the matrix containing the vertices of each face as its column, 
         which is "ListVertFaces" and the matrix containing the ids of the edges of each face, 
         which is "ListEdgeFaces" if we want to use it for a starting polyhedron. "FindFaces" can also 
@@ -71,17 +82,6 @@ namespace PolyhedraLibrary
                        int& facesFound, 
                        vector<array<int, 3>>& vecVertFaces, 
                        int& numAdjacentVertices);
-
-        /* "FindEdges" creates the matrix containing the vertices of each edge as its column, 
-        which is "ExtremaEdges" and the matrix containing the ids of the edges in position 
-        (extremum1, extremum2), which is "MatrEdgeVertices" if we want to use it for a 
-        starting polyhedron. "FindEdges" can also do the same things for the tessellated polyhedron, 
-        but in this case it does everything on a single face of the starting polyhedron, 
-        so it needs the "verticesOnFace" as an argument.
-        Inputs list:
-        - verticesOnFace: vector containing the ids of the vertices for the face considered;
-        - edgesFound: integer representing how many edges of the polyhedron were already found. */
-        void FindEdges(vector<int>& verticesOnFace, int& edgesFound);
         
         /* "ExportPolyhedron" exports the structures of the polyhedron colouring them and using 
         the code of Mr. Vicini in order to create a file readable by ParaView. 
