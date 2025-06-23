@@ -1,70 +1,104 @@
 @startuml 
 
+<style>
+partition{
+    RoundCorner 7
+}
+
+package{
+    RoundCorner 7
+    LineColor #6BC2FA
+    BackgroundColor #BCE5FF}
+</style>
+skinparam defaultFontSize 14
+skinparam titleFontName Serif
+skinparam titleFontSize 18
+skinparam titleBorderColor Black
+skinparam titleBorderThickness 2
+skinparam titleBorderRoundCorner 10
 title Create Geodetic or Goldberg Polyhedron
 
 package PolyhedraLibrary <<Folder>>
 {
-
-struct Path {
-  + VerticesShortPath : vector<double>
-  + EdgesShortPath : vector<double>
-  }
-
 struct GEOPolyhedron {
-
   + p : int
   + q : int
   + lengthEdge : double
 
   + NumVertices : int
   + IdVertices : vector<int>
-  + CoordVertices : MatrixXd
-  + ShortPathCell0Ds : map<int, list<int>>
+  + CoordVertices : MatrixXd    
 
   + NumEdges : int
   + IdEdges : vector<int>
-  + ExtremaEdges : MatrixXi
-  + MatrEdgeVertices : MatrixXi
+  + ExtremaEdges : MatrixXi 
+  + MatrEdgeVertices : MatrixXi    
 
   + NumFaces : int
   + IdFaces : vector<int>
-  + Cell2DsVertices : vector<vector<int>>
-  + Cell2DsEdges : vector<vector<int>>
+  + ListVertFaces : MatrixXi    
+  + ListEdgeFaces : MatrixXi    
 
-  + NumCell3Ds : int
-  + Cell3DsId : vector<int>
-  + ListVertFaces : MatrixXi
-  + ListEdgeFaces : MatrixXi
-  + ListAdjacentFaces : MatrixXi
-  
-  + IdPolyhedra : int
-  + ListVertPolyhedra : vector<int>
-  + ListEdgePolyhedra : vector<int>
-  + ListFacePolyhedra : vector<int>
---
-
+  .. MEMBER FUNCTION ..
   + void CreateStartingPolyhedron()
   
-  + double DistanceSquaredBetween(int& idPoint1, int& idPoint2);
-  
+  + void FindEdges(vector<int>& verticesOnFace, int& edgesFound)
+  + void FindFaces(vector<int>& verticesOnFace, int& facesFound, vector<array<int, 3>>& vecVertFaces, int& numAdjacentVertices)
+
   + vector<vector<int>> AdjacencyList(vector<int>& verticesOnFace, int& numAdjacentVertices)
   
-  + void FindFaces(vector<int>& verticesOnFace, int& newFacesFound, vector<array<int, 3>>& vecVertFaces, int& numAdjacentVertices)
-  + void FindEdges(vector<int>& verticesOnFace, int& newEdgesFound, const int& numberVerticesToCheck)
-  + void FindAdjacentFaces();
-  
   + void ExportPolyhedron(Path& minimumPath)
-  
   + void Cell0Ds()
   + void Cell1Ds()
   + void Cell2Ds()
   + void Cell3Ds()
+  
+  + double DistanceSquaredBetween(int& idPoint1, int& idPoint2)
+  
+  .. NON MEMBER FUNCTION ..
+  + Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Vector3i& VertFace)
+  + GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
+  + GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tessellatedPolyhedron, int& numberDivisions)
+  
+  + void OntoTheUnitSphere(GEOPolyhedron& polyhedron)
 
-.. TESTPolyhedron ..
-
-
-
-}
+  + vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const double& lengthEdge, double& lengthPath)
+  + vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, MatrixXd& matrWeights, double& lengthPath)
+  + void MinimumPath(const vector<int>& minPath, GEOPolyhedron& polyhedron, const double& lengthPath, Path& minimumPath)
+  
+  .. TEST POLYHEDRON ..
+  TestOntoTheUnitSphereTetrahedron              TestBFS
+  TestOntoTheUnitSphereOctahedron               TestDijkstra
+  TestOntoTheUnitSphereIcosahedron              TestFindBarycenter
+  TestOntoTheUnitSphereMoreGeneral             TestDistanceSquaredBetween
+  }
+  note left of GEOPolyhedron::CoordVertices
+  Coordinates of all vertices, (3 x NumVertices)
+  end note
+  
+  note left of GEOPolyhedron::ExtremaEdges
+  Extrema of each edge, (2 x NumEdges)
+  end note
+  
+  note left of GEOPolyhedron::MatrEdgeVertices
+  Edge connecting each pair of extrema, 
+  (NumVertices x NumVertices)
+  end note
+  
+  note left of GEOPolyhedron::ListVertFaces
+  Vertices of each face, (p x NumFaces)
+  end note
+  
+  note left of GEOPolyhedron::ListEdgeFaces
+  Edges of each face, (p x NumFaces)
+  end note
+  
+struct Path {
+  + VerticesShortPath : vector<double>
+  + EdgesShortPath : vector<double>
+  }
+  
+  GEOPolyhedron::ExportPolyhedron -left-> Path
 }
 
 package Gedim <<Frame>>
@@ -79,17 +113,17 @@ package Eigen <<Frame>>
 {
 
 }
+package std <<Frame>>
+{
 
-GEOPolyhedron::ExportPolyhedron --left--> Path 
+}
 
-GEOPolyhedron::GedimInterface --down--> Gedim
-GEOPolyhedron::GedimInterface --down--> Eigen
-GEOPolyhedron::GedimInterface --down--> GTest
+note "External packages" as ExternalNote
+GEOPolyhedron::GedimInterface -down-> ExternalNote
+ExternalNote -down. Gedim
+ExternalNote -down. GTest
+ExternalNote -down. Eigen
+ExternalNote -down. std
 
-
-note "These are external packages" as ExternalNote
-Gedim --down.. ExternalNote
-Eigen --down.. ExternalNote
-GTest --down.. ExternalNote
 
 @enduml
