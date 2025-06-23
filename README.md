@@ -34,8 +34,9 @@ The code produces as outputs 3 files with .inp extension, inside the directory '
 Polyhedron visualisation
 -
 
-Kitware Glance
-----
+### Kitware Glance
+-
+
 
 In order to visualise the above-mentioned generated polyhedron through Kitware Glance, you should follow these steps:
 
@@ -43,8 +44,9 @@ In order to visualise the above-mentioned generated polyhedron through Kitware G
 
 2. Once you've obtained the .vtu files, it is possible to upload them onto the online visualiser software https://kitware.github.io/glance/app/ in order to interactively explore the 3D geometry of the above-mentioned generated polyhedron.
 
-ParaView
-----
+### ParaView
+-
+
 
 In order to visualise the above-mentioned generated polyhedron through ParaView downloaded locally, you should follow these steps:
 
