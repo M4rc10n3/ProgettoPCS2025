@@ -8,22 +8,22 @@ Input parameters
 -
 
 The program accepts a input tuple made of positive integers, following the sintax:
-
+```
     ./PlatonicSolids p q b c
-
+```
 Where:
 
-p and q identify the type of starting platonic polyhedron (tetrahedron, cube, octahedron, dodecahedron or icosahedron), using Schläfli's symbols {p, q};
+- `p` and `q` identify the type of starting platonic polyhedron (tetrahedron, cube, octahedron, dodecahedron or icosahedron), using Schläfli's symbols {p, q};
 
-b and c define the parameters for the tessellation, following Magnus Wenniger notation {p, q+}_(b,c), determining the number of subdivisions of the faces of the starting polyhedron and the complexity of the mesh on them.
+- `b` and `c` define the parameters for the tessellation, following Magnus Wenniger notation {p, q+}_(b,c), determining the number of subdivisions of the faces of the starting polyhedron and the complexity of the mesh on them.
 
 Minimum path finding
 -
 
 In addition to the parameters explained above, the program also accepts the two following identifiers:
-
+```
     id_vertex1 id_vertex2
-
+```
 These parameters, if given as input, make the program compute the minimum path between the two vertices that have those ids on the above-mentioned generated polyhedron. The minimum path is calculated using a proper pathfinding algorithm applied to the graph that has the vertices of the polyhedron as nodes and the edges of the polyhedron as arcs.
 
 Program output
