@@ -1,6 +1,6 @@
 # ProgettoPCS2025
 
-Il presente progetto è stato realizzato da Anna Dalmasso, Manuel Macis e Marco Odasso. L’obiettivo del lavoro è la generazione di un poliedro di Goldberg, opportunamente tassellato e successivamente proiettato sulla sfera unitaria. Il codice sviluppato è contenuto all'interno dell'eseguibile denominato './PlatonicSolids', il quale consente la creazione del poliedro desiderato sulla base dei parametri forniti in input.
+Il presente progetto è stato realizzato da Anna Dalmasso, Manuel Macis e Marco Odasso. L’obiettivo del lavoro è la generazione di un poliedro geodetico o di Goldberg, opportunamente tassellato e successivamente proiettato sulla sfera unitaria. Il codice sviluppato è contenuto all'interno dell'eseguibile denominato './PlatonicSolids', il quale consente la creazione del poliedro desiderato sulla base dei parametri forniti in input.
 
 -Parametri di Input
 
@@ -10,7 +10,7 @@ Il programma accetta una tupla di valori come input, secondo la seguente sintass
 
 Dove:
 
-p e q: identificano il tipo di poliedro platonico di partenza (come icosaedro, dodecaedro, ecc.), secondo le convenzioni dei simboli di Schlafli {p, q}.
+p e q: identificano il tipo di poliedro platonico di partenza (come icosaedro, dodecaedro, ecc.), secondo le convenzioni dei simboli di Schläfli {p, q}.
 
 b e c: definiscono i parametri di tassellazione, determinando il numero di suddivisioni delle facce e la complessità della mesh generata.
 
@@ -34,4 +34,5 @@ Per visualizzare il modello generato, è necessario seguire i seguenti passaggi:
 
    Una volta ottenuti i file .vtu, è possibile caricarli nel visualizzatore online https://kitware.github.io/glance/app/ per esplorare in modo interattivo la geometria del poliedro proiettato sulla sfera.
 
-Per maggiori informazioni consultare la cartella Documentation con una spiegazione più dettagliata del progetto. 
+Per maggiori informazioni sui contenuti di tale progetto consultare la cartella Documentation con una spiegazione più dettagliata del progetto. 
+

@@ -24,7 +24,6 @@ namespace PolyhedraLibrary
         MatrEdgeVertices = Eigen::MatrixXi::Constant(NumVertices, NumVertices, -1);
         ListVertFaces = Eigen::MatrixXi(p, NumFaces);
         ListEdgeFaces = Eigen::MatrixXi(p, NumFaces);
-        ListAdjacentFaces = Eigen::MatrixXi(p, NumFaces);
         
         switch (q)
         {
@@ -82,7 +81,8 @@ namespace PolyhedraLibrary
         FindFaces(nullVec, facesFound, vecVertFaces, p);
     }
 
-    void GEOPolyhedron::FindEdges(vector<int>& verticesOnFace, int& edgesFound)
+    void GEOPolyhedron::FindEdges(vector<int>& verticesOnFace, 
+                                  int& edgesFound)
     {
         /* Let's initialise the numbers of "verticesToCheck" with the total number of vertices 
         of the polyhedron. If we're interested on just one of its faces, then we can set the size of 
@@ -141,7 +141,10 @@ namespace PolyhedraLibrary
         }
     }
 
-    void GEOPolyhedron::FindFaces(vector<int>& verticesOnFace, int& facesFound, vector<array<int, 3>>& vecVertFaces, int& numAdjacentVertices)
+    void GEOPolyhedron::FindFaces(vector<int>& verticesOnFace, 
+                                  int& facesFound, 
+                                  vector<array<int, 3>>& vecVertFaces, 
+                                  int& numAdjacentVertices)
     {
 
         /* Let's find the adjacencyList for each vertex */
@@ -221,7 +224,8 @@ namespace PolyhedraLibrary
         }
     }
 
-    vector<vector<int>> GEOPolyhedron::AdjacencyList(vector<int>& verticesOnFace, int& numAdjacentVertices)
+    vector<vector<int>> GEOPolyhedron::AdjacencyList(vector<int>& verticesOnFace, 
+                                                     int& numAdjacentVertices)
     {
         /* Let's initialise the structure "adjacencyList" with "NumVertices" memory spaces
         in order to avoid segmentation faults: we don't know which vertices ids are on each face, 

@@ -35,7 +35,6 @@ namespace PolyhedraLibrary
         std::vector<int> IdFaces = {}; // Id of all faces
         Eigen::MatrixXi ListVertFaces = {}; // Vertices of each face, p x NumFaces matrix
         Eigen::MatrixXi ListEdgeFaces = {}; // Edges of each face, p x NumFaces matrix
-        Eigen::MatrixXi ListAdjacentFaces = {}; // Adjacent faces for each face, p x NumFaces matrix
                                                 
         /* "CreatePolyhedron" creates the starting polyhedron: this function can create a tetrahedron, octahedron or icosahedron */
         void CreateStartingPolyhedron();
@@ -65,7 +64,8 @@ namespace PolyhedraLibrary
         Inputs list:
         - verticesOnFace: vector containing the ids of the vertices for the face considered;
         - edgesFound: integer representing how many edges of the polyhedron were already found. */
-        void FindEdges(vector<int>& verticesOnFace, int& edgesFound);
+        void FindEdges(vector<int>& verticesOnFace, 
+                       int& edgesFound);
        
         /* "FindFaces" creates the matrix containing the vertices of each face as its column, 
         which is "ListVertFaces" and the matrix containing the ids of the edges of each face, 
