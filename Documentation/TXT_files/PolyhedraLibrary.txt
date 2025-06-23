@@ -21,7 +21,7 @@ title Create Geodetic or Goldberg Polyhedron
 package PolyhedraLibrary <<Folder>>
 {
 struct GEOPolyhedron {
-  + p : int
+  + p : int 
   + q : int
   + lengthEdge : double
 
@@ -62,8 +62,8 @@ struct GEOPolyhedron {
   
   + void OntoTheUnitSphere(GEOPolyhedron& polyhedron)
 
-  + vector<int> BFS(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, const double& lengthEdge, double& lengthPath)
-  + vector<int> Dijkstra(const vector<vector<int>>& adjList, const int& v1, const int& v2, const int& numVert, MatrixXd& matrWeights, double& lengthPath)
+  + vector<int> BFS(const vector<vector<int>>& adjList, GEOPolyhedron& polyhedron, const int& v1, const int& v2, double& lengthPath)
+  + vector<int> Dijkstra(const vector<vector<int>>& adjList, GEOPolyhedron& polyhedron, const int& v1, const int& v2, MatrixXd& matrWeights, double& lengthPath)
   + void MinimumPath(const vector<int>& minPath, GEOPolyhedron& polyhedron, const double& lengthPath, Path& minimumPath)
   
   .. TEST POLYHEDRON ..
@@ -72,26 +72,6 @@ struct GEOPolyhedron {
   TestOntoTheUnitSphereIcosahedron              TestFindBarycenter
   TestOntoTheUnitSphereMoreGeneral             TestDistanceSquaredBetween
   }
-  note left of GEOPolyhedron::CoordVertices
-  Coordinates of all vertices, (3 x NumVertices)
-  end note
-  
-  note left of GEOPolyhedron::ExtremaEdges
-  Extrema of each edge, (2 x NumEdges)
-  end note
-  
-  note left of GEOPolyhedron::MatrEdgeVertices
-  Edge connecting each pair of extrema, 
-  (NumVertices x NumVertices)
-  end note
-  
-  note left of GEOPolyhedron::ListVertFaces
-  Vertices of each face, (p x NumFaces)
-  end note
-  
-  note left of GEOPolyhedron::ListEdgeFaces
-  Edges of each face, (p x NumFaces)
-  end note
   
 struct Path {
   + VerticesShortPath : vector<double>
