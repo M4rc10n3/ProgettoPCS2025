@@ -6,7 +6,7 @@ Il presente progetto è stato realizzato da Anna Dalmasso, Manuel Macis e Marco 
 
 Il programma accetta una tupla di valori come input, secondo la seguente sintassi:
 
-                              ./PlatonicSolids p q b c
+   ./PlatonicSolids p q b c
 
 Dove:
 
@@ -18,7 +18,7 @@ b e c: definiscono i parametri di tassellazione, determinando il numero di suddi
 
 Oltre ai parametri sopra indicati, il programma accetta opzionalmente anche i seguenti due identificatori:
 
-                                 id_vertex1 id_vertex2
+    id_vertex1 id_vertex2
 
 Questi parametri, se forniti, permettono di calcolare il percorso minimo tra due vertici specifici del poliedro risultante, utilizzando un algoritmo di pathfinding applicato alla struttura tridimensionale generata.
 
