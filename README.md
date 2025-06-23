@@ -35,7 +35,7 @@ Polyhedron visualisation
 -
 
 Kitware Glance
---
+----
 
 In order to visualise the above-mentioned generated polyhedron through Kitware Glance, you should follow these steps:
 
@@ -44,7 +44,7 @@ In order to visualise the above-mentioned generated polyhedron through Kitware G
 2. Once you've obtained the .vtu files, it is possible to upload them onto the online visualiser software https://kitware.github.io/glance/app/ in order to interactively explore the 3D geometry of the above-mentioned generated polyhedron.
 
 ParaView
---
+----
 
 In order to visualise the above-mentioned generated polyhedron through ParaView downloaded locally, you should follow these steps:
 
@@ -52,18 +52,17 @@ In order to visualise the above-mentioned generated polyhedron through ParaView 
 
 2. Inside ParaView, open the .inp files e accept the default reader suggested by ParaView itself;
 
-3. Click on "Apply" inside the "Properties" menu, which should be in the bottom left corner of the screen.
-    You should now be able to interactively explore the 3D geometry of the above-mentioned generated polyhedron.
+3. Click on "Apply" inside the "Properties" menu, which should be in the bottom left corner of the screen. You should now be able to interactively explore the 3D geometry of the above-mentioned generated polyhedron.
 
 4. Moreover, in order to visualise the "ShortPath" property, associated to the minimum path found by the program, it is necessary to follow these steps:
 
-        a. Click on "Cell0Ds.inp" in the "Pipeline Browser" menu, which should be in the left side of the screen; then click above in the drop-down menu where is written "Material Id" and click on  the "ShortPath" beside a cube;
+a. Click on "Cell0Ds.inp" in the "Pipeline Browser" menu, which should be in the left side of the screen; then click above in the drop-down menu where is written "Material Id" and click on  the "ShortPath" beside a cube;
 
-        b. Click on "Cell1Ds.inp" in the "Pipeline Browser" menu, which should be in the left side of the screen; then click above in the drop-down menu where is written "Material Id" and click on  the "ShortPath" beside a cube;
+b. Click on "Cell1Ds.inp" in the "Pipeline Browser" menu, which should be in the left side of the screen; then click above in the drop-down menu where is written "Material Id" and click on  the "ShortPath" beside a cube;
 
-        c. Inside the "Properties" menu, in the "Coloring" section, click on the button where is written "Edit"; a "Color Map Editor" menu should appear on the right side of the screen. Inside it, click on the box beside "Interpret Values As Categories";
+c. Inside the "Properties" menu, in the "Coloring" section, click on the button where is written "Edit"; a "Color Map Editor" menu should appear on the right side of the screen. Inside it, click on the box beside "Interpret Values As Categories";
 
-        d. Modify the size of the points and of the edges respectively belonging to "Cell0Ds.inp" and "Cell1Ds.inp" through the "Properties" menu.
+d. Modify the size of the points and of the edges respectively belonging to "Cell0Ds.inp" and "Cell1Ds.inp" through the "Properties" menu.
 
 
 More details
