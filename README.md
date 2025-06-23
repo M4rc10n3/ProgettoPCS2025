@@ -24,11 +24,11 @@ Questi parametri, se forniti, permettono di calcolare il percorso minimo tra due
 
 -Output del Programma
 
-Il codice produce in output uno o più file con estensione .inp, che contengono la descrizione del poliedro tassellato in un formato compatibile con software di conversione e visualizzazione.
+Il codice produce in output tre file con estensione .inp, che contengono la descrizione del poliedro tassellato in un formato compatibile con software di conversione e visualizzazione.
 
 -Visualizzazione del Risultato
 
-Per visualizzare il modello generato, è necessario seguire questi passaggi:
+Per visualizzare il modello generato, è necessario seguire i seguenti passaggi:
 
     Caricare i file .inp ottenuti sul sito https://meshconverter.it/it, convertirli da file .ucd a file .vtu.
 
