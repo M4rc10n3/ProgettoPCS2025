@@ -6,7 +6,6 @@ partition{
 
 package{
     RoundCorner 7
-    LineColor #6BC2FA
     BackgroundColor #BCE5FF}
 </style>
 skinparam defaultFontSize 14

@@ -7,7 +7,6 @@ partition{
 
 package{
     RoundCorner 7
-    LineColor #6BC2FA
     BackgroundColor #BCE5FF}
 </style>
 skinparam defaultFontSize 14
@@ -42,29 +41,29 @@ struct GEOPolyhedron {
   .. MEMBER FUNCTION ..
   + void CreateStartingPolyhedron()
   
-  + void FindEdges(vector<int>& verticesOnFace, int& edgesFound)
-  + void FindFaces(vector<int>& verticesOnFace, int& facesFound, vector<array<int, 3>>& vecVertFaces, int& numAdjacentVertices)
+  + void FindEdges(vector<int>& **<color:#A70E18>verticesOnFace</color>**, int& **<color:#0B91D5>facesFound</color>**)
+  + void FindFaces(vector<int>& **<color:#A70E18>verticesOnFace</color>**, int& **<color:#0B91D5>facesFound</color>**, vector<array<int, 3>>& **<color:#13463D>vecVertFaces</color>**, int& **<color:#4D018F>numAdjacentVertices</color>**)
 
-  + vector<vector<int>> AdjacencyList(vector<int>& verticesOnFace, int& numAdjacentVertices)
+  + vector<vector<int>> AdjacencyList(vector<int>& **<color:#A70E18>verticesOnFace</color>**, int& **<color:#4D018F>numAdjacentVertices</color>**)
   
-  + void ExportPolyhedron(Path& minimumPath)
+  + void ExportPolyhedron(Path& **<color:#E255B1>minimumPath</color>**)
   + void Cell0Ds()
   + void Cell1Ds()
   + void Cell2Ds()
   + void Cell3Ds()
   
-  + double DistanceSquaredBetween(int& idPoint1, int& idPoint2)
+  + double DistanceSquaredBetween(int& **<color:#44372F>idPoint1</color>**, int& **<color:#53555B>idPoint2</color>**)
   
   .. NON MEMBER FUNCTION ..
-  + Vector3d FindBarycenter(GEOPolyhedron& polyhedron, Vector3i& VertFace)
-  + GEOPolyhedron TypeITessellation(GEOPolyhedron& polyhedron, int& numberDivisions)
-  + GEOPolyhedron TypeIITessellation(GEOPolyhedron& polyhedron, GEOPolyhedron& tessellatedPolyhedron, int& numberDivisions)
+  + Vector3d FindBarycenter(GEOPolyhedron& **<color #470968>polyhedron</color>**, Vector3i& **<color:#13463D>VertFace</color>**)
+  + GEOPolyhedron TypeITessellation(GEOPolyhedron& **<color #470968>polyhedron</color>**, int& **<color:#022839>numberDivisions</color>**)
+  + GEOPolyhedron TypeIITessellation(GEOPolyhedron& **<color #470968>polyhedron</color>**, GEOPolyhedron& **<color:#FD5201>tessellatedPolyhedron</color>**, int& **<color:#022839>numberDivisions</color>**)
   
   + void OntoTheUnitSphere(GEOPolyhedron& polyhedron)
 
-  + vector<int> BFS(const vector<vector<int>>& adjList, GEOPolyhedron& polyhedron, const int& v1, const int& v2, double& lengthPath)
-  + vector<int> Dijkstra(const vector<vector<int>>& adjList, GEOPolyhedron& polyhedron, const int& v1, const int& v2, MatrixXd& matrWeights, double& lengthPath)
-  + void MinimumPath(const vector<int>& minPath, GEOPolyhedron& polyhedron, const double& lengthPath, Path& minimumPath)
+  + vector<int> BFS(const vector<vector<int>>& **<color:#C60CA1>adjList</color>**, GEOPolyhedron& **<color #470968>polyhedron</color>**, const int& **<color:#44372F>v1</color>**, const int& **<color:#53555B>v2</color>**, double& **<color:#CE2A39>lengthPath</color>**)
+  + vector<int> Dijkstra(const vector<vector<int>>& **<color:#C60CA1>adjList</color>**, GEOPolyhedron& **<color #470968>polyhedron</color>**, const int& **<color:#44372F>v1</color>**, const int& **<color:#53555B>v2</color>**, MatrixXd& **<color:#FD5201>matrWeights</color>**, double& **<color:#CE2A39>lengthPath</color>**)
+  + void MinimumPath(const vector<int>& **<color:#3BAF49>minPath</color>**, GEOPolyhedron& **<color #470968>polyhedron</color>**, const double& **<color:#CE2A39>lengthPath</color>**, Path& **<color:#E255B1>minimumPath</color>**))
   
   .. TEST POLYHEDRON ..
   TestOntoTheUnitSphereTetrahedron              TestBFS
@@ -104,6 +103,5 @@ ExternalNote -down. Gedim
 ExternalNote -down. GTest
 ExternalNote -down. Eigen
 ExternalNote -down. std
-
 
 @enduml
