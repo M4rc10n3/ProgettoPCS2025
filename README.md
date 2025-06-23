@@ -1,38 +1,73 @@
-# ProgettoPCS2025
+# PCSProject2025
 
-Il presente progetto è stato realizzato da Anna Dalmasso, Manuel Macis e Marco Odasso. L’obiettivo del lavoro è la generazione di un poliedro geodetico o di Goldberg, opportunamente tassellato e successivamente proiettato sulla sfera unitaria. Il codice sviluppato è contenuto all'interno dell'eseguibile denominato './PlatonicSolids', il quale consente la creazione del poliedro desiderato sulla base dei parametri forniti in input.
+The hereby project was made by Anna Dalmasso, Manuel Macis e Marco Odasso. The objective of the code is to generate a geodetic polyehdron or a generalised Goldberg polyhedron, after tessellating the respective starting platonic polyhedron and then projecting it onto the unit sphere. Moreover, the program finds the minimum path between two vertices of the generated polyhedron.
 
--Parametri di Input
+The name of the executable is './PlatonicSolids': it generates the desired polyhedron based on the parameters given as input.
 
-Il programma accetta una tupla di valori come input, secondo la seguente sintassi:
+Input parameters
+-
+
+The program accepts a input tuple made of positive integers, following the sintax:
 
     ./PlatonicSolids p q b c
 
-Dove:
+Where:
 
-p e q: identificano il tipo di poliedro platonico di partenza (come icosaedro, dodecaedro, ecc.), secondo le convenzioni dei simboli di Schläfli {p, q}.
+p and q identify the type of starting platonic polyhedron (tetrahedron, cube, octahedron, dodecahedron or icosahedron), using Schläfli's symbols {p, q};
 
-b e c: definiscono i parametri di tassellazione, determinando il numero di suddivisioni delle facce e la complessità della mesh generata.
+b and c define the parameters for the tessellation, following Magnus Wenniger notation {p, q+}_(b,c), determining the number of subdivisions of the faces of the starting polyhedron and the complexity of the mesh on them.
 
--Funzionalità Aggiuntive
+Minimum path finding
+-
 
-Oltre ai parametri sopra indicati, il programma accetta opzionalmente anche i seguenti due identificatori:
+In addition to the parameters explained above, the program also accepts the two following identifiers:
 
     id_vertex1 id_vertex2
 
-Questi parametri, se forniti, permettono di calcolare il percorso minimo tra due vertici specifici del poliedro risultante, utilizzando un algoritmo di pathfinding applicato alla struttura tridimensionale generata.
+These parameters, if given as input, make the program compute the minimum path between the two vertices that have those ids on the above-mentioned generated polyhedron. The minimum path is calculated using a proper pathfinding algorithm applied to the graph that has the vertices of the polyhedron as nodes and the edges of the polyhedron as arcs.
 
--Output del Programma
+Program output
+-
 
-Il codice produce in output tre file con estensione .inp, all'interno della cartella PolygonalData, che contengono la descrizione del poliedro tassellato in un formato compatibile con software di conversione e visualizzazione.
+The code produces as outputs 3 files with .inp extension, inside the directory 'PolygonalData'. They contain the description of the main data sttructures of the above-mentioned generated polyhedron with a format compatible with converting and visualising softwares.
 
--Visualizzazione del Risultato
+Polyhedron visualisation
+-
 
-Per visualizzare il modello generato, è necessario seguire i seguenti passaggi:
+Kitware Glance
+--
 
-   Caricare i file .inp ottenuti sul sito https://meshconverter.it/it, convertirli da file .ucd a file .vtu.
+In order to visualise the above-mentioned generated polyhedron through Kitware Glance, you should follow these steps:
 
-   Una volta ottenuti i file .vtu, è possibile caricarli nel visualizzatore online https://kitware.github.io/glance/app/ per esplorare in modo interattivo la geometria del poliedro proiettato sulla sfera.
+1. Upload the .inp files onto the site https://meshconverter.it/it, and convert them form .ucd files to .vtu files, downloading the latter ones.
 
-Per maggiori informazioni sui contenuti di tale progetto consultare la cartella Documentation con una spiegazione più dettagliata del progetto. 
+2. Once you've obtained the .vtu files, it is possible to upload them onto the online visualiser software https://kitware.github.io/glance/app/ in order to interactively explore the 3D geometry of the above-mentioned generated polyhedron.
+
+ParaView
+--
+
+In order to visualise the above-mentioned generated polyhedron through ParaView downloaded locally, you should follow these steps:
+
+1. Open ParaView;
+
+2. Inside ParaView, open the .inp files e accept the default reader suggested by ParaView itself;
+
+3. Click on "Apply" inside the "Properties" menu, which should be in the bottom left corner of the screen.
+    You should now be able to interactively explore the 3D geometry of the above-mentioned generated polyhedron.
+
+4. Moreover, in order to visualise the "ShortPath" property, associated to the minimum path found by the program, it is necessary to follow these steps:
+
+        a. Click on "Cell0Ds.inp" in the "Pipeline Browser" menu, which should be in the left side of the screen; then click above in the drop-down menu where is written "Material Id" and click on  the "ShortPath" beside a cube;
+
+        b. Click on "Cell1Ds.inp" in the "Pipeline Browser" menu, which should be in the left side of the screen; then click above in the drop-down menu where is written "Material Id" and click on  the "ShortPath" beside a cube;
+
+        c. Inside the "Properties" menu, in the "Coloring" section, click on the button where is written "Edit"; a "Color Map Editor" menu should appear on the right side of the screen. Inside it, click on the box beside "Interpret Values As Categories";
+
+        d. Modify the size of the points and of the edges respectively belonging to "Cell0Ds.inp" and "Cell1Ds.inp" through the "Properties" menu.
+
+
+More details
+-
+
+In order to gain more information on the contents of the project and on how they work, please consult the 'Documentation' directory, which contains the UML documentation (generated through PlantUML language and online editor) for the more difficult functions and methods.
 
