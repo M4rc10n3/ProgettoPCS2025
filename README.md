@@ -15,7 +15,7 @@ Where:
 
 - `p` and `q` identify the type of starting platonic polyhedron (tetrahedron, cube, octahedron, dodecahedron or icosahedron), using Schläfli's symbols {p, q};
 
-- `b` and `c` define the parameters for the tessellation, following Magnus Wenniger notation {p, q+}_(b,c), determining the number of subdivisions of the faces of the starting polyhedron and the complexity of the mesh on them.
+- `b` and `c` define the parameters for the tessellation, following Magnus Wenniger notation ${p, q+}_(b,c)$, determining the number of subdivisions of the faces of the starting polyhedron and the complexity of the mesh on them.
 
 Minimum path finding
 -
