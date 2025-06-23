@@ -6,7 +6,7 @@ Il presente progetto è stato realizzato da Anna Dalmasso, Manuel Macis e Marco 
 
 Il programma accetta una tupla di valori come input, secondo la seguente sintassi:
 
-   ./PlatonicSolids p q b c
+    ./PlatonicSolids p q b c
 
 Dove:
 
