@@ -1,69 +1,37 @@
 # ProgettoPCS2025
 
-Code and documentation for the PCS project 2025
+Il presente progetto è stato realizzato da Anna Dalmasso, Manuel Macis e Marco Odasso. L’obiettivo del lavoro è la generazione di un poliedro di Goldberg, opportunamente tassellato e successivamente proiettato sulla sfera unitaria. Il codice sviluppato è contenuto all'interno dell'eseguibile denominato './PlatonicSolids', il quale consente la creazione del poliedro desiderato sulla base dei parametri forniti in input.
 
-Domande:
-1. Il file .txt può essere un .csv oppure un file che ha degli spazi come delimitatori? 
+-Parametri di Input
 
-   Risposta: possiamo formattarli come vogliamo, basta che l'estensione sia .txt
+Il programma accetta una tupla di valori come input, secondo la seguente sintassi:
 
+                              ./PlatonicSolids p q b c
 
-2. Dobbiamo solo fare in modo che il programma dia output solo per poliedri che hanno p = 3, così come dia il poliedro di Goldberg solo per quelli con q = 3 ?
+Dove:
 
-   Risposta: conferma. Per ottenere i poliedri di Goldberg per q=3 (partendo dal cubo e dodecaedro) si passa dai poliedri con p=3 (tetraedro, ottaedro, icosaedro), quindi sono questi ultimi quelli su cui dobbiamo concentrarci. Se ci dessero come _input_ {4, 3}, possiamo partire da {3, 4} e svolgere ciò che ci è richiesto.
+    p e q: identificano il tipo di poliedro platonico di partenza (come icosaedro, dodecaedro, ecc.), secondo le convenzioni dei simboli di Schlafli {p, q}.
 
+    b e c: definiscono i parametri di tassellazione, determinando il numero di suddivisioni delle facce e la complessità della mesh generata.
 
-3. Come possiamo ottenere il _dataset_ dei vertici dei poliedri di partenza?
+-Funzionalità Aggiuntive
 
-   Risposta: alla prof. non interessa come arriviamo ai vertici di partenza, ma consiglia di usare carta e penna, perché così i vertici a cui arriviamo sono corretti e il costo computazionale del codice diventa minore. Con il nostro algoritmo si ottiene un programma più generalizzato, quindi consiglia poi di farlo alla fine di tutto il programma.
+Oltre ai parametri sopra indicati, il programma accetta opzionalmente anche i seguenti due identificatori:
 
+                                 id_vertex1 id_vertex2
 
-4. Come si ottiene la tassellazione delle facce che rappresenta il primo passo per trovare il poliedro geodetico? 
+Questi parametri, se forniti, permettono di calcolare il percorso minimo tra due vertici specifici del poliedro risultante, utilizzando un algoritmo di pathfinding applicato alla struttura tridimensionale generata.
 
-   Risposta: pare che non esistano algoritmi online per spiegare i casi più semplici di tassellazione (ci sono solo per $b!=c$ che non ci interessa per il progetto). La prima tassellazione è basata sul fatto che dividiamo per b ciascun lato (in modo da ottenere una divisione equispaziata), così da ottenere i vertici esterni che poi vanno connessi tra loro. I vertici interni possono essere ottenuti come intersezioni dei lati interni alle facce così ottenuti oppure come divisione equispaziata dei segmenti paralleli ai lati (a voce ve lo potrò spiegare meglio, altrimenti chiedete pure alla Teora). 
-   La seconda tasselazione, invece, si può ottenere a partire dalla prima trovando i baricentri di tutte le facce trovate con la prima tassellazione e poi unirli con i baricentri delle facce adiacenti, se esistono, oppure con i punti medi dei lati della faccia a cui appartiene il baricentro.
+-Output del Programma
 
+Il codice produce in output uno o più file con estensione .inp, che contengono la descrizione del poliedro tassellato in un formato compatibile con software di conversione e visualizzazione.
 
-5. La triangolazione di tipo II non deve avere i triangoli rossi, vero? 
+-Visualizzazione del Risultato
 
-   Risposta: i triangoli rossi nei disegni servono solo come punto di partenza per la tassellazione di tipo II, ma non fanno parte di quest'ultima.
+Per visualizzare il modello generato, è necessario seguire questi passaggi:
 
-6. Cosa indica la formula 4?
-   Risposta: la prima formula delle due indica che, se la faccia ha 3 vertici, allora il vertice a cui si accede all'interno del vettore dei vertici tramite l'indice zero si connetterà a quello a cui si accede tramite indice 1, quello a cui si accede con indice 1 si connetterà a quello a cui si accede con indice 2, mentre quello con indice 2 si connetterà a quello con indice 0, che è (2 + 1) % 3 = 0.
-   La seconda formula, invece, dice che il vertice della faccia a cui si accede nella lista/vettore tramite l'indice 0 deve essere l'origine (o la fine) del lato della faccia a cui si accede nella lista/vettore tramite l'indice 0.
+    Caricare i file .inp ottenuti sul sito https://meshconverter.it/it, convertirli da file .ucd a file .vtu.
 
-7. Le formule che danno vertici, lati e facce per i duali dei poliedri valgono per ciascuna faccia o per tutto il poliedro?
-Tali formule valgono solo per i poliedri di tipo I, mentre quella di tipo II vale solo se consideriamo il contributo delle varie aree e delle lunghezze: ci sono triangoli con area pari a 1/2 di quella di un triangolo.
+    Una volta ottenuto il file .vtu, è possibile caricarlo nel visualizzatore online https://kitware.github.io/glance/app/ per esplorare in modo interattivo la geometria del poliedro proiettato sulla sfera.
 
-Il caso in cui p = q = 3 non è detto come gestirlo, si può gestire come si vuole (magari chiedendo all'utente di specificare quale desidera)
-
-8: Formule per il numero di componenti del secondo tipo di tassellazione? 
-Risposta:
- V = numV + numE*(2b-1)+numF((3b^2)/2-3b/2+1)
- E = numE(2b)+numF((9b^2)/2+3b/2)
- F = numF((3b^2)+3b)
-
- Relazione di Eulero: 
- V+F=E+2
- 
- numV,numE,numF del solido platonico di partenza
-
-Cose da fare:
-1. Creare algoritmo che crea il poliedro a partire da p e q;
-2. Creare algoritmo che ne fa la tassellazione a seconda della classe;
-   - Creare una funzione che calcola i baricentri dei poligoni che sono facce del poliedro.
-3. Creare algoritmo che fa il duale di tale tassellazione;
-4. Creare una funzione che proietta sulla sfera;
-5. Fare documentazione UML delle strutture e del coldice;
-6. Creare algoritmo di stampa dei file di output;
-7. Crare algoritmo che trova il cammino minimo del grafo.
-8. Il codice del prof. Vicini esporta solo triangoli (pare), quindi possiamo esportare solo quelli su ParaView per provare a visualizzare i poliedri.
-
-
-Documentazione con PlantUML:
-
-Activity diagram per spiegare le condizioni in main e i poliedri che esporta
-Activity diagram per le funzioni più particolari del nostro programma
-Sequence diagram per spiegare il processo seguito dal programma
-Class diagram per gli oggetti del nostro codice
-MindMaps per esporre concetti (potrebbero essere utili)
+Per maggiori informazioni consultare la cartella Documentation con una spiegazione più dettagliata del progetto. 
