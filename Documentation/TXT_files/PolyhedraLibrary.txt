@@ -21,7 +21,7 @@ title Create Geodetic or Goldberg Polyhedron
 package PolyhedraLibrary <<Folder>>
 {
 struct GEOPolyhedron {
-  + p : int <<prova>>
+  + p : int
   + q : int
   + lengthEdge : double
 
