@@ -24,7 +24,7 @@ Questi parametri, se forniti, permettono di calcolare il percorso minimo tra due
 
 -Output del Programma
 
-Il codice produce in output tre file con estensione .inp, che contengono la descrizione del poliedro tassellato in un formato compatibile con software di conversione e visualizzazione.
+Il codice produce in output tre file con estensione .inp, all'interno della cartella PolygonalData, che contengono la descrizione del poliedro tassellato in un formato compatibile con software di conversione e visualizzazione.
 
 -Visualizzazione del Risultato
 
