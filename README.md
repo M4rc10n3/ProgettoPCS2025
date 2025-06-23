@@ -54,13 +54,13 @@ In order to visualise the above-mentioned generated polyhedron through ParaView 
 
 4. Moreover, in order to visualise the "ShortPath" property, associated to the minimum path found by the program, it is necessary to follow these steps:
 
-    - Click on "Cell0Ds.inp" in the "Pipeline Browser" menu, which should be in the left side of the screen; then click above in the drop-down menu where is written "Material Id" and click on  the "ShortPath" beside a cube;
+    1. Click on "Cell0Ds.inp" in the "Pipeline Browser" menu, which should be in the left side of the screen; then click above in the drop-down menu where is written "Material Id" and click on  the "ShortPath" beside a cube;
 
-    - Click on "Cell1Ds.inp" in the "Pipeline Browser" menu, which should be in the left side of the screen; then click above in the drop-down menu where is written "Material Id" and click on  the "ShortPath" beside a cube;
+    2. Click on "Cell1Ds.inp" in the "Pipeline Browser" menu, which should be in the left side of the screen; then click above in the drop-down menu where is written "Material Id" and click on  the "ShortPath" beside a cube;
 
-    - Inside the "Properties" menu, in the "Coloring" section, click on the button where is written "Edit"; a "Color Map Editor" menu should appear on the right side of the screen. Inside it, click on the box beside "Interpret Values As Categories";
+    3. Inside the "Properties" menu, in the "Coloring" section, click on the button where is written "Edit"; a "Color Map Editor" menu should appear on the right side of the screen. Inside it, click on the box beside "Interpret Values As Categories";
 
-    - Modify the size of the points and of the edges respectively belonging to "Cell0Ds.inp" and "Cell1Ds.inp" through the "Properties" menu.
+    4. Modify the size of the points and of the edges respectively belonging to "Cell0Ds.inp" and "Cell1Ds.inp" through the "Properties" menu.
 
 
 More details
