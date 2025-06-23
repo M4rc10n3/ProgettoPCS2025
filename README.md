@@ -32,6 +32,6 @@ Per visualizzare il modello generato, è necessario seguire i seguenti passaggi:
 
    Caricare i file .inp ottenuti sul sito https://meshconverter.it/it, convertirli da file .ucd a file .vtu.
 
-   Una volta ottenuto il file .vtu, è possibile caricarlo nel visualizzatore online https://kitware.github.io/glance/app/ per esplorare in modo interattivo la geometria del poliedro proiettato sulla sfera.
+   Una volta ottenuti i file .vtu, è possibile caricarli nel visualizzatore online https://kitware.github.io/glance/app/ per esplorare in modo interattivo la geometria del poliedro proiettato sulla sfera.
 
 Per maggiori informazioni consultare la cartella Documentation con una spiegazione più dettagliata del progetto. 
