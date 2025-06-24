@@ -24,7 +24,6 @@ int main(int argc, char* argv[])
     else {
         executable = argv[0];
     }
-    //
     
     if(argc != 5 && argc != 7) // check if there is a compatible number of inputs 
     {
