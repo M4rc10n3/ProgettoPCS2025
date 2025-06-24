@@ -12,12 +12,9 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     int p, q, b, c, id_vertex_1, id_vertex_2; // initialize all the variables
-    // TODO: da togliere prima di consegnare
     string executable;
-    //
     vector<string> parameters;
 
-    // TODO: da togliere prima di consegnare
     if (strcmp(argv[0], "gdb") == 0) // check if you're using gdb for Debug and avoids unnecessary input errors
     {
         argc--;
