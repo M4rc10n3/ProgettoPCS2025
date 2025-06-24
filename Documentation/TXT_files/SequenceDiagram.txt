@@ -42,10 +42,6 @@ participant Dijkstra as Dj
 
 m -\ GP ** : (//p//, //q//)
 m \- GP : **<color #470968>polyhedron</color> **
-||15||
-hnote over m, GP
-**Exporting** if the input was only (//p//, //q//)
-endhnote
 ||10||
 
 == Tessellating ==
