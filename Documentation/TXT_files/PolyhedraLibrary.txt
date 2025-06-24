@@ -66,10 +66,15 @@ struct GEOPolyhedron {
   + void MinimumPath(const vector<int>& **<color:#3BAF49>minPath</color>**, GEOPolyhedron& **<color #470968>polyhedron</color>**, const double& **<color:#CE2A39>lengthPath</color>**, Path& **<color:#E255B1>minimumPath</color>**))
   
   .. TEST POLYHEDRON ..
-  TestOntoTheUnitSphereTetrahedron              TestBFS
-  TestOntoTheUnitSphereOctahedron               TestDijkstra
-  TestOntoTheUnitSphereIcosahedron              TestFindBarycenter
-  TestOntoTheUnitSphereMoreGeneral             TestDistanceSquaredBetween
+  TestBFS
+  TestDijkstra
+  TestMinimumPath
+  TestFindBarycenter
+  TestDistanceSquaredBetween
+  TestOntoTheUnitSphereTetrahedron              
+  TestOntoTheUnitSphereOctahedron               
+  TestOntoTheUnitSphereIcosahedron              
+  TestOntoTheUnitSphereMoreGeneral             
   }
   
 struct Path {

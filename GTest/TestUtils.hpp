@@ -203,6 +203,7 @@ TEST(TestUtils, TestOntoTheUnitSphereMoreGeneral)
 
 TEST(TestUtils, TestBFS)
 {
+    // Adjacency list representing the graph
     vector<vector<int>> adjList = { {1, 2},     // vertex 0 
                                     {2},        // vertex 1 
                                     {0, 3, 4},  // vertex 2 
@@ -211,25 +212,32 @@ TEST(TestUtils, TestBFS)
                                     {4, 3} };   // vertex 5  
     int v1 = 2;
     int v2 = 5;
+
+    // Create a polyhedron object and set the number of vertices
     GEOPolyhedron polyhedron;
     polyhedron.NumVertices = 6;
     polyhedron.CoordVertices.resize(3, 6); 
-    polyhedron.CoordVertices <<0, 0, 0, 0, 1, -1,
+    polyhedron.CoordVertices <<0, 0, 0, 0, 1, -1, // assign coordinates to the vertices — needed by polyhedron.DistanceSquaredBetween() in the BFS function
                                 0, 0, 1, -1, 0, 0,
                                 1, -1, 0, 0, 0, 0;
     double lengthPath = 0.0;
+
+    // Find the minimum path from vertex 2 to vertex 5 using the function to be tested
     vector<int> minPathBFS = BFS(adjList, polyhedron, v1, v2, lengthPath);
-    vector<int> minPathEx = {2, 4, 5};
+    vector<int> minPathEx = {2, 4, 5}; // expected minumum path: 2 → 4 → 5
+    
     EXPECT_EQ(minPathBFS, minPathEx);
 }
 
 TEST(TestUtils, TestDijkstra)
 {
+    // Adjacency list representing the weighted graph
     vector<vector<int>> adjList = { {1, 2, 3, 4},   // vertex 0 
                                     {0},            // vertex 1 
                                     {1, 3, 4},      // vertex 2 
                                     {2, 4},         // vertex 3
                                     {0, 1} };       // vertex 4
+    // Define the weight matrix (weight = 0 means no direct edge from i to j)                                    
     MatrixXd matrWeights(5, 5); 
     matrWeights << 0, 5, 2, 3, 4,
                    5, 0, 0, 0, 0,
@@ -238,19 +246,26 @@ TEST(TestUtils, TestDijkstra)
                    4, 1, 0, 0, 0; 
     int v1 = 3;
     int v2 = 0;
+
+    // Create a polyhedron object and set the number of vertices
     GEOPolyhedron polyhedron;
     polyhedron.NumVertices = 5;
     double lengthPath = 0.0;
+
+    // Find the minimum path from vertex 3 to vertex 0 using the function to be tested
     vector<int> minPathDijkstra = Dijkstra(adjList, polyhedron, v1, v2, matrWeights, lengthPath);
-    vector<int> minPathEx = {3, 4, 0};
+    vector<int> minPathEx = {3, 4, 0}; // expected minumum path: 3 → 4 → 0
+
     EXPECT_EQ(minPathDijkstra, minPathEx);
     EXPECT_DOUBLE_EQ(lengthPath, 6.0);
 
-    vector<vector<int>> adjList1 = { {1, 2},        // vertex 0 
-                                    {0, 2, 3, 4},   // vertex 1 
-                                    {0, 1, 4},      // vertex 2 
-                                    {1, 4},         // vertex 3
-                                    {1, 2, 3} };    // vertex 4
+    // Repeat the test using a different weighted graph
+
+    vector<vector<int>> adjList1 = { {1, 2},         // vertex 0 
+                                     {0, 2, 3, 4},   // vertex 1 
+                                     {0, 1, 4},      // vertex 2 
+                                     {1, 4},         // vertex 3
+                                     {1, 2, 3} };    // vertex 4
     MatrixXd matrWeights1(5, 5); 
     matrWeights1 << 0, 10, 1, 0, 0,
                    10, 0, 2, 9, 5,
@@ -259,12 +274,56 @@ TEST(TestUtils, TestDijkstra)
                    0, 5, 20, 3, 0; 
     int v1_1 = 3;
     int v2_1 = 2;
-    // int numVert1 = 5;
     double lengthPath1 = 0.0;
     vector<int> minPathDijkstra1 = Dijkstra(adjList1, polyhedron, v1_1, v2_1, matrWeights1, lengthPath1);
     vector<int> minPathEx1 = {3, 4, 1, 2};
+
     EXPECT_EQ(minPathDijkstra1, minPathEx1);
     EXPECT_DOUBLE_EQ(lengthPath1, 10.0);
+}
+
+TEST(TestUtils, TestMinimumPath)
+{
+    // Set a weighted graph and use Dijkstra's algorithm to find the minimum path
+
+    vector<vector<int>> adjList = { {1, 2},         // vertex 0 
+                                    {0, 2, 3, 4},   // vertex 1 
+                                    {0, 1, 4},      // vertex 2 
+                                    {1, 4},         // vertex 3
+                                    {1, 2, 3} };    // vertex 4
+    MatrixXd matrWeights(5, 5); 
+    matrWeights << 0, 10, 1, 0, 0,
+                   10, 0, 2, 9, 5,
+                   1, 2, 0, 0, 20,
+                   0, 9, 0, 0, 3,
+                   0, 5, 20, 3, 0;
+    int v1 = 3;
+    int v2 = 2;
+    GEOPolyhedron polyhedron;
+    polyhedron.NumVertices = 5;
+    polyhedron.NumEdges = 7;
+    polyhedron.MatrEdgeVertices = MatrixXi(5, 5);
+    polyhedron.MatrEdgeVertices << -1, 0, 1, -1, -1,
+                                   0, -1, 2, 3, 4,
+                                   1, 2, -1, -1, 5,
+                                   -1, 3, -1, -1, 6,
+                                   -1, 4, 5, 6, -1;
+    double lengthPath = 0.0;
+    vector<int> minPathDijkstra = Dijkstra(adjList, polyhedron, v1, v2, matrWeights, lengthPath);
+    
+    // Define the Path struct and run the function to be tested
+    Path minimumPath;
+    MinimumPath(minPathDijkstra, polyhedron, lengthPath, minimumPath);
+
+    // Retrieve the updated ShortPath vectors from the Path struct
+    vector<double>& VerticesShortPath = minimumPath.VerticesShortPath;
+    vector<double>& EdgesShortPath = minimumPath.EdgesShortPath;
+
+    vector<double> VerticesShortPathEx = {0.0, 1.0, 1.0, 1.0, 1.0}; // expected vertices in the path: 1, 2, 3, 4
+    vector<double> EdgesShortPathEx = {0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0}; // expected edges in the path: 2, 4, 6
+
+    EXPECT_EQ(VerticesShortPath, VerticesShortPathEx);
+    EXPECT_EQ(EdgesShortPath, EdgesShortPathEx);
 }
 
 TEST(TestUtils, TestDistanceSquaredBetween)

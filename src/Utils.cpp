@@ -73,7 +73,7 @@ vector<int> BFS(const vector<vector<int>>& adjList,
                 }
                 reverse(minPath.begin(), minPath.end());
 
-                // calculate the minimum path's length
+                // Compute the minimum path's length
                 for(unsigned int i = 0; i < minPath.size() - 1; i++){
                     int& firstVertex = minPath[i];
                     int& secondVertex = minPath[i + 1];
@@ -101,7 +101,7 @@ vector<int> Dijkstra(const vector<vector<int>>& adjList,
     
     for(int i = 0; i < numVert; i++) 
     {
-        predecessor[i] = -1; // Initialize all predecessors to -1
+        predecessor[i] = -1; // initialize all predecessors to -1
         distance[i] = inf; // initialize all distances to "infinity"
     }
     
@@ -109,10 +109,10 @@ vector<int> Dijkstra(const vector<vector<int>>& adjList,
     predecessor[v1] = v1;
     distance[v1] = 0.0;
 
-    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>> pq; // std::greater<int> makes the max priority queue act as a min priority queue;
-                                                                                                 // std::pair<T1, T2> is a class template that provides a way to store two heterogeneous objects as a single unit,
-                                                                                                 // in this case it stores the distance of each vertex from the source v1 (as the first element,
-                                                                                                 // since it represents the priority in the queue) and the vertex id as the second element
+    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>> pq; /* std::greater<int> makes the max priority queue act as a min priority queue;
+                                                                                                    std::pair<T1, T2> is a class template that provides a way to store two heterogeneous objects as a single unit,
+                                                                                                    in this case it stores the distance of each vertex from the source v1 (as the first element,
+                                                                                                    since it represents the priority in the queue) and the vertex id as the second element */
     for(int i = 0; i < numVert; i++) 
     {
         pq.push({distance[i], i}); // initialize the priority queue
@@ -156,7 +156,7 @@ vector<int> Dijkstra(const vector<vector<int>>& adjList,
     minPath.push_back(v1);
     reverse(minPath.begin(), minPath.end());
     
-    // Calculate the length of the minimum path
+    // Compute the length of the minimum path
     for(unsigned int i = 1; i < minPath.size(); i++)
     {
         lengthPath += matrWeights(minPath[i-1], minPath[i]);

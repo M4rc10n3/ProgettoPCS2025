@@ -1,6 +1,6 @@
 # PCSProject2025
 
-The hereby project was made by Anna Dalmasso, Manuel Macis e Marco Odasso. The objective of the code is to generate a geodetic polyehdron or a generalised Goldberg polyhedron, after tessellating the respective starting platonic polyhedron and then projecting it onto the unit sphere. Moreover, the program finds the minimum path between two vertices of the generated polyhedron.
+The hereby project was made by Anna Dalmasso, Manuel Macis and Marco Odasso. The objective of the code is to generate a geodetic polyehdron or a generalised Goldberg polyhedron, after tessellating the respective starting platonic polyhedron and then projecting it onto the unit sphere. Moreover, the program finds the minimum path between two vertices of the generated polyhedron.
 
 The name of the executable is './PlatonicSolids': it generates the desired polyhedron based on the parameters given as input.
 
