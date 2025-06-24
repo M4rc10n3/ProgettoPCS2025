@@ -1,0 +1,76 @@
+@startuml
+<style>
+partition{
+    RoundCorner 7
+}
+
+package{
+    RoundCorner 7
+    LineColor #6BC2FA
+    BackgroundColor #BCE5FF}
+</style>
+skinparam defaultFontSize 14
+skinparam titleFontName Serif
+skinparam titleFontSize 18
+skinparam titleBorderColor Black
+skinparam titleBorderThickness 2
+skinparam titleBorderRoundCorner 10
+title BFS
+split
+    -[hidden]->
+    :adjList; <<input>>
+split again
+    -[hidden]->
+    :**<color #470968>polyhedron</color>**; <<input>>
+split again
+    -[hidden]->
+    :**<color #DC143C>v1</color>**; <<input>>
+split again
+    -[hidden]->
+    :**<color #1E90FF>v2</color>**; <<input>>
+split again
+    -[hidden]->
+    :**<color #9932CC>lengthPath</color>**; <<input>>
+end split
+-> Passing arguments to function;
+:Initializing the vectors **<color #008000>reached</color>** and **<color #008080>predecessor</color>**; <<task>>
+
+-> Creating the **<color #FF8C00>queue</color>**;
+:Add **<color #DC143C>v1</color>** to the **<color #FF8C00>queue</color>** using <i>.push()</i>
+        and mark it as **<color #008000>reached</color>**; <<procedure>>
+
+repeat
+    partition Repeating until the **<color #FF8C00>queue</color>** is empty {
+    :Dequeue the first vertex **<color #0000CD>u</color>** in the **<color #FF8C00>queue</color>**
+                using <i>.front()</i> and <i>.pop()</i>; <<procedure>>
+    repeat
+        partition New vertex **<color #32CD32>w</color>** adjacent to **<color #0000CD>u</color>** {
+            if (Has the vertex **<color #32CD32>w</color>** already been **<color #008000>reached</color>**?) then (<color:red>yes)
+            :continue; <<continuous>>
+            else (<color:green>no)
+            :  Mark **<color #32CD32>w</color>** as **<color #008000>reached</color>** and
+            save **<color #0000CD>u</color>** as its **<color #008080>predecessor</color>**; <<procedure>>
+            :Add **<color #32CD32>w</color>** to the **<color #FF8C00>queue</color>**
+                   using <i>.push()</i>; <<procedure>>
+            endif
+            if (Has the target vertex **<color #1E90FF>v2</color>** been reached?) then (<color:green>yes)
+            :Reconstruct the path from **<color #1E90FF>v2</color>** back to **<color #DC143C>v1</color>**
+            (using the **<color #008080>predecessor</color>** of each vertex); <<procedure>>
+            :Reverse the created vector 
+            to obtain the minimum path; <<procedure>>
+            :             Compute the **<color #9932CC>lengthPath</color>** using
+            sqrt(**<color #470968>polyhedron</color>**<i>.DistanceSquaredBetween()</i>); <<save>>
+            :Output the list of vertices
+                  in the minimum path; <<output>>
+            stop
+            else (<color:red>no)
+            :continue; <<continuous>>
+            endif
+        }
+    repeat while (All vertices adjacent to **<color #0000CD>u</color>** have been considered?) is (<color:red>no) not (<color:green>yes)
+    }
+repeat while (Is the **<color #FF8C00>queue</color>** empty?) is (<color:red>no) not (<color:green>yes)
+:No minimum path has been found;
+-> Returning an empty vector;
+stop
+@enduml

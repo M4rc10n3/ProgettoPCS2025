@@ -213,6 +213,10 @@ TEST(TestUtils, TestBFS)
     int v2 = 5;
     GEOPolyhedron polyhedron;
     polyhedron.NumVertices = 6;
+    polyhedron.CoordVertices.resize(3, 6); 
+    polyhedron.CoordVertices <<0, 0, 0, 0, 1, -1,
+                                0, 0, 1, -1, 0, 0,
+                                1, -1, 0, 0, 0, 0;
     double lengthPath = 0.0;
     vector<int> minPathBFS = BFS(adjList, polyhedron, v1, v2, lengthPath);
     vector<int> minPathEx = {2, 4, 5};

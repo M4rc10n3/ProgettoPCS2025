@@ -1,0 +1,86 @@
+@startuml
+<style>
+partition{
+    RoundCorner 7
+}
+
+package{
+    RoundCorner 7
+    LineColor #6BC2FA
+    BackgroundColor #BCE5FF}
+</style>
+skinparam defaultFontSize 14
+skinparam titleFontName Serif
+skinparam titleFontSize 18
+skinparam titleBorderColor Black
+skinparam titleBorderThickness 2
+skinparam titleBorderRoundCorner 10
+title Dijkstra
+split
+    -[hidden]->
+    :adjList; <<input>>
+split again
+    -[hidden]->
+    :**<color #470968>polyhedron</color>**; <<input>>
+split again
+    -[hidden]->
+    :**<color #DC143C>v1</color>**; <<input>>
+split again
+    -[hidden]->
+    :**<color #1E90FF>v2</color>**; <<input>>
+split again
+    -[hidden]->
+    :**<color #808000>matrWeights</color>**; <<input>>
+split again
+    -[hidden]->
+    :**<color #9932CC>lengthPath</color>**; <<input>>
+end split
+-> Passing arguments to function;
+:Initializing the vectors **<color #C71585>distance</color>** and **<color #008080>predecessor</color>**; <<task>>
+
+:Setting the source vertex **<color #DC143C>v1</color>**; <<task>>
+
+-> Creating the **<color #FF8C00>priority_queue</color>**;
+:Initializing the **<color #FF8C00>priority_queue</color>**; <<task>>
+
+repeat
+    partition Repeating until the **<color #FF8C00>priority_queue</color>** is empty {
+    :Dequeue the first vertex **<color #0000CD>u</color>** in the **<color #FF8C00>priority_queue</color>** using 
+    <i>.top()</i> and <i>.pop()</i> and saving its distance from **<color #DC143C>v1</color>** as <i>dist_u</i>; <<procedure>>
+    if (Has a shorter **<color #C71585>distance</color>** (than <i>dist_u</i>) already been found?) then (<color:red>yes)
+    :continue; <<continuous>>
+    else (<color:green>no)
+    endif
+    repeat
+        partition New vertex **<color #32CD32>w</color>** adjacent to **<color #0000CD>u</color>** {
+            if (Passing through **<color #0000CD>u</color>** gives a shorter path to **<color #32CD32>w</color>**?) then (<color:green>yes)
+            :Update the **<color #C71585>distance</color>** to **<color #32CD32>w</color>** 
+            with the one passing through **<color #0000CD>u</color>**; <<procedure>>
+            :Set **<color #0000CD>u</color>** as the **<color #008080>predecessor</color>** of **<color #32CD32>w</color>**; <<procedure>>
+            :Add the updated **<color #C71585>distance</color>** to the
+              **<color #FF8C00>priority_queue</color>** using <i>.push()</i>; <<procedure>>
+            else (<color:red>no)
+            :continue; <<continuous>>
+            endif
+        }
+    repeat while (All vertices adjacent to **<color #0000CD>u</color>** have been considered?) is (<color:red>no) not (<color:green>yes)
+    }
+repeat while (Is the **<color #FF8C00>priority_queue</color>** empty?) is (<color:red>no) not (<color:green>yes)
+
+if (Has the target vertex **<color #1E90FF>v2</color>** been reached?) then (<color:green>yes)
+:Reconstruct the path from **<color #1E90FF>v2</color>** back to **<color #DC143C>v1</color>**
+ (using the **<color #008080>predecessor</color>** of each vertex); <<procedure>>
+:Reverse the created vector 
+to obtain the minimum path; <<procedure>>
+:Compute the **<color #9932CC>lengthPath</color>**
+   using **<color #808000>matrWeights</color>**; <<save>>
+:Output the list of vertices
+      in the minimum path; <<output>>
+else (<color:red>no)
+:No minimum path has been found;
+-> Returning an empty vector;
+stop
+endif
+
+stop
+@enduml

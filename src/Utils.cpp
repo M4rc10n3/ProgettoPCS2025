@@ -54,13 +54,13 @@ vector<int> BFS(const vector<vector<int>>& adjList,
         q.pop();
         for(int w : adjList[u])
         {
-            if(!reached[w]) // check if the predecessor vertex hasn't been visited yet
+            if(!reached[w]) // check if vertex w has not been visited yet
             {
                 reached[w] = true; // mark as visited
-                predecessor[w] = u; // save the predecessor of w
+                predecessor[w] = u; // save u as the predecessor of w
                 q.push(w); // add to the queue
             }    
-            if(w == v2)
+            if(w == v2) // check if the target vertex has been reached
             {
                 // Reconstruct the path from v2 back to v1  (using the predecessor of each vertex 
                 // and finally reversing the created vector)
@@ -170,21 +170,25 @@ void MinimumPath(const vector<int>& minPath,
                  const double& lengthPath,
                  Path& minimumPath)
 {
+    // Retrieve some attributes from the polyhedron
     const int& numVert = polyhedron.NumVertices;
     const int& numEdge = polyhedron.NumEdges;
     Eigen::MatrixXi& MatrEdgeVertices = polyhedron.MatrEdgeVertices;
 
+    // Access the ShortPath vectors in the Path struct
     vector<double>& VerticesShortPath = minimumPath.VerticesShortPath;
     vector<double>& EdgesShortPath = minimumPath.EdgesShortPath;
 
-    
+    // Initialize the ShortPath vectors to the correct size and set all values to 0.0
     VerticesShortPath.resize(numVert, 0.0);
     EdgesShortPath.resize(numEdge, 0.0);
 
+    // Assign the property ShortPath = 1.0 to the vertices that belong to the minimum path
     for(auto vertexId : minPath){
         VerticesShortPath[vertexId] = 1.0;
     }
 
+    // Assign the property ShortPath = 1.0 to the edges that belong to the minimum path
     for(unsigned int vertexId = 0; vertexId < minPath.size() - 1; vertexId++){
         const int& vertex1 = minPath[vertexId];
         const int& vertex2 = minPath[vertexId + 1];
@@ -192,7 +196,7 @@ void MinimumPath(const vector<int>& minPath,
         EdgesShortPath[edgeId] = 1.0;
     }
     
-    // Output the minimum path (through the ids of the vertices that compose it) and its length
+    // Output the minimum path (as a sequence of its vertex ids), the number of edges and its total length
     cout << "The minimum path is: ";
     for(unsigned int i = 0; i < minPath.size(); i++){
         if(i != minPath.size() - 1){
